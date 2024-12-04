@@ -1,8 +1,8 @@
 "use client";
 declare global {
-interface Window {
-    adsbygoogle?: any[];
-}
+    interface Window {
+        adsbygoogle?: any[];
+    }
 }
 
 import Script from 'next/script';
