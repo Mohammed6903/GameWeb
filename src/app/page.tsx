@@ -1,13 +1,21 @@
-import { Button } from "@/components/ui/button";
-import Image from "next/image";
+import React from 'react'
+import Navbar from '@/components/NavBar';
+import { AppSideBar } from '@/components/AppSideBar';
+import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';import { Button } from '@/components/ui/button'
+import Link from 'next/link'
 
-export default function Home() {
+const page = () => {
   return (
-   <div>
-    <Button>
-      Hello
-    </Button>
-    Hello
-   </div>
-  );
+    <SidebarProvider>
+    <Navbar />
+    <main className="flex">
+      <AppSideBar />
+      <div className="flex-1 p-8">
+        {/* Your main content goes here */}
+      </div>
+    </main>
+  </SidebarProvider>
+  )
 }
+
+export default page
