@@ -1,6 +1,7 @@
 "use client"
 import React from 'react';
 import dynamic from 'next/dynamic';
+import { createClient } from "@/lib/utils/supabase/client";
 import { ApexOptions } from 'apexcharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { 
@@ -10,11 +11,17 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-
+import { redirect } from "next/navigation";
+import { useEffect, useState } from 'react';
+import { useRouter } from "next/navigation";
+ 
 // Dynamically import ApexCharts to ensure client-side rendering
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
 export default function GameAnalyticsDashboard() {
+  const router = useRouter();
+  const supabase = createClient();
+
   // Mock data - in a real implementation, this would come from your API
   const gameStats = {
     totalGames: 42,
@@ -69,6 +76,34 @@ export default function GameAnalyticsDashboard() {
   };
 
   const gameCategorySeries = [30, 25, 20, 25];
+
+  useEffect(() => {
+    const checkUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        try{
+          if(session.user?.id) {
+            console.log(session.user);
+          }
+        } catch (error) {
+          console.error('Database error:', error);
+        }
+        router.push('/admin');
+      }
+    };
+    
+    checkUser();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' && session) {
+        router.push('/admin'); // in future add role manager
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [router, supabase]);
 
   return (
     <div className="space-y-6 p-6 bg-white">
