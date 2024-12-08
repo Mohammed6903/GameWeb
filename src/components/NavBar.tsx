@@ -1,32 +1,59 @@
-import Image from 'next/image';
-import { FaUserCircle } from 'react-icons/fa';
-import { BiSearch } from 'react-icons/bi';
-import { Input } from '@/components/ui/input';
+"use client"
 
-export default function NavBar() {
+import Link from "next/link"
+import { Bell, Heart, Search } from 'lucide-react'
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { SidebarTrigger } from "@/components/ui/sidebar"
+
+export function NavBar() {
   return (
-    <div className="bg-blue-300 w-full h-16 flex items-center justify-between px-4 md:px-8">
-      <a href="/" className="flex items-center">
-        <Image
-          src="/logogame.png"
-          alt="Game Logo"
-          width={100}
-          height={40}
-          className="h-10 md:h-12"
-        />
-      </a>
-      <div className="flex items-center space-x-4 md:space-x-6">
-        <div className="relative">
-          <BiSearch className="absolute top-1/2 left-3 transform -translate-y-1/2 text-gray-400" />
-          <Input
-            placeholder="Search games..."
-            className="bg-[#3F3F4F] rounded-md pl-10 pr-4 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-[#4C4F6F]"
-          />
+    <header className="sticky top-0 z-50 border-b border-white/10 bg-purple-700">
+      <nav className="flex justify-between h-14 w-full">
+        <div className="flex items-center gap-3">
+          <SidebarTrigger className="-ml-2 text-white/80 hover:text-white" />
+          <Link href="/" className="flex items-center gap-2">
+            <div className="size-8 rounded-lg bg-white/20 flex items-center justify-center">
+              <span className="text-sm font-bold text-white">GG</span>
+            </div>
+            <span className="font-semibold text-white">GameGrid</span>
+          </Link>
         </div>
-        <a href="/login" className="text-white hover:text-gray-300 transition-colors duration-200">
-          <FaUserCircle className="w-6 h-6 md:w-7 md:h-7" />
-        </a>
-      </div>
-    </div>
-  );
+        
+        <div className="flex-1 flex items-center justify-center max-w-lg mx-6">
+          <div className="w-full relative group">
+            <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-white/50 group-focus-within:text-white/70" />
+            <Input
+              placeholder="Search games..."
+              className="h-9 w-full pl-9 bg-white/10 border-transparent text-white placeholder:text-white/50 focus:bg-white/20 focus:border-white/20"
+            />
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 mr-2">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="text-white/80 hover:text-white hover:bg-white/10"
+          >
+            <Bell className="size-5" />
+          </Button>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="text-white/80 hover:text-white hover:bg-white/10"
+          >
+            <Heart className="size-5" />
+          </Button>
+          <Button 
+            size="sm" 
+            className="ml-1.5 bg-white/20 hover:bg-white/30 text-white font-medium"
+          >
+            Log in
+          </Button>
+        </div>
+      </nav>
+    </header>
+  )
 }
+
