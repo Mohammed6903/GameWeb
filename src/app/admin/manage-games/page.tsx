@@ -1,13 +1,13 @@
 "use client"
 import React, { useState } from 'react';
-import dynamic from 'next/dynamic';
+// import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { 
   Gamepad, 
   Search, 
   Plus, 
   Edit, 
-  Trash2 
+  // Trash2 
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';

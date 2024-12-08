@@ -9,7 +9,7 @@ export default function AddGamePage() {
     'use server';
     
     try {
-      const newGame = await addGame(gameData);
+      // const newGame = await addGame(gameData);
       
       // Show success toast and redirect
       toast.success('Game added successfully');

@@ -1,7 +1,7 @@
-import { GameForm } from '@/components/admin/GameForm';
+// import { GameForm } from '@/components/admin/GameForm';
 import { getGameById, updateGame } from '@/lib/api/games';
 import { redirect } from 'next/navigation';
-import { Game, GameFormData } from '@/types/games';
+// import { Game, GameFormData } from '@/types/games';
 import EditGameClient from './EditGameClient';
 
 export default async function EditGamePage({ 
