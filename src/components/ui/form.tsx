@@ -12,11 +12,7 @@ import {
   useFormContext,
 } from "react-hook-form"
 
-<<<<<<< HEAD
-import { cn } from "@/lib/utils"
-=======
 import { cn } from "@/lib/utils/cn"
->>>>>>> 9e77cfbce397bad25cb33d0228761e4dcd867137
 import { Label } from "@/components/ui/label"
 
 const Form = FormProvider
@@ -84,11 +80,7 @@ const FormItem = React.forwardRef<
 
   return (
     <FormItemContext.Provider value={{ id }}>
-<<<<<<< HEAD
-      <div ref={ref} className={cn("space-y-2", className)} {...props} />
-=======
       <div ref={ref} className={cn("space-y-2", className as string)} {...props} />
->>>>>>> 9e77cfbce397bad25cb33d0228761e4dcd867137
     </FormItemContext.Provider>
   )
 })
@@ -103,11 +95,7 @@ const FormLabel = React.forwardRef<
   return (
     <Label
       ref={ref}
-<<<<<<< HEAD
-      className={cn(error && "text-destructive", className)}
-=======
       className={cn(error ? "text-destructive" : "", className as string)}
->>>>>>> 9e77cfbce397bad25cb33d0228761e4dcd867137
       htmlFor={formItemId}
       {...props}
     />
@@ -147,11 +135,7 @@ const FormDescription = React.forwardRef<
     <p
       ref={ref}
       id={formDescriptionId}
-<<<<<<< HEAD
-      className={cn("text-[0.8rem] text-muted-foreground", className)}
-=======
       className={cn("text-[0.8rem] text-muted-foreground", className as string)}
->>>>>>> 9e77cfbce397bad25cb33d0228761e4dcd867137
       {...props}
     />
   )
@@ -173,11 +157,7 @@ const FormMessage = React.forwardRef<
     <p
       ref={ref}
       id={formMessageId}
-<<<<<<< HEAD
-      className={cn("text-[0.8rem] font-medium text-destructive", className)}
-=======
       className={cn("text-[0.8rem] font-medium text-destructive", className as string)}
->>>>>>> 9e77cfbce397bad25cb33d0228761e4dcd867137
       {...props}
     >
       {body}
