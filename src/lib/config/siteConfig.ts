@@ -79,7 +79,7 @@ type SiteConfig = {
 const siteConfig: SiteConfig = {
   general: {
     siteName: "My Awesome Website",
-    siteUrl: "https://www.myawesomewebsite.com",
+    siteUrl: "http://localhost:8080",
     logo: "/images/logo.svg",
     favicon: "/favicon.ico",
   },

@@ -21,6 +21,7 @@ const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 export default function GameAnalyticsDashboard() {
   const router = useRouter();
   const supabase = createClient();
+  const [confirmedUser, setConfirmed] = useState(false);
 
   // Mock data - in a real implementation, this would come from your API
   const gameStats = {
@@ -79,27 +80,77 @@ export default function GameAnalyticsDashboard() {
 
   useEffect(() => {
     const checkUser = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        try{
-          if(session.user?.id) {
-            console.log(session.user);
-          }
-        } catch (error) {
-          console.error('Database error:', error);
+      try {
+        console.log('Checking user session'); // Initial log
+        
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        
+        console.log('Session data:', session);
+        console.log('Session error:', sessionError);
+  
+        // If there's an error getting the session
+        if (sessionError) {
+          console.error('Session retrieval error:', sessionError);
+          router.push('/sign-in');
+          return;
         }
+  
+        // If no session exists
+        if (!session) {
+          console.log('No active session found');
+          router.push('/sign-in');
+          return;
+        }
+  
+        // Additional checks for user and email verification
+        if (!session.user) {
+          console.log('No user in session');
+          router.push('/sign-in');
+          return;
+        }
+  
+        const confirmed = session.user.user_metadata.email_verified;
+        console.log('Email verified:', confirmed);
+  
+        if (!confirmed && session.user.email) {
+          console.log('Sending verification email');
+          const { error } = await supabase.auth.resend({
+            type: 'signup',
+            email: session.user.email,
+            options: {
+              emailRedirectTo: `http://localhost:8080/auth/callback`
+            }
+          });
+  
+          if (error) {
+            console.error('Verification email resend error:', error);
+          } else {
+            console.log('Verification email resent successfully');
+          }
+        } else {
+          setConfirmed(true);
+        }
+  
         router.push('/admin');
+      } catch (error) {
+        console.error('Unexpected error in checkUser:', error);
+        router.push('/sign-in');
       }
     };
     
     checkUser();
-
+  
+    // Optional: Add auth state change listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log('Auth state change event:', event);
+      console.log('Session on auth state change:', session);
+      
       if (event === 'SIGNED_IN' && session) {
-        router.push('/admin'); // in future add role manager
+        router.push('/admin');
       }
     });
-
+  
+    // Cleanup subscription
     return () => {
       subscription.unsubscribe();
     };

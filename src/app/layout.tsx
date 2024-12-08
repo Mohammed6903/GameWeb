@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import siteConfig from "@/lib/config/siteConfig";
+import Script from "next/script";
 
 const geistSans = localFont({
   src: "fonts/GeistVF.woff",
@@ -16,7 +17,7 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: siteConfig.seo.title,
+  title: siteConfig.general.siteName,
   description: siteConfig.seo.description,
 };
 
@@ -29,6 +30,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         {children}
+        <Script src="https://accounts.google.com/gsi/client" strategy="beforeInteractive" />
       </body>
     </html>
   );
