@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import { redirect } from "next/navigation";
 import { useEffect, useState } from 'react';
 import { useRouter } from "next/navigation";
+import {jwtDecode} from "jwt-decode";
  
 // Dynamically import ApexCharts to ensure client-side rendering
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
@@ -81,38 +82,22 @@ export default function GameAnalyticsDashboard() {
   useEffect(() => {
     const checkUser = async () => {
       try {
-        console.log('Checking user session'); // Initial log
-        
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+
+        if (!session?.user.email) {
+          router.push('/sign-in');
+        }
+
+        const {data: roleData, error: roleError} = await supabase.from('user_roles').select('role').eq('user_id', session?.user.id).single();
+        if (roleError || roleData?.role !== 'admin') {
+          router.push('/permission-denied');
+        } else {
+          console.log(roleData?.role);
+        }
         
-        console.log('Session data:', session);
-        console.log('Session error:', sessionError);
+        const confirmed = session?.user.user_metadata.email_verified;
   
-        // If there's an error getting the session
-        if (sessionError) {
-          console.error('Session retrieval error:', sessionError);
-          router.push('/sign-in');
-          return;
-        }
-  
-        // If no session exists
-        if (!session) {
-          console.log('No active session found');
-          router.push('/sign-in');
-          return;
-        }
-  
-        // Additional checks for user and email verification
-        if (!session.user) {
-          console.log('No user in session');
-          router.push('/sign-in');
-          return;
-        }
-  
-        const confirmed = session.user.user_metadata.email_verified;
-        console.log('Email verified:', confirmed);
-  
-        if (!confirmed && session.user.email) {
+        if (!confirmed && session?.user.email) {
           console.log('Sending verification email');
           const { error } = await supabase.auth.resend({
             type: 'signup',
@@ -129,22 +114,20 @@ export default function GameAnalyticsDashboard() {
           }
         } else {
           setConfirmed(true);
-        }
-  
-        router.push('/admin');
+        }  
       } catch (error) {
         console.error('Unexpected error in checkUser:', error);
         router.push('/sign-in');
       }
+      const providers = await supabase.from('providers').select('*');
+      console.log(providers);
     };
     
     checkUser();
+
   
     // Optional: Add auth state change listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log('Auth state change event:', event);
-      console.log('Session on auth state change:', session);
-      
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' && session) {
         router.push('/admin');
       }

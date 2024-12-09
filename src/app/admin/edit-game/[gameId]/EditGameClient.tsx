@@ -1,20 +1,31 @@
 'use client';
 
-// import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { GameForm } from '@/components/admin/GameForm';
-import { updateGame } from '@/lib/api/games';
+import { updateGame } from '@/lib/controllers/games';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { Game, GameFormData } from '@/types/games';
+import { Provider } from '@/components/admin/ProviderForm';
+import { getAllProviders } from '@/lib/controllers/providers';
 
 export default function EditGameClient({ 
   initialGame, 
   gameId 
 }: { 
   initialGame: Game, 
-  gameId: string 
+  gameId: number
 }) {
+  const [providers, setProviders] = useState<Provider[]>([]);
   const router = useRouter();
+
+  useEffect(() => {
+    const fetchProviders = async () => {
+      const result = await getAllProviders();
+      setProviders(result);
+    }
+    fetchProviders();
+  },[]);
 
   const handleUpdateGame = async (gameData: GameFormData) => {
     try {
@@ -38,6 +49,8 @@ export default function EditGameClient({
       <GameForm 
         initialData={initialGame} 
         onSubmit={handleUpdateGame}  
+        providers={providers} 
+        categories={['2 player', 'fun']}
       />
     </div>
   );

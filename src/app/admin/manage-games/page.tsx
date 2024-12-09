@@ -21,7 +21,7 @@ import {
   TableRow 
 } from '@/components/ui/table';
 import { DeleteGameDialog } from '@/components/admin/DeleteGameDialog';
-import { getAllGames, deleteGame } from '@/lib/api/games';
+import { getAllGames, deleteGame } from '@/lib/controllers/games';
 import { Game } from '@/types/games';
 
 export default function ManageGamesPage() {

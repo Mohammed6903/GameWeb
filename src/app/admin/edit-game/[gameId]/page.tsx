@@ -1,5 +1,5 @@
 // import { GameForm } from '@/components/admin/GameForm';
-import { getGameById, updateGame } from '@/lib/api/games';
+import { getGameById, updateGame } from '@/lib/controllers/games';
 import { redirect } from 'next/navigation';
 // import { Game, GameFormData } from '@/types/games';
 import EditGameClient from './EditGameClient';
@@ -7,7 +7,7 @@ import EditGameClient from './EditGameClient';
 export default async function EditGamePage({ 
   params 
 }: { 
-  params: { gameId: string } 
+  params: { gameId: number } 
 }) {
   const game = await getGameById(params.gameId);
 

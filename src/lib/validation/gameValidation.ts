@@ -6,7 +6,9 @@ export const gameFormSchema = z.object({
   gameUrl: z.string().url({ message: "Invalid URL format" }),
   tags: z.array(z.string()).optional(),
   status: z.enum(['active', 'inactive']).default('active'),
-  thumbnailFile: z.instanceof(File).optional()
+  thumbnailFile: z.instanceof(File).optional(),
+  providerId: z.number().optional(),
+  categories: z.array(z.string()).min(1, { message: "At least one category must be selected" }),
 });
 
 export const validateGameForm = (data: unknown) => {

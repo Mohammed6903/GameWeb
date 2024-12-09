@@ -5,9 +5,11 @@ export interface Game {
   thumbnailUrl?: string;
   gameUrl: string;
   tags?: string[];
+  providerId: string;
+  categories: string[]
   status: 'active' | 'inactive';
-  createdAt?: Date;
-  updatedAt?: Date;
+  created_at?: Date;
+  updated_at?: Date;
 }
 
 export interface GameFormData extends Omit<Game, 'id' | 'createdAt' | 'updatedAt'> {

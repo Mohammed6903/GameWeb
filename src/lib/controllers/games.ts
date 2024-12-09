@@ -1,5 +1,6 @@
-// src/lib/api/games.ts
 import { Game, GameFormData } from '@/types/games';
+import { ApiClient } from '../utils/supabase/apiClient';
+import { supabaseAdmin } from '../utils/supabase/admin';
 
 // Mock games data
 const mockGames: Game[] = [
@@ -11,8 +12,10 @@ const mockGames: Game[] = [
     thumbnailUrl: 'https://via.placeholder.com/150',
     status: 'active',
     tags: ['Arcade', 'Shooter'],
-    createdAt: new Date(),
-    updatedAt: new Date()
+    categories: ['2 player games', 'game for kids'],
+    providerId: '1',
+    created_at: new Date(),
+    updated_at: new Date()
   },
   {
     id: '2',
@@ -22,23 +25,37 @@ const mockGames: Game[] = [
     thumbnailUrl: 'https://via.placeholder.com/150',
     status: 'inactive',
     tags: ['Puzzle', 'Strategy'],
-    createdAt: new Date(),
-    updatedAt: new Date()
+    categories: ['2 player games', 'game for kids'],
+    providerId: '1',
+    created_at: new Date(),
+    updated_at: new Date()
   }
 ];
 
-export async function addGame(gameData: GameFormData): Promise<Game> {
-  const newGame: Game = {
-    id: (mockGames.length + 1).toString(),
-    ...gameData,
-    thumbnailUrl: gameData.thumbnailFile 
-      ? 'https://via.placeholder.com/150' 
-      : undefined,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  };
-  mockGames.push(newGame);
-  return newGame;
+export async function addGame(gameData: GameFormData) {
+  try{
+    const { data, error } = await supabaseAdmin.from('games').insert({
+      name: gameData.title,
+      description: gameData.description,
+      play_url: gameData.gameUrl,
+      thumbnail_url: gameData.thumbnailUrl || null,
+      is_active: (gameData.status === 'active' ? true : false),
+      tags: gameData.tags,
+      categories: gameData.categories,
+      provider_id: Number(gameData.providerId),
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    }).select();
+
+    if (error) {
+      throw new Error(`Error inserting game: ${error.message}`);
+    }
+
+    return data;
+  } catch (err) {
+    console.error('Error adding game:', err);
+    throw err;
+  }
 }
 
 export async function updateGame(
@@ -56,7 +73,7 @@ export async function updateGame(
     thumbnailUrl: gameData.thumbnailFile 
       ? 'https://via.placeholder.com/150' 
       : mockGames[gameIndex].thumbnailUrl,
-    updatedAt: new Date()
+    updated_at: new Date()
   };
 
   return mockGames[gameIndex];
