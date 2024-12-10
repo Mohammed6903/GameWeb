@@ -14,7 +14,7 @@ export default function EditGameClient({
   gameId 
 }: { 
   initialGame: Game, 
-  gameId: number
+  gameId: string
 }) {
   const [providers, setProviders] = useState<Provider[]>([]);
   const router = useRouter();
