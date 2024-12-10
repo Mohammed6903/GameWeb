@@ -13,15 +13,13 @@ export async function uploadGameThumbnail(file: File): Promise<string> {
         upsert: false
     });
     if (error) {
-        console.log('Error uploading file: ', error);
+        throw new Error(`Error uploading file: ${error}`);
     }
 
     const {data} = supabase
     .storage
     .from('gameThumbnails')
-    .getPublicUrl(`${uploadedFile?.fullPath}`);
-
-    console.log(data.publicUrl);
+    .getPublicUrl(`${uploadedFile?.path}`);
     
     return data.publicUrl;
 }

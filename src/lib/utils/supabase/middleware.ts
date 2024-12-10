@@ -35,25 +35,21 @@ export const updateSession = async (request: NextRequest) => {
       },
     );
 
-    const user = await supabase.auth.getUser();
-    const {data: roleData, error: roleError} = await supabase.from('user_roles').select('role').eq('user_id', user.data.user?.id).single();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+    const {data: roleData, error: roleError} = await supabase.from('user_roles').select('role').eq('user_id', user?.id).single();
 
-    // protected routes
-    if (request.nextUrl.pathname.startsWith("/api/users")) {
-      if (user.error) {
-        return NextResponse.json(
-          { message: "Unauthorized: Please sign in." },
-          { status: 401 }
-        );
-      }
-    }
-
-    if (request.nextUrl.pathname.startsWith("/admin") && user.error){
-      return NextResponse.redirect(new URL("/sign-in", request.url));
-    }
-
-    if (request.nextUrl.pathname.startsWith("/admin") && (roleError || roleData?.role !== 'admin')) {
-      return NextResponse.redirect(new URL("/permission-denied", request.url));
+  
+    if (
+      !(user ? roleData?.role === 'admin' : true) &&
+      !request.nextUrl.pathname.startsWith('/api') &&
+      !request.nextUrl.pathname.startsWith('/admin')
+    ) {
+      // no user, potentially respond by redirecting the user to the login page
+      const url = request.nextUrl.clone()
+      url.pathname = '/sign-in'
+      return NextResponse.redirect(url)
     }
 
     return response;

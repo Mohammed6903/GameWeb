@@ -6,7 +6,6 @@ export async function GET() {
       const supabase = await createClient();
       const user = await supabase.auth.getUser();
       const {data: roleData, error: roleError} = await supabase.from('user_roles').select('role').eq('user_id', user.data.user?.id).single();
-      console.log(roleData?.role);
       if (!(user.data.user?.role === "authenticated")){
         return NextResponse.json(
           {error: "Not Signed In"},

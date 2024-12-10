@@ -1,10 +1,11 @@
+'use server'
 import { Provider, ProviderFormData } from "@/components/admin/ProviderForm";
-import { ApiClient } from "../utils/supabase/apiClient";
-import { supabaseAdmin } from "../utils/supabase/admin";
+import { createClient } from "../utils/supabase/server";
 
 export const addProvider = async (providerData: ProviderFormData) => {
+  const supabase = await createClient();
   try {
-    const { data, error } = await supabaseAdmin.from('providers').insert({
+    const { data, error } = await supabase.from('providers').insert({
       name: providerData.name,
       url: providerData.url,
       description: providerData.description || null,
@@ -24,11 +25,11 @@ export const addProvider = async (providerData: ProviderFormData) => {
 };
 
 export const getAllProviders = async (): Promise<Provider[]> => {
+    const supabase = await createClient();
     try {
-        // const { data, error } = await ApiClient.from('providers').select('*');
-        const { data, error } = await supabaseAdmin.from('providers').select('*');
-            if (error) {
-            throw new Error(`Error adding provider: ${error.message}`);
+        const { data, error } = await supabase.from('providers').select('*');
+          if (error) {
+          throw new Error(`Error adding provider: ${error.message}`);
         }
         return data;
     } catch (err) {

@@ -1,12 +1,14 @@
-import { supabaseAdmin } from "@/lib/utils/supabase/admin";
+'use server'
+import { createClient } from "@/lib/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
     const data = await request.json();
+    const supabase = await createClient();
     try {
         const { name, description, gameUrl, tags, status, providerId, thumbnailUrl, categories } = data;
         
-        const { data: newGame, error } = await supabaseAdmin
+        const { data: newGame, error } = await supabase
             .from('games')
             .insert({
                 name: name,

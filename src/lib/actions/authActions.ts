@@ -54,10 +54,8 @@ export const signInAction = async (formData: FormData) => {
     return encodedRedirect("error", "/sign-in", error.message);
   }
   if (data.user) {
-    console.log('User authenticated:', data.user);
     return redirect("/admin"); 
   } else {
-    console.log('No user data returned');
     return encodedRedirect("error", "/sign-in", "Authentication failed");
   }
 };

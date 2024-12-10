@@ -29,7 +29,9 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ScrollArea } from '../ui/scroll-area';
 import { Provider } from './ProviderForm';
-import { createClient } from '@/lib/utils/supabase/client';
+import { addCategory } from '@/lib/controllers/categories';
+import { addTag } from '@/lib/controllers/tags';
+// import { createClient } from '@/lib/utils/supabase/client';
 
 interface BaseGameFormProps {
   initialData: Partial<Game>;
@@ -125,9 +127,11 @@ export function BaseGameForm({ initialData, providers = [], categories = [], tag
     if (field === "categories") {
       setCustomCategory("");
       setOpenCategory(false);
+      addCategory(value);
     } else {
       setCustomTag("");
       setOpenTag(false);
+      addTag(value);
     }
   };
 
@@ -242,7 +246,9 @@ export function BaseGameForm({ initialData, providers = [], categories = [], tag
                     <CommandInput placeholder="Search categories..." onValueChange={setCustomCategory} />
                     <CommandList className='bg-white'>
                       <CommandEmpty>
-                        No category found.
+                        <h1>
+                          No category found.
+                        </h1>
                         <Button
                           type="button"
                           size="sm"

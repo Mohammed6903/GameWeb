@@ -30,10 +30,9 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { ScrollArea } from '../ui/scroll-area';
 import { Provider } from './ProviderForm';
 import { createClient } from '@/lib/utils/supabase/client';
-import { supabaseAdmin } from '@/lib/utils/supabase/admin';
 
 interface GameFormProps {
-  initialData: Partial<Game> ;
+  initialData: any ;
   providers: Provider[];
   categories: string[];
   tags: string[];
@@ -106,7 +105,6 @@ export function GameForm({ initialData, providers = [], categories = [], tags = 
       
       if (data.thumbnailFile) {
         const file = data.thumbnailFile;
-        console.log(data.thumbnailFile);
         const supabase = await createClient();
         // Return a placeholder URL for mock implementation
         const {data: uploadedFile, error} = await supabase
@@ -117,7 +115,7 @@ export function GameForm({ initialData, providers = [], categories = [], tags = 
             upsert: false
         });
         if (error) {
-            console.log('Error uploading file');
+            throw new Error(`Error uploading file: ${error}`)
         }
     
         const {data: res} = supabase
@@ -125,7 +123,6 @@ export function GameForm({ initialData, providers = [], categories = [], tags = 
         .from('gameThumbnails')
         .getPublicUrl(`${uploadedFile?.fullPath}`);
     
-        console.log(res.publicUrl);
         // const thumbnail_url = await uploadGameThumbnail(data.thumbnailFile);
         data.thumbnail_url = res.publicUrl;
         delete data.thumbnailFile;
@@ -135,9 +132,6 @@ export function GameForm({ initialData, providers = [], categories = [], tags = 
       await onSubmit(submitData);
     } catch (error) {
       console.error("Form submission error:", error);
-    } finally {
-      const { thumbnailFile, thumbnail_url, ...submitData } = data;
-      console.log(thumbnail_url);
     }
   };
 

@@ -27,7 +27,6 @@ const SquareAd: React.FC<GoogleAdProps> = ({
         try {
         // Ensure window is defined (client-side only)
             if (typeof window !== 'undefined') {
-                console.log('here')
                 // Push the ad configuration when the component mounts
                 // (window.adsbygoogle = window.adsbygoogle || []).push({});
                 const adsbygoogle = window.adsbygoogle || []

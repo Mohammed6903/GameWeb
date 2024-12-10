@@ -1,10 +1,8 @@
 "use client"
 
 import { useEffect, useState } from 'react';
-import { GameForm } from '@/components/admin/GameForm';
 import { ProviderForm, ProviderFormData, Provider } from '@/components/admin/ProviderForm';
-import { addGame } from '@/lib/controllers/games';
-import { addProvider, getAllProviders } from '@/lib/controllers/providers';
+import { addProvider } from '@/lib/controllers/providers';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { GameFormData } from '@/types/games';
@@ -16,20 +14,25 @@ import axios from 'axios';
 export default function AddGamePage() {
   const [activeTab, setActiveTab] = useState('add-game');
   const [providers, setProviders] = useState<Provider[]>([]);
+  const [categories, setCategories] = useState<any[]>([]);
+  const [tags, setTags] = useState<any[]>([]);
   const router = useRouter();
 
   useEffect(() => {
-    const fetchProviders = async () => {
-      const result = await getAllProviders();
-      console.log(result);
-      setProviders(result);
+    const fetchAll = async () => {
+      const result = await axios.get('http://localhost:8080/api/providers');
+      setProviders(result.data.providers);
+      const catRes = (await axios.get('http://localhost:8080/api/categories')).data.categories.map((item: any) => item.category);
+      setCategories(catRes);
+      const tagRes = (await axios.get('http://localhost:8080/api/tags')).data.tags.map((item: any) => item.tag);
+      setTags(tagRes);
     }
-    fetchProviders();
+    fetchAll();
   },[]);
 
   const handleAddGame = async (gameData: GameFormData) => {
     try {
-      const newGame = await axios.post(`http://localhost:8080/api/game/create`, {
+      await axios.post(`http://localhost:8080/api/game/create`, {
         name: gameData.title,
         description: gameData.description,
         gameUrl: gameData.gameUrl,
@@ -39,7 +42,6 @@ export default function AddGamePage() {
         thumbnailUrl: gameData.thumbnail_url,
         categories: gameData.categories,
       })
-      console.log(newGame);
       toast.success('Game added successfully');
       router.push('/admin/manage-games');
     } catch (error) {
@@ -51,7 +53,6 @@ export default function AddGamePage() {
   const handleAddProvider = async (providerData: ProviderFormData) => {
     try {
       const newProvider = await addProvider(providerData);
-      console.log(newProvider);
       toast.success('Provider added successfully');
       setActiveTab('add-game');
     } catch (error) {
@@ -74,8 +75,7 @@ export default function AddGamePage() {
           </TabsList>
           <CardContent className="p-6">
             <TabsContent value="add-game">  
-              {/* <GameForm onSubmit={handleAddGame} providers={providers} categories={['2 player', 'fun']} tags={['fun', 'creative', 'unique']} initialData={{}}/> */}
-              <CreateGameForm onSubmit={handleAddGame} providers={providers} categories={['2 player', 'fun']} tags={['fun', 'creative', 'unique']} />
+              <CreateGameForm onSubmit={handleAddGame} providers={providers} categories={categories} tags={tags} />
             </TabsContent>
             <TabsContent value="add-provider">
               <ProviderForm onSubmit={handleAddProvider} />

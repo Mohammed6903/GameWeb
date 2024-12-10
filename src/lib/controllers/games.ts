@@ -1,6 +1,5 @@
 import { Game, GameFormData } from '@/types/games';
-import { ApiClient } from '@/lib/utils/supabase/apiClient';
-import { createClient } from '@/lib/utils/supabase/server';
+import { createClient } from "../utils/supabase/server";
 
 // Mock games data
 const mockGames: Game[] = [
@@ -47,7 +46,6 @@ export async function addGame(gameData: GameFormData) {
       // created_at: new Date().toISOString(),
       // updated_at: new Date().toISOString(),
     }).select();
-    console.log("End");
 
     if (error) {
       throw new Error(`Error inserting game: ${error.message}`);
@@ -92,8 +90,14 @@ export async function getAllGames(): Promise<Game[]> {
   return mockGames;
 }
 
-export async function getGameById(gameId: string): Promise<Game | null> {
-  return mockGames.find(game => game.id === gameId) || null;
+export async function getGameById(gameId: string) {
+  const supabase = await createClient();
+  try {
+    const game = await supabase.from('games').select().eq('id', gameId).single();
+    return game.data;
+  } catch (error) {
+    throw new Error(`Error fetching game: ${error}`);
+  }
 }
 
 export async function getGameStats() {
