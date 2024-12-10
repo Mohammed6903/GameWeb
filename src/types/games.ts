@@ -12,6 +12,13 @@ export interface Game {
   updated_at?: Date;
 }
 
+export interface RelatedGame {
+  id: string
+  title: string
+  thumbnail: string
+  slug: string
+}
+
 export interface GameFormData extends Omit<Game, 'id' | 'createdAt' | 'updatedAt'> {
   thumbnailFile?: File;
 }
