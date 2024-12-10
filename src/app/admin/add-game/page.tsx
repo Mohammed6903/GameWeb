@@ -10,6 +10,8 @@ import { toast } from 'sonner';
 import { GameFormData } from '@/types/games';
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { CreateGameForm } from '@/components/admin/CreateGameForm';
+import axios from 'axios';
 
 export default function AddGamePage() {
   const [activeTab, setActiveTab] = useState('add-game');
@@ -27,7 +29,16 @@ export default function AddGamePage() {
 
   const handleAddGame = async (gameData: GameFormData) => {
     try {
-      const newGame = await addGame(gameData);
+      const newGame = await axios.post(`http://localhost:8080/api/game/create`, {
+        name: gameData.title,
+        description: gameData.description,
+        gameUrl: gameData.gameUrl,
+        tags: gameData.tags,
+        status: gameData.status,
+        providerId: gameData.providerId,
+        thumbnailUrl: gameData.thumbnail_url,
+        categories: gameData.categories,
+      })
       console.log(newGame);
       toast.success('Game added successfully');
       router.push('/admin/manage-games');
@@ -63,7 +74,8 @@ export default function AddGamePage() {
           </TabsList>
           <CardContent className="p-6">
             <TabsContent value="add-game">  
-              <GameForm onSubmit={handleAddGame} providers={providers} categories={['2 player', 'fun']}/>
+              {/* <GameForm onSubmit={handleAddGame} providers={providers} categories={['2 player', 'fun']} tags={['fun', 'creative', 'unique']} initialData={{}}/> */}
+              <CreateGameForm onSubmit={handleAddGame} providers={providers} categories={['2 player', 'fun']} tags={['fun', 'creative', 'unique']} />
             </TabsContent>
             <TabsContent value="add-provider">
               <ProviderForm onSubmit={handleAddProvider} />

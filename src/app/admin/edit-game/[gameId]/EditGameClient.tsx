@@ -14,7 +14,7 @@ export default function EditGameClient({
   gameId 
 }: { 
   initialGame: Game, 
-  gameId: number
+  gameId: string
 }) {
   const [providers, setProviders] = useState<Provider[]>([]);
   const router = useRouter();
@@ -51,6 +51,7 @@ export default function EditGameClient({
         onSubmit={handleUpdateGame}  
         providers={providers} 
         categories={['2 player', 'fun']}
+        tags={['fun', 'creative', 'unique']}
       />
     </div>
   );

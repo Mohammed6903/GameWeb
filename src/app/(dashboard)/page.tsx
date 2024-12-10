@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Gamepad2, Laptop2, Users2, Sparkles } from 'lucide-react'
+import React from "react";
 
 export default function Page() {
   return (

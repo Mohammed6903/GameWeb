@@ -2,7 +2,7 @@ export interface Game {
   id: string;
   title: string;
   description: string;
-  thumbnailUrl?: string;
+  thumbnail_url?: string;
   gameUrl: string;
   tags?: string[];
   providerId: string;

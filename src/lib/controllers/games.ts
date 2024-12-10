@@ -1,6 +1,6 @@
 import { Game, GameFormData } from '@/types/games';
-import { ApiClient } from '../utils/supabase/apiClient';
-import { supabaseAdmin } from '../utils/supabase/admin';
+import { ApiClient } from '@/lib/utils/supabase/apiClient';
+import { createClient } from '@/lib/utils/supabase/server';
 
 // Mock games data
 const mockGames: Game[] = [
@@ -9,7 +9,7 @@ const mockGames: Game[] = [
     title: 'Space Invaders',
     description: 'Classic arcade space shooting game',
     gameUrl: 'https://example.com/space-invaders',
-    thumbnailUrl: 'https://via.placeholder.com/150',
+    thumbnail_url: 'https://via.placeholder.com/150',
     status: 'active',
     tags: ['Arcade', 'Shooter'],
     categories: ['2 player games', 'game for kids'],
@@ -22,7 +22,7 @@ const mockGames: Game[] = [
     title: 'Puzzle Master',
     description: 'Challenging puzzle game with multiple levels',
     gameUrl: 'https://example.com/puzzle-master',
-    thumbnailUrl: 'https://via.placeholder.com/150',
+    thumbnail_url: 'https://via.placeholder.com/150',
     status: 'inactive',
     tags: ['Puzzle', 'Strategy'],
     categories: ['2 player games', 'game for kids'],
@@ -33,19 +33,21 @@ const mockGames: Game[] = [
 ];
 
 export async function addGame(gameData: GameFormData) {
+  const supabase = await createClient();
   try{
-    const { data, error } = await supabaseAdmin.from('games').insert({
+    const { data, error } = await supabase.from('games').insert({
       name: gameData.title,
       description: gameData.description,
       play_url: gameData.gameUrl,
-      thumbnail_url: gameData.thumbnailUrl || null,
+      thumbnail_url: gameData.thumbnail_url || null,
       is_active: (gameData.status === 'active' ? true : false),
       tags: gameData.tags,
       categories: gameData.categories,
       provider_id: Number(gameData.providerId),
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
+      // created_at: new Date().toISOString(),
+      // updated_at: new Date().toISOString(),
     }).select();
+    console.log("End");
 
     if (error) {
       throw new Error(`Error inserting game: ${error.message}`);
@@ -70,9 +72,9 @@ export async function updateGame(
   mockGames[gameIndex] = {
     ...mockGames[gameIndex],
     ...gameData,
-    thumbnailUrl: gameData.thumbnailFile 
+    thumbnail_url: gameData.thumbnailFile 
       ? 'https://via.placeholder.com/150' 
-      : mockGames[gameIndex].thumbnailUrl,
+      : mockGames[gameIndex].thumbnail_url,
     updated_at: new Date()
   };
 
@@ -100,9 +102,4 @@ export async function getGameStats() {
     activeGames: mockGames.filter(game => game.status === 'active').length,
     inactiveGames: mockGames.filter(game => game.status === 'inactive').length
   };
-}
-
-export async function uploadGameThumbnail(file: File): Promise<string> {
-  // Return a placeholder URL for mock implementation
-  return 'https://via.placeholder.com/150';
 }

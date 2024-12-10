@@ -35,17 +35,25 @@ export const updateSession = async (request: NextRequest) => {
       },
     );
 
-    // This will refresh session if expired - required for Server Components
-    // https://supabase.com/docs/guides/auth/server-side/nextjs
     const user = await supabase.auth.getUser();
+    const {data: roleData, error: roleError} = await supabase.from('user_roles').select('role').eq('user_id', user.data.user?.id).single();
 
     // protected routes
-    if (request.nextUrl.pathname.startsWith("/admin") && user.error) {
+    if (request.nextUrl.pathname.startsWith("/api/users")) {
+      if (user.error) {
+        return NextResponse.json(
+          { message: "Unauthorized: Please sign in." },
+          { status: 401 }
+        );
+      }
+    }
+
+    if (request.nextUrl.pathname.startsWith("/admin") && user.error){
       return NextResponse.redirect(new URL("/sign-in", request.url));
     }
 
-    if (request.nextUrl.pathname === "/" && !user.error) {
-      return NextResponse.redirect(new URL("/admin", request.url));
+    if (request.nextUrl.pathname.startsWith("/admin") && (roleError || roleData?.role !== 'admin')) {
+      return NextResponse.redirect(new URL("/permission-denied", request.url));
     }
 
     return response;

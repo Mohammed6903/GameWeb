@@ -88,13 +88,6 @@ export default function GameAnalyticsDashboard() {
           router.push('/sign-in');
         }
 
-        const {data: roleData, error: roleError} = await supabase.from('user_roles').select('role').eq('user_id', session?.user.id).single();
-        if (roleError || roleData?.role !== 'admin') {
-          router.push('/permission-denied');
-        } else {
-          console.log(roleData?.role);
-        }
-        
         const confirmed = session?.user.user_metadata.email_verified;
   
         if (!confirmed && session?.user.email) {

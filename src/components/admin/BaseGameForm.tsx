@@ -30,17 +30,17 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { ScrollArea } from '../ui/scroll-area';
 import { Provider } from './ProviderForm';
 import { createClient } from '@/lib/utils/supabase/client';
-import { supabaseAdmin } from '@/lib/utils/supabase/admin';
 
-interface GameFormProps {
-  initialData: Partial<Game> ;
+interface BaseGameFormProps {
+  initialData: Partial<Game>;
   providers: Provider[];
   categories: string[];
   tags: string[];
   onSubmit: (data: GameFormData) => Promise<void>;
+  submitButtonText: string;
 }
 
-export function GameForm({ initialData, providers = [], categories = [], tags = [], onSubmit }: GameFormProps) {
+export function BaseGameForm({ initialData, providers = [], categories = [], tags = [], onSubmit, submitButtonText }: BaseGameFormProps) {
   const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(
     initialData?.thumbnail_url || null
   );
@@ -63,7 +63,7 @@ export function GameForm({ initialData, providers = [], categories = [], tags = 
       thumbnail_url: initialData.thumbnail_url || "",
     },
   });
-  
+
   const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -105,29 +105,8 @@ export function GameForm({ initialData, providers = [], categories = [], tags = 
       }
       
       if (data.thumbnailFile) {
-        const file = data.thumbnailFile;
-        console.log(data.thumbnailFile);
-        const supabase = await createClient();
-        // Return a placeholder URL for mock implementation
-        const {data: uploadedFile, error} = await supabase
-        .storage
-        .from('gameThumbnails')
-        .upload(`public/${file.name}-${file.size}`, file, {
-            cacheControl: '3600',
-            upsert: false
-        });
-        if (error) {
-            console.log('Error uploading file');
-        }
-    
-        const {data: res} = supabase
-        .storage
-        .from('gameThumbnails')
-        .getPublicUrl(`${uploadedFile?.fullPath}`);
-    
-        console.log(res.publicUrl);
-        // const thumbnail_url = await uploadGameThumbnail(data.thumbnailFile);
-        data.thumbnail_url = res.publicUrl;
+        const publicUrl = await uploadGameThumbnail(data.thumbnailFile);
+        data.thumbnail_url = publicUrl;
         delete data.thumbnailFile;
       }
 
@@ -135,9 +114,6 @@ export function GameForm({ initialData, providers = [], categories = [], tags = 
       await onSubmit(submitData);
     } catch (error) {
       console.error("Form submission error:", error);
-    } finally {
-      const { thumbnailFile, thumbnail_url, ...submitData } = data;
-      console.log(thumbnail_url);
     }
   };
 
@@ -484,7 +460,7 @@ export function GameForm({ initialData, providers = [], categories = [], tags = 
         )}
 
         <Button type="submit">
-          {initialData ? "Update Game" : "Add Game"}
+          {submitButtonText}
         </Button>
       </form>
     </Form>

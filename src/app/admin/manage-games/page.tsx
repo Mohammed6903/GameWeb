@@ -107,9 +107,9 @@ export default function ManageGamesPage() {
               {filteredGames.map((game) => (
                 <TableRow key={game.id}>
                   <TableCell>
-                    {game.thumbnailUrl ? (
+                    {game.thumbnail_url ? (
                       <img
-                        src={game.thumbnailUrl}
+                        src={game.thumbnail_url}
                         alt={`${game.title} thumbnail`}
                         className="w-16 h-16 object-cover rounded"
                       />

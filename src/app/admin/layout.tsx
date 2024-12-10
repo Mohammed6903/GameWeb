@@ -9,10 +9,10 @@ export default async function Layout({
 }: {
   children: React.ReactNode;
 }) {
-  const supabase = createClient();
+  const supabase = await createClient();
 
 
-  const output = (await supabase).auth.getUser();
+  const res = await supabase.auth.getUser();
   // if ((await output).data.user?.role !== 'supabase_admin') {
   //   return redirect("/permission-denied");
   // }
@@ -20,6 +20,11 @@ export default async function Layout({
   // if (!(await output).data.user?.email) {
   //   return redirect("/sign-in");
   // }
+  
+  const {data: roleData, error: roleError} = await supabase.from('user_roles').select('role').eq('user_id', res.data.user?.id).single();
+  if (roleError || roleData?.role !== 'admin') {
+    return redirect('/permission-denied');
+  }
 
   return (
     <div className="flex h-screen">

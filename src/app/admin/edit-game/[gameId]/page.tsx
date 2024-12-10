@@ -7,7 +7,7 @@ import EditGameClient from './EditGameClient';
 export default async function EditGamePage({ 
   params 
 }: { 
-  params: { gameId: number } 
+  params: { gameId: string } 
 }) {
   const game = await getGameById(params.gameId);
 
