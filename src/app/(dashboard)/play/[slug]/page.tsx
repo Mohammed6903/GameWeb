@@ -1,11 +1,10 @@
-import { Maximize2, Minimize2, Tag, Clock, Star } from 'lucide-react'
+import { Maximize2, Minimize2, Tag, Clock, Star, ThumbsUp, ThumbsDown } from 'lucide-react'
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { CommentSection } from '@/components/comment'
 import { RelatedGames } from './relatedgame'
 import { GameViewer } from '@/components/game-viewer'
-import { Game } from "@/types/game"
 import { getGameById } from '@/lib/controllers/games'
 import { FetchedGameData } from '@/types/games'
 
@@ -35,11 +34,11 @@ export default async function GamePage({ params }: GamePageProps) {
                 {game.name}
               </h1>
               <div className="flex items-center space-x-2">
-                <Button variant="outline" size="icon" className="text-white hover:bg-purple-700">
-                  <Minimize2 className="h-5 w-5" />
+                <Button variant="outline" size="icon" className="text-black bg-white hover:bg-purple-700 hover:text-white">
+                  <ThumbsUp className="h-5 w-5" />
                 </Button>
-                <Button variant="outline" size="icon" className="text-white hover:bg-purple-700">
-                  <Maximize2 className="h-5 w-5" />
+                <Button variant="outline" size="icon" className="text-black bg-white hover:bg-purple-700 hover:text-white">
+                  <ThumbsDown className="h-5 w-5" />
                 </Button>
               </div>
             </div>

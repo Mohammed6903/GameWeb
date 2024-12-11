@@ -4,13 +4,18 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Card } from "@/components/ui/card"
 import { FetchedGameData } from '@/types/games'
+import { useRouter } from 'next/navigation'
 
 interface FeaturedGamesProps {
   games: FetchedGameData[]
 }
 
 export function FeaturedGames({ games }: FeaturedGamesProps) {
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const router = useRouter();
+  const openGame = (gameId: string) => {
+    router.push(`/play/${gameId}`);
+  }
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -25,6 +30,7 @@ export function FeaturedGames({ games }: FeaturedGamesProps) {
             className="group relative overflow-hidden rounded-2xl bg-white/5 border-transparent hover:bg-white/10 transition-all duration-300 cursor-pointer"
             onMouseEnter={() => setHoveredIndex(index)}
             onMouseLeave={() => setHoveredIndex(null)}
+            onClick={() => openGame(game.id)}
           >
             <img 
               src={game.thumbnail_url || '/placeholder.png'}
