@@ -6,11 +6,11 @@ import { Button } from "@/components/ui/button"
 import Image from "next/image"
 
 interface GameViewerProps {
-  gameUrl: string
+  play_url: string
   thumbnail?: string  // Make thumbnail optional
 }
 
-export function GameViewer({ gameUrl, thumbnail }: GameViewerProps) {
+export function GameViewer({ play_url, thumbnail }: GameViewerProps) {
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [isPlaying, setIsPlaying] = useState(false)
 
@@ -32,7 +32,7 @@ export function GameViewer({ gameUrl, thumbnail }: GameViewerProps) {
           </Button>
         </div>
         <iframe
-          src={gameUrl}
+          src={play_url}
           className="w-full h-full"
           allow="fullscreen"
         />
@@ -67,7 +67,7 @@ export function GameViewer({ gameUrl, thumbnail }: GameViewerProps) {
       ) : (
         <div className="relative aspect-video">
           <iframe
-            src={gameUrl}
+            src={play_url}
             className="w-full h-full"
             allow="fullscreen"
           />

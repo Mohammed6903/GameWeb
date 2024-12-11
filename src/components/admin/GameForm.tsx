@@ -52,12 +52,12 @@ export function GameForm({ initialData, providers = [], categories = [], tags = 
   const form = useForm<GameFormData>({
     resolver: zodResolver(gameFormSchema),
     defaultValues: {
-      title: initialData.title || "",
+      name: initialData.name || "",
       description: initialData.description || "",
-      gameUrl: initialData.gameUrl || "",
+      play_url: initialData.play_url || "",
       tags: initialData.tags || [],
-      status: initialData.status || "active",
-      providerId: initialData.providerId || "",
+      status: initialData.is_active ? 'active' : 'inactive',
+      provider_id: initialData.provider_id || "",
       categories: initialData.categories || [],
       thumbnail_url: initialData.thumbnail_url || "",
     },
@@ -154,7 +154,7 @@ export function GameForm({ initialData, providers = [], categories = [], tags = 
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6 pb-4">
         <FormField
           control={form.control}
-          name="title"
+          name="name"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Game Title</FormLabel>
@@ -182,7 +182,7 @@ export function GameForm({ initialData, providers = [], categories = [], tags = 
 
         <FormField
           control={form.control}
-          name="gameUrl"
+          name="play_url"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Game URL</FormLabel>
@@ -380,7 +380,7 @@ export function GameForm({ initialData, providers = [], categories = [], tags = 
 
         <FormField
           control={form.control}
-          name="providerId"
+          name="provider_id"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Provider</FormLabel>
@@ -409,7 +409,7 @@ export function GameForm({ initialData, providers = [], categories = [], tags = 
                             <CommandItem
                               key={provider.id}
                               onSelect={() => {
-                                form.setValue("providerId", provider.id);
+                                form.setValue("provider_id", provider.id);
                                 setOpenProvider(false);
                               }}
                             >

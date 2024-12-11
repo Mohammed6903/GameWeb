@@ -4,7 +4,7 @@ type ThemeOptions = 'light' | 'dark' | 'system';
 type NavigationLink = {
   label: string;
   href: string;
-  icon?: string; // Optional icon
+  icon?: string;
 };
 
 type SocialLink = {

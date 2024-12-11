@@ -75,7 +75,7 @@ export default function Page() {
             <Card key={i} className="group relative overflow-hidden rounded-lg bg-white/5 border-transparent hover:bg-white/10 transition-all">
               <img 
                 src="/game1.jpg?height=300&width=400"
-                alt={game.title}
+                alt={game.name}
                 className="w-full aspect-[4/3] object-cover group-hover:scale-105 transition-transform duration-300"
               />
               {game.tag && (
@@ -84,7 +84,7 @@ export default function Page() {
                 </span>
               )}
               <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent p-3">
-                <h3 className="text-base font-medium">{game.title}</h3>
+                <h3 className="text-base font-medium">{game.name}</h3>
               </div>
             </Card>
           ))}

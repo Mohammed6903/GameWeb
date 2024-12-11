@@ -12,16 +12,12 @@ export default async function EditGamePage({
   params: { gameId: string } 
 }) {
   try {
-    // Fetch game details
-    const response = await axios.get(`http://localhost:8080/api/game/byId/${params.gameId}`);
+    const response = await axios.get(`${process.env.NEXT_PUBLIC_SITE_URL}/api/game/byId/${params.gameId}`);
     const gameById = response.data.game;
 
-    const providers = (await axios.get('http://localhost:8080/api/providers')).data.providers;
-    // setProviders(result.data.providers);
-    const categories = (await axios.get('http://localhost:8080/api/categories')).data.categories.map((item: any) => item.category);
-    // setCategories(catRes);
-    const tags = (await axios.get('http://localhost:8080/api/tags')).data.tags.map((item: any) => item.tag);
-    // setTags(tagRes);
+    const providers = (await axios.get(`${process.env.NEXT_PUBLIC_SITE_URL}/api/providers`)).data.providers;
+    const categories = (await axios.get(`${process.env.NEXT_PUBLIC_SITE_URL}/api/categories`)).data.categories.map((item: any) => item.category);
+    const tags = (await axios.get(`${process.env.NEXT_PUBLIC_SITE_URL}/api/tags`)).data.tags.map((item: any) => item.tag);
 
     if (!gameById) {
       return redirect('/admin/manage-games');

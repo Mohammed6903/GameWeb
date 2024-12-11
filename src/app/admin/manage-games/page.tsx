@@ -22,16 +22,16 @@ import {
 } from '@/components/ui/table';
 import { DeleteGameDialog } from '@/components/admin/DeleteGameDialog';
 import { getAllGames, deleteGame } from '@/lib/controllers/games';
-import { Game } from '@/types/games';
+import { FetchedGameData, Game } from '@/types/games';
 
 export default function ManageGamesPage() {
   const [searchTerm, setSearchTerm] = useState('');
-  const [games, setGames] = React.useState([] as Game[]);
-  const [filteredGames, setFilteredGames] = React.useState([] as Game[]);
+  const [games, setGames] = React.useState([] as FetchedGameData[]);
+  const [filteredGames, setFilteredGames] = React.useState([] as FetchedGameData[]);
 
   React.useEffect(() => {
     async function loadGames() {
-      const fetchedGames: Game[] = await getAllGames();
+      const fetchedGames: FetchedGameData[] = await getAllGames();
       setGames(fetchedGames);
       setFilteredGames(fetchedGames);
     }
@@ -43,8 +43,7 @@ export default function ManageGamesPage() {
     setSearchTerm(term);
     
     const filtered = games.filter(game => 
-      game.title.toLowerCase().includes(term) ||
-      game.status.toLowerCase().includes(term)
+      game.name.toLowerCase().includes(term)
     );
     
     setFilteredGames(filtered);
@@ -110,7 +109,7 @@ export default function ManageGamesPage() {
                     {game.thumbnail_url ? (
                       <img
                         src={game.thumbnail_url}
-                        alt={`${game.title} thumbnail`}
+                        alt={`${game.name} thumbnail`}
                         className="w-16 h-16 object-cover rounded"
                       />
                     ) : (
@@ -119,18 +118,18 @@ export default function ManageGamesPage() {
                       </div>
                     )}
                   </TableCell>
-                  <TableCell className="font-medium">{game.title}</TableCell>
+                  <TableCell className="font-medium">{game.name}</TableCell>
                   <TableCell>
                     <span
                       className={`
                         px-2 py-1 rounded text-xs font-semibold
-                        ${game.status === 'active'
+                        ${(game.is_active)
                           ? 'bg-green-100 text-green-800'
                           : 'bg-red-100 text-red-800'
                         }
                       `}
                     >
-                      {game.status}
+                      {game.is_active ? 'active' : 'inactive' }
                     </span>
                   </TableCell>
                   <TableCell className="text-right">
@@ -142,7 +141,7 @@ export default function ManageGamesPage() {
                       </Link>
                       <DeleteGameDialog
                         gameId={game.id}
-                        gameTitle={game.title}
+                        gameTitle={game.name}
                         onDelete={() => handleDeleteGame(game.id)}
                       />
                     </div>

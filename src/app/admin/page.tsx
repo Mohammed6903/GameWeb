@@ -96,7 +96,7 @@ export default function GameAnalyticsDashboard() {
             type: 'signup',
             email: session.user.email,
             options: {
-              emailRedirectTo: `http://localhost:8080/auth/callback`
+              emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`
             }
           });
   
@@ -112,25 +112,10 @@ export default function GameAnalyticsDashboard() {
         console.error('Unexpected error in checkUser:', error);
         router.push('/sign-in');
       }
-      const providers = await supabase.from('providers').select('*');
-      console.log(providers);
     };
     
     checkUser();
-
-  
-    // Optional: Add auth state change listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' && session) {
-        router.push('/admin');
-      }
-    });
-  
-    // Cleanup subscription
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [router, supabase]);
+  }, []);
 
   return (
     <div className="space-y-6 p-6 bg-white">
@@ -163,9 +148,9 @@ export default function GameAnalyticsDashboard() {
             bg: 'bg-purple-50'
           }
         ].map((card) => (
-          <Card key={card.title} className={`${card.bg} border-none`}>
+          <Card key={card.name} className={`${card.bg} border-none`}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{card.title}</CardTitle>
+              <CardTitle className="text-sm font-medium">{card.name}</CardTitle>
               <card.icon className={`h-5 w-5 ${card.color}`} />
             </CardHeader>
             <CardContent>

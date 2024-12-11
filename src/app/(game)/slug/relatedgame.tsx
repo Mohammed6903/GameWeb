@@ -18,8 +18,8 @@ export const RelatedGames = ({ categories }: { categories: string[] }) => {
         <h2>Related Games</h2>
         {relatedGames.map((game) => (
           <div key={game.id} className="w-[200px] h-[200px] bg-white mt-4">
-            <h3>{game.title}</h3>
-            <img src={game.thumbnail} alt={game.title} />
+            <h3>{game.name}</h3>
+            <img src={game.thumbnail} alt={game.name} />
           </div>
         ))}
       </div>

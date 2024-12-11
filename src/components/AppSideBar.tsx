@@ -94,11 +94,11 @@ export function AppSideBar() {
           <SidebarGroupContent>
             <SidebarMenu>
               {mainNavItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
+                <SidebarMenuItem key={item.name}>
                   <SidebarMenuButton asChild>
                     <a href={item.url} className="flex items-center gap-2">
                       <item.icon className="size-5" />
-                      <span>{item.title}</span>
+                      <span>{item.name}</span>
                     </a>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -112,11 +112,11 @@ export function AppSideBar() {
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
+                <SidebarMenuItem key={item.name}>
                   <SidebarMenuButton asChild>
                     <a href={item.url}>
                       <item.icon />
-                      <span>{item.title}</span>
+                      <span>{item.name}</span>
                     </a>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

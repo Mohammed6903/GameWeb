@@ -8,7 +8,7 @@ export function AuthProviders() {
         await supabase.auth.signInWithOAuth({
             provider: 'google',
             options: {
-              redirectTo: `http://localhost:8080/auth/callback`,
+              redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`,
             },
         })          
     }

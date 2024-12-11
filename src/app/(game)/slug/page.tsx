@@ -15,7 +15,7 @@ const getGameBySlug = (slug: string): Game => {
     title: 'Thief Puzzle',
     description: 'Master stealth and strategy in Thief Puzzle – become the ultimate stealth master in this captivating 2D puzzle game!',
     thumbnail: '/game1.jpg',
-    gameUrl: '/games/thief-puzzle',
+    play_url: '/games/thief-puzzle',
     categories: ['puzzle', 'strategy'],
     platform: 'mobile'
   }
@@ -36,11 +36,11 @@ export default function GamePage({ params }: GamePageProps) {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Game Section */}
           <div className="lg:col-span-2 space-y-6">
-            <h1 className="text-3xl font-bold">{game.title}</h1>
+            <h1 className="text-3xl font-bold">{game.name}</h1>
             
             {/* Game Viewer Component */}
             <GameViewer 
-              gameUrl={game.gameUrl}
+              play_url={game.play_url}
               thumbnail={game.thumbnail}
             />
 

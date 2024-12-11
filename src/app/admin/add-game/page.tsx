@@ -20,11 +20,11 @@ export default function AddGamePage() {
 
   useEffect(() => {
     const fetchAll = async () => {
-      const result = await axios.get('http://localhost:8080/api/providers');
+      const result = await axios.get(`${process.env.NEXT_PUBLIC_SITE_URL}/api/providers`);
       setProviders(result.data.providers);
-      const catRes = (await axios.get('http://localhost:8080/api/categories')).data.categories.map((item: any) => item.category);
+      const catRes = (await axios.get(`${process.env.NEXT_PUBLIC_SITE_URL}/api/categories`)).data.categories.map((item: any) => item.category);
       setCategories(catRes);
-      const tagRes = (await axios.get('http://localhost:8080/api/tags')).data.tags.map((item: any) => item.tag);
+      const tagRes = (await axios.get(`${process.env.NEXT_PUBLIC_SITE_URL}/api/tags`)).data.tags.map((item: any) => item.tag);
       setTags(tagRes);
     }
     fetchAll();
@@ -32,13 +32,13 @@ export default function AddGamePage() {
 
   const handleAddGame = async (gameData: GameFormData) => {
     try {
-      await axios.post(`http://localhost:8080/api/game/create`, {
-        name: gameData.title,
+      await axios.post(`${process.env.NEXT_PUBLIC_SITE_URL}/api/game/create`, {
+        name: gameData.name,
         description: gameData.description,
-        gameUrl: gameData.gameUrl,
+        play_url: gameData.play_url,
         tags: gameData.tags,
-        status: gameData.status,
-        providerId: gameData.providerId,
+        is_active: gameData.status === 'active' ? true : false,
+        provider_id: gameData.provider_id,
         thumbnailUrl: gameData.thumbnail_url,
         categories: gameData.categories,
       })

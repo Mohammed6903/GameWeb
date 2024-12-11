@@ -1,4 +1,4 @@
-'use client';
+// 'use client';
 import { BaseGameForm } from './BaseGameForm';
 import { GameFormData } from '@/types/games';
 import { Provider } from '@/components/admin/ProviderForm';
