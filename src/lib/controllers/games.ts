@@ -98,6 +98,9 @@ export async function getGameById(gameId: string) {
   const supabase = await createClient();
   try {
     const game = await supabase.from('games').select().eq('id', gameId).single();
+    if (game.error) {
+      throw new Error(`Error fetching game: ${game.error}`)
+    }
     return game.data;
   } catch (error) {
     throw new Error(`Error fetching game: ${error}`);
