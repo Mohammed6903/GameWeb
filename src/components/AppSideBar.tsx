@@ -15,22 +15,22 @@ import {
 
 const mainNavItems = [
   {
-    title: "Recently Played",
+    name: "Recently Played",
     url: "/recent",
     icon: History,
   },
   {
-    title: "New Games",
+    name: "New Games",
     url: "/new",
     icon: Sparkles,
   },
   {
-    title: "Trending",
+    name: "Trending",
     url: "/trending",
     icon: Flame,
   },
   {
-    title: "Updated",
+    name: "Updated",
     url: "/updated",
     icon: RefreshCw,
   },
@@ -39,55 +39,61 @@ const mainNavItems = [
 // Menu items.
 const items = [
   {
-    title: "Action",
+    name: "Action",
     url: "#",
     icon: Home,
   },
   {
-    title: "Adventure",
+    name: "Adventure",
     url: "#",
     icon: Inbox,
   },
   {
-    title: "Arcade",
+    name: "Arcade",
     url: "#",
     icon: Calendar,
   },
   {
-    title: "Board Game",
+    name: "Board Game",
     url: "#",
     icon: Search,
   },
   {
-    title: "Dress-up",
+    name: "Dress-up",
     url: "#",
     icon: Settings,
   },
   {
-    title: "Driving",
+    name: "Driving",
     url: "#",
     icon: Settings,
   },
   {
-    title: "Multiplayer",
+    name: "Multiplayer",
     url: "#",
     icon: Settings,
   },
   {
-    title: "Puzzles",
+    name: "Puzzles",
     url: "#",
     icon: Settings,
   },
   {
-    title: "Sports",
+    name: "Sports",
     url: "#",
     icon: Settings,
   },
 ]
 
-export function AppSideBar() {
+type AppSideBarProps = {
+  visible: boolean;
+};
+
+export function AppSideBar(
+  { visible }: AppSideBarProps
+) {
   return (
-    <Sidebar>
+    <Sidebar visible={visible}>
       <SidebarHeader className="border-b" />
       <SidebarContent>
         <SidebarGroup>

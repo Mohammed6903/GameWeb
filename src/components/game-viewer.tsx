@@ -1,47 +1,43 @@
 'use client'
 
-import { useState } from "react"
+import { useState, useRef, useEffect } from "react"
 import { Maximize2, Minimize2 } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
 
 interface GameViewerProps {
   play_url: string
-  thumbnail?: string  // Make thumbnail optional
+  thumbnail?: string
 }
 
 export function GameViewer({ play_url, thumbnail }: GameViewerProps) {
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [isPlaying, setIsPlaying] = useState(false)
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement)
+    }
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange)
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange)
+    }
+  }, [])
 
   const toggleFullscreen = () => {
-    setIsFullscreen(!isFullscreen)
-  }
-
-  if (isFullscreen) {
-    return (
-      <div className="fixed inset-0 z-50 bg-black">
-        <div className="absolute top-4 right-4 z-10">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={toggleFullscreen}
-            className="text-white hover:bg-white/20"
-          >
-            <Minimize2 className="h-6 w-6" />
-          </Button>
-        </div>
-        <iframe
-          src={play_url}
-          className="w-full h-full"
-          allow="fullscreen"
-        />
-      </div>
-    )
+    if (!document.fullscreenElement) {
+      containerRef.current?.requestFullscreen().catch(err => {
+        console.error(`Error attempting to enable fullscreen: ${err.message}`)
+      })
+    } else {
+      document.exitFullscreen()
+    }
   }
 
   return (
-    <div className="relative rounded-lg overflow-hidden bg-[#2a1b52]">
+    <div ref={containerRef} className="relative rounded-lg overflow-hidden bg-[#2a1b52]">
       {!isPlaying ? (
         <div className="relative aspect-video">
           {thumbnail ? (
@@ -65,7 +61,7 @@ export function GameViewer({ play_url, thumbnail }: GameViewerProps) {
           </Button>
         </div>
       ) : (
-        <div className="relative aspect-video">
+        <div className={`relative ${isFullscreen ? 'w-screen h-screen' : 'aspect-video'}`}>
           <iframe
             src={play_url}
             className="w-full h-full"
@@ -77,11 +73,14 @@ export function GameViewer({ play_url, thumbnail }: GameViewerProps) {
             onClick={toggleFullscreen}
             className="absolute top-4 right-4 text-white hover:bg-white/20"
           >
-            <Maximize2 className="h-6 w-6" />
+            {isFullscreen ? (
+              <Minimize2 className="h-6 w-6" />
+            ) : (
+              <Maximize2 className="h-6 w-6" />
+            )}
           </Button>
         </div>
       )}
     </div>
   )
 }
-

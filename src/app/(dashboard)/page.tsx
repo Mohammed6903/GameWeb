@@ -1,119 +1,68 @@
-"use client"
-
-import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
+import { Suspense } from 'react'
 import { Gamepad2, Laptop2, Users2, Sparkles } from 'lucide-react'
-import React from "react";
+import { Button } from "@/components/ui/button"
+import { FeaturedGames } from '@/components/featured-games'
+import { AllGames } from '@/components/all-games'
+import { FetchedGameData } from '@/types/games'
+import { getAllGames } from '@/lib/controllers/games'
 
-export default function Page() {
+export default async function DashboardPage() {
+  const games = await getAllGames();
+
   return (
-    <div className="w-full p-3 text-white">
-      {/* Welcome Section */}
-      <section className="mb-6">
-        <div className="flex flex-col lg:flex-row lg:items-center gap-4">
-          <div className="flex justify-between items-center gap-4">
-            <div className="size-12 rounded-xl bg-violet-600 flex items-center justify-center shrink-0">
-              <Gamepad2 className="size-8 text-white" />
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-purple-900 text-white p-6 md:p-8 lg:p-12">
+      <div className="max-w-7xl mx-auto space-y-12">
+        {/* Welcome Section */}
+        <section className="bg-white/10 backdrop-blur-lg rounded-3xl p-6 md:p-8 shadow-xl">
+          <div className="flex flex-col lg:flex-row lg:items-center gap-6">
+            <div className="flex items-center gap-6">
+              <div className="size-16 rounded-2xl bg-violet-600 flex items-center justify-center shrink-0 shadow-lg">
+                <Gamepad2 className="size-10 text-white" />
+              </div>
+              <div>
+                <h1 className="text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500">
+                  Welcome to CrazyGames
+                </h1>
+                <p className="text-purple-300 mt-2">Play instantly, no downloads needed</p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-2xl text-red-600 font-bold">Welcome to CrazyGames</h1>
-              <p className="text-purple-400">Play instantly, no downloads needed</p>
+            <div className="flex flex-wrap lg:ml-auto gap-3">
+              <Button variant="ghost" size="lg" className="gap-2 text-gray-300 hover:text-white hover:bg-white/10">
+                <Laptop2 className="text-pink-500 size-5" />
+                {games.length}+ games
+              </Button>
+              <Button variant="ghost" size="lg" className="gap-2 text-gray-300 hover:text-white hover:bg-white/10">
+                <Users2 className="text-purple-500 size-5" />
+                Play with friends
+              </Button>
+              <Button variant="ghost" size="lg" className="gap-2 text-gray-300 hover:text-white hover:bg-white/10">
+                <Sparkles className="text-yellow-500 size-5" />
+                All for free
+              </Button>
             </div>
           </div>
-          <div className="flex flex-wrap lg:ml-auto gap-2">
-            <Button variant="ghost" size="sm" className="gap-2 text-gray-400">
-              <Laptop2 className="text-red-500 size-4" />
-              4000+ games
-            </Button>
-            <Button variant="ghost" size="sm" className="gap-2 text-gray-400">
-              <Users2 className="text-red-500 size-4" />
-              Play with friends
-            </Button>
-            <Button variant="ghost" size="sm" className="gap-2 text-gray-400">
-              <Sparkles className="text-red-500 size-4" />
-              All for free
-            </Button>
-          </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Featured Games */}
-      <section className="mb-6">
-        <h2 className="text-xl font-semibold mb-3">Featured games</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-6 gap-2">
-          {[
-            {
-              title: "Bloxd.io",
-              image: "/game1.jpg?height=200&width=400",
-              tag: "HOT"
-            },
-            {
-              title: "Racing Limits",
-              image: "/game1.jpg?height=200&width=400",
-              tag: "TOP RATED"
-            },
-            {
-              title: "Smash Karts",
-              image: "/game1.jpg?height=200&width=400",
-              tag: "UPDATED"
-            },
-            {
-              title: "Dead Shot",
-              image: "/game1.jpg?height=200&width=400",
-              tag: "NEW"
-            },
-            {
-              title: "Mini Car Racing",
-              image: "/game1.jpg?height=200&width=400",
-              tag: "HOT"
-            },
-            {
-              title: "Zombie Defense",
-              image: "/game1.jpg?height=200&width=400",
-              tag: "NEW"
-            }
-          ].map((game, i) => (
-            <Card key={i} className="group relative overflow-hidden rounded-lg bg-white/5 border-transparent hover:bg-white/10 transition-all">
-              <img 
-                src="/game1.jpg?height=300&width=400"
-                alt={game.name}
-                className="w-full aspect-[4/3] object-cover group-hover:scale-105 transition-transform duration-300"
-              />
-              {game.tag && (
-                <span className="absolute top-2 right-2 bg-violet-600 text-xs font-medium px-2 py-1 rounded">
-                  {game.tag}
-                </span>
-              )}
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent p-3">
-                <h3 className="text-base font-medium">{game.name}</h3>
-              </div>
-            </Card>
-          ))}
-        </div>
-      </section>
+        {/* Featured Games */}
+        <section>
+          <h2 className="text-2xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500">
+            Featured Games
+          </h2>
+          <Suspense fallback={<div className="h-64 bg-white/5 rounded-3xl animate-pulse"></div>}>
+            <FeaturedGames games={games.slice(0, 6)} />
+          </Suspense>
+        </section>
 
-      {/* All Games Grid */}
-      <section>
-        <h2 className="text-xl font-semibold mb-3">All Games</h2>
-        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-10 gap-2">
-          {Array.from({ length: 50 }).map((_, i) => (
-            <Card 
-              key={i} 
-              className="group relative overflow-hidden rounded-lg bg-white/5 border-transparent hover:bg-white/10 transition-all"
-            >
-              <div className="aspect-square relative">
-                <img
-                  src={`/game1.jpg?height=200&width=200`}
-                  alt={`Game ${i + 1}`}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-              </div>
-            </Card>
-          ))}
-        </div>
-      </section>
+        {/* All Games Grid */}
+        <section>
+          <h2 className="text-2xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500">
+            All Games
+          </h2>
+          <Suspense fallback={<div className="h-96 bg-white/5 rounded-3xl animate-pulse"></div>}>
+            <AllGames games={games} />
+          </Suspense>
+        </section>
+      </div>
     </div>
   )
 }
-

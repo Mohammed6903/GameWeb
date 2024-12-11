@@ -9,9 +9,9 @@ import { SidebarTrigger } from "@/components/ui/sidebar"
 export function NavBar() {
   return (
     <header className="sticky top-0 z-50 border-b border-white/10 bg-purple-700">
-      <nav className="flex justify-between h-14 w-full">
+      <nav className="flex justify-between h-14 w-full px-4">
         <div className="flex items-center gap-3">
-          <SidebarTrigger className="-ml-2 text-white/80 hover:text-white" />
+          <SidebarTrigger className="text-white/80 hover:text-white" />
           <Link href="/" className="flex items-center gap-2">
             <div className="size-8 rounded-lg bg-white/20 flex items-center justify-center">
               <span className="text-sm font-bold text-white">GG</span>
@@ -30,7 +30,7 @@ export function NavBar() {
           </div>
         </div>
 
-        <div className="flex items-center gap-2 mr-2">
+        <div className="flex items-center gap-2">
           <Button 
             variant="ghost" 
             size="icon" 
@@ -56,4 +56,3 @@ export function NavBar() {
     </header>
   )
 }
-
