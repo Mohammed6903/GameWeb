@@ -27,7 +27,7 @@ const GameNotFound = () => {
         >
           Return to Home
         </a>
-        <a 
+        {/* <a 
           href="/games" 
           className="inline-block px-6 py-3 rounded-full 
             bg-transparent border border-purple-700 text-purple-300 
@@ -35,7 +35,7 @@ const GameNotFound = () => {
             font-semibold"
         >
           Browse Games
-        </a>
+        </a> */}
       </div>
     </div>
   );

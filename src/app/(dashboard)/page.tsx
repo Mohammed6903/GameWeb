@@ -8,9 +8,6 @@ import { getAllGames } from '@/lib/controllers/games'
 
 export default async function DashboardPage() {
   const games = await getAllGames();
-  const duplicatedGames = Array(200)
-  .fill([])
-  .flatMap(() => games);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-purple-900 text-white p-6 md:p-8 lg:p-12">
@@ -32,7 +29,7 @@ export default async function DashboardPage() {
             <div className="flex flex-wrap lg:ml-auto gap-3">
               <Button variant="ghost" size="lg" className="gap-2 text-gray-300 hover:text-white hover:bg-white/10">
                 <Laptop2 className="text-pink-500 size-5" />
-                {duplicatedGames.length}+ games
+                {games.length}+ games
               </Button>
               <Button variant="ghost" size="lg" className="gap-2 text-gray-300 hover:text-white hover:bg-white/10">
                 <Users2 className="text-purple-500 size-5" />
@@ -52,7 +49,7 @@ export default async function DashboardPage() {
             Featured Games
           </h2>
           <Suspense fallback={<div className="h-64 bg-white/5 rounded-3xl animate-pulse"></div>}>
-            <FeaturedGames games={duplicatedGames.slice(0, 6)} />
+            <FeaturedGames games={games.slice(0, 6)} />
           </Suspense>
         </section>
 
@@ -62,7 +59,7 @@ export default async function DashboardPage() {
             All Games
           </h2>
           <Suspense fallback={<div className="h-96 bg-white/5 rounded-3xl animate-pulse"></div>}>
-            <AllGames games={duplicatedGames} />
+            <AllGames games={games} />
           </Suspense>
         </section>
       </div>
