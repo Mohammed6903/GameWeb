@@ -6,6 +6,8 @@ export interface Game {
     play_url: string
     categories: string[]
     platform: 'mobile' | 'desktop' | 'all'
+    title:string
+    gameUrl:string
   }
   
   export interface RelatedGame {

@@ -3,6 +3,8 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSideBar } from "@/components/AppSideBar";
 import { NavBar } from "@/components/NavBar";
 import { useState } from "react";
+import Footer from "@/components/footer";
+
 
 export default function DashboardLayout({
   children,
@@ -42,6 +44,7 @@ export default function DashboardLayout({
             >
               {children}
             </main>
+            <Footer />
           </div>
         )}
     </SidebarProvider>

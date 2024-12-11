@@ -6,6 +6,7 @@ import { AllGames } from '@/components/all-games'
 import { FetchedGameData } from '@/types/games'
 import { getAllGames } from '@/lib/controllers/games'
 
+
 export default async function DashboardPage() {
   const games = await getAllGames();
 
@@ -13,14 +14,14 @@ export default async function DashboardPage() {
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-purple-900 text-white p-6 md:p-8 lg:p-12">
       <div className="max-w-7xl mx-auto space-y-12">
         {/* Welcome Section */}
-        <section className="bg-white/10 backdrop-blur-lg rounded-3xl p-6 md:p-8 shadow-xl">
+        <section className="bg-white/10 bg-gradient-to-br from-purple-700 to-purple-700 rounded-3xl p-2 md:p-4 shadow-xl">
           <div className="flex flex-col lg:flex-row lg:items-center gap-6">
             <div className="flex items-center gap-6">
-              <div className="size-16 rounded-2xl bg-violet-600 flex items-center justify-center shrink-0 shadow-lg">
-                <Gamepad2 className="size-10 text-white" />
+              <div className="size-10 rounded-2xl bg-white flex items-center justify-center shrink-0 shadow-lg">
+                <Gamepad2 className="size-8 text-purple-700" />
               </div>
               <div>
-                <h1 className="text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500">
+                <h1 className="text-2xl md:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500">
                   Welcome to CrazyGames
                 </h1>
                 <p className="text-purple-300 mt-2">Play instantly, no downloads needed</p>
@@ -48,7 +49,7 @@ export default async function DashboardPage() {
           <h2 className="text-2xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500">
             Featured Games
           </h2>
-          <Suspense fallback={<div className="h-64 bg-white/5 rounded-3xl animate-pulse"></div>}>
+          <Suspense fallback={<div className="h-36 bg-white/5 rounded-3xl animate-pulse"></div>}>
             <FeaturedGames games={games.slice(0, 6)} />
           </Suspense>
         </section>
@@ -56,12 +57,52 @@ export default async function DashboardPage() {
         {/* All Games Grid */}
         <section>
           <h2 className="text-2xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500">
-            All Games
+            Action
           </h2>
           <Suspense fallback={<div className="h-96 bg-white/5 rounded-3xl animate-pulse"></div>}>
             <AllGames games={games} />
           </Suspense>
         </section>
+        <section>
+          <h2 className="text-2xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500">
+            Adventure 
+          </h2>
+          <Suspense fallback={<div className="h-96 bg-white/5 rounded-3xl animate-pulse"></div>}>
+            <AllGames games={games} />
+          </Suspense>
+        </section>
+        <section>
+          <h2 className="text-2xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500">
+            Arcade 
+          </h2>
+          <Suspense fallback={<div className="h-96 bg-white/5 rounded-3xl animate-pulse"></div>}>
+            <AllGames games={games} />
+          </Suspense>
+        </section>
+        <section>
+          <h2 className="text-2xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500">
+            BoardGame
+          </h2>
+          <Suspense fallback={<div className="h-96 bg-white/5 rounded-3xl animate-pulse"></div>}>
+            <AllGames games={games} />
+          </Suspense>
+        </section>
+        <section>
+          <h2 className="text-2xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500">
+            Driving
+          </h2>
+          <Suspense fallback={<div className="h-96 bg-white/5 rounded-3xl animate-pulse"></div>}>
+            <AllGames games={games} />
+          </Suspense>
+        </section>
+        <section>
+          <h2 className="text-2xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500">
+            Multiplayer
+          </h2>
+          <Suspense fallback={<div className="h-96 bg-white/5 rounded-3xl animate-pulse"></div>}>
+            <AllGames games={games} />
+          </Suspense>
+        </section>  
       </div>
     </div>
   )

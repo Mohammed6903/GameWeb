@@ -7,6 +7,7 @@ import { RelatedGames } from './relatedgame'
 import { GameViewer } from '@/components/game-viewer'
 import { getGameById } from '@/lib/controllers/games'
 import { FetchedGameData } from '@/types/games'
+import { ArrowLeft } from 'lucide-react'
 
 const getGameBySlug = async (slug: string): Promise<FetchedGameData> => {
   const game = await getGameById(slug);
@@ -30,6 +31,7 @@ export default async function GamePage({ params }: GamePageProps) {
           <div className="lg:col-span-3 space-y-6">
             {/* Game Header */}
             <div className="flex justify-between items-center">
+              <Link href="/"><ArrowLeft size={24} /></Link>
               <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-600">
                 {game.name}
               </h1>

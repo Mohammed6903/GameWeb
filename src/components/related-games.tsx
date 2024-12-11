@@ -4,7 +4,7 @@ import { Game } from "@/types/game"
 
 interface RelatedGamesProps {
   categories: string[]
-  currentGameId: string
+  currentGameId:string
 }
 
 async function getRelatedGames(categories: string[], currentGameId: string): Promise<Game[]> {

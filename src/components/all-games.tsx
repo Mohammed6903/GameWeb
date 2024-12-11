@@ -10,7 +10,7 @@ interface AllGamesProps {
   games: FetchedGameData[]
 }
 
-export function AllGames({ games }: AllGamesProps) {
+export function   AllGames({ games }: AllGamesProps) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const router = useRouter();
   const openGame = (gameId: string) => {

@@ -35,7 +35,7 @@ export function FeaturedGames({ games }: FeaturedGamesProps) {
             <img 
               src={game.thumbnail_url || '/placeholder.png'}
               alt={game.name}
-              className="w-full aspect-[4/3] object-cover group-hover:scale-105 transition-transform duration-300"
+              className="w-full h-[200px] object-cover group-hover:scale-105 transition-transform duration-300"
             />
             {game.tags && game.tags.length > 0 && (
               <span className="absolute top-3 right-3 bg-violet-600 text-xs font-medium px-2 py-1 rounded-full">

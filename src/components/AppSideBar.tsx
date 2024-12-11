@@ -95,10 +95,10 @@ export function AppSideBar(
   return (
     <Sidebar visible={visible}>
       <SidebarHeader className="border-b" />
-      <SidebarContent>
+      <SidebarContent className="bg-purple-700">
         <SidebarGroup>
           <SidebarGroupContent>
-            <SidebarMenu>
+            <SidebarMenu className="text-white">
               {mainNavItems.map((item) => (
                 <SidebarMenuItem key={item.name}>
                   <SidebarMenuButton asChild>
@@ -114,11 +114,11 @@ export function AppSideBar(
         </SidebarGroup>
 
         <SidebarGroup>
-          <SidebarGroupLabel>Categories</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-white">Categories</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (
-                <SidebarMenuItem key={item.name}>
+                <SidebarMenuItem className="text-white" key={item.name}>
                   <SidebarMenuButton asChild>
                     <a href={item.url}>
                       <item.icon />
