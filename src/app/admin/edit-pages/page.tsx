@@ -32,18 +32,34 @@ const htmlSuggestions = [
 
 export default function PolicyEditorPage() {
   const [selectedPage, setSelectedPage] = useState("about");
-  const [content, setContent] = useState("");
+  const [pageContents, setPageContents] = useState<{[key: string]: string}>({
+    "about": "",
+    "contact": "",
+    "cookies": "",
+    "dmca": "",
+    "terms": "",
+    "privacy": ""
+  });
   const [isSaving, setIsSaving] = useState(false);
 
   const handleSave = async () => {
     setIsSaving(true);
-    await saveContent(selectedPage, content);
-    setIsSaving(false);
+    try {
+      await saveContent(selectedPage, pageContents[selectedPage]);
+      // You could add additional success handling here if needed
+    } catch (error) {
+      console.error("Failed to save content:", error);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleEditorChange = (value: string | undefined) => {
     if (value !== undefined) {
-      setContent(value);
+      setPageContents(prev => ({
+        ...prev,
+        [selectedPage]: value
+      }));
     }
   };
 
@@ -66,7 +82,7 @@ export default function PolicyEditorPage() {
               <SelectTrigger id="page-select">
                 <SelectValue placeholder="Select a page" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-white">
                 <SelectItem value="about">About Us</SelectItem>
                 <SelectItem value="contact">Contact Us</SelectItem>
                 <SelectItem value="cookies">Cookies Policy</SelectItem>
@@ -88,7 +104,7 @@ export default function PolicyEditorPage() {
                   height="100%"
                   defaultLanguage="html"
                   theme="vs-dark"
-                  value={content}
+                  value={pageContents[selectedPage]}
                   onChange={handleEditorChange}
                   options={{
                     minimap: { enabled: false },
@@ -98,37 +114,36 @@ export default function PolicyEditorPage() {
                     quickSuggestions: true,
                   }}
                   beforeMount={(monaco) => {
-                  
                     monaco.languages.setLanguageConfiguration('html', {
-                        autoClosingPairs: [
+                      autoClosingPairs: [
                         { open: '<', close: '>' },
                         { open: '"', close: '"' },
                         { open: "'", close: "'" }
-                        ],
-                        brackets: [
+                      ],
+                      brackets: [
                         ['<', '>']
-                        ]
+                      ]
                     });
                     monaco.languages.registerCompletionItemProvider('html', {
-                        provideCompletionItems: (model, position) => {
-                          const suggestions = htmlSuggestions.map((item) => ({
-                            label: item.label,
-                            kind: monaco.languages.CompletionItemKind.Snippet,
-                            insertText: item.insertText,
-                            insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-                            range: {
-                              startLineNumber: position.lineNumber,
-                              startColumn: position.column,
-                              endLineNumber: position.lineNumber,
-                              endColumn: position.column
-                            }
-                          }));
-              
-                          return {
-                            suggestions: suggestions,
-                            incomplete: false
-                          };
-                        }
+                      provideCompletionItems: (model, position) => {
+                        const suggestions = htmlSuggestions.map((item) => ({
+                          label: item.label,
+                          kind: monaco.languages.CompletionItemKind.Snippet,
+                          insertText: item.insertText,
+                          insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                          range: {
+                            startLineNumber: position.lineNumber,
+                            startColumn: position.column,
+                            endLineNumber: position.lineNumber,
+                            endColumn: position.column
+                          }
+                        }));
+        
+                        return {
+                          suggestions: suggestions,
+                          incomplete: false
+                        };
+                      }
                     });
                   }}
                 />
@@ -136,7 +151,7 @@ export default function PolicyEditorPage() {
             </TabsContent>
             <TabsContent value="preview">
               <div className="border p-4 h-[600px] overflow-auto prose max-w-none">
-                <div dangerouslySetInnerHTML={{ __html: content }} />
+                <div dangerouslySetInnerHTML={{ __html: pageContents[selectedPage] }} />
               </div>
             </TabsContent>
           </Tabs>
@@ -151,6 +166,7 @@ export default function PolicyEditorPage() {
         </CardContent>
       </Card>
 
+      {/* Rest of the components remain the same */}
       <Card className="bg-gray-50 border-none">
         <CardHeader>
           <CardTitle className="text-lg font-semibold text-gray-700">

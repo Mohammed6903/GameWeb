@@ -148,9 +148,9 @@ export default function GameAnalyticsDashboard() {
             bg: 'bg-purple-50'
           }
         ].map((card) => (
-          <Card key={card.name} className={`${card.bg} border-none`}>
+          <Card key={card.title} className={`${card.bg} border-none`}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{card.name}</CardTitle>
+              <CardTitle className="text-sm font-medium">{card.title}</CardTitle>
               <card.icon className={`h-5 w-5 ${card.color}`} />
             </CardHeader>
             <CardContent>
