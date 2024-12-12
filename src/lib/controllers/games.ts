@@ -115,8 +115,7 @@ function capitalizeFirstLetter(str: string): string {
 export async function getGamesByCategory(category: string, { page = 1, limit = 10 } = {}) {
   const supabase = await createClient();
   try {
-    // Calculate the starting index for pagination
-    var cat = capitalizeFirstLetter(category);
+    const cat = capitalizeFirstLetter(category);
     const from = (page - 1) * limit;
     const to = from + limit - 1;
 

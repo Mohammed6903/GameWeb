@@ -5,6 +5,7 @@ import { FetchedGameData } from '@/types/games'
 import { getGamesByCategory } from '@/lib/controllers/games'
 import { Pagination } from '@/components/pagination'
 import GameNotFound from '@/components/game-not-found'
+import Image from 'next/image'
 
 interface CategoryPageProps {
   params: {
@@ -72,11 +73,13 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
                 className="bg-white/10 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
               >
                 <div className="aspect-video relative">
-                  <img 
-                    src={game.thumbnail_url} 
-                    alt={game.name} 
-                    className="w-full h-full object-cover"
-                  />
+                  {game.thumbnail_url && (
+                    <Image
+                      src={game.thumbnail_url} 
+                      alt={game.name} 
+                      className="w-full h-full object-cover"
+                    />
+                  )}
                   <div className="absolute inset-0 bg-black/20 hover:bg-black/40 transition-all duration-300 flex items-center justify-center opacity-0 hover:opacity-100">
                     <Button className="bg-white/30 hover:bg-white/50 text-white">
                       Play Now

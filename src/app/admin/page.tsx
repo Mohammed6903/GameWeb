@@ -115,7 +115,7 @@ export default function GameAnalyticsDashboard() {
     };
     
     checkUser();
-  }, []);
+  }, [router, supabase.auth]);
 
   return (
     <div className="space-y-6 p-6 bg-white">

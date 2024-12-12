@@ -13,7 +13,7 @@ export function Pagination({ currentPage, totalPages, baseUrl }: PaginationProps
     const pages = [];
     const maxPagesToShow = 5;
     let startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
-    let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+    const endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
 
     // Adjust start page if we're near the end
     if (endPage === totalPages) {

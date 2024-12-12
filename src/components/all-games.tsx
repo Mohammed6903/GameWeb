@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import { Card } from "@/components/ui/card"
 import { FetchedGameData } from '@/types/games'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 
 interface AllGamesProps {
   games: FetchedGameData[]
@@ -33,7 +34,7 @@ export function   AllGames({ games }: AllGamesProps) {
             onClick={() => openGame(game.id)}
           >
             <div className="aspect-square relative">
-              <img
+              <Image
                 src={game.thumbnail_url || '/placeholder.png'}
                 alt={game.name}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"

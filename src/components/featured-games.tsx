@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import { Card } from "@/components/ui/card"
 import { FetchedGameData } from '@/types/games'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 
 interface FeaturedGamesProps {
   games: FetchedGameData[]
@@ -32,7 +33,7 @@ export function FeaturedGames({ games }: FeaturedGamesProps) {
             onMouseLeave={() => setHoveredIndex(null)}
             onClick={() => openGame(game.id)}
           >
-            <img 
+            <Image
               src={game.thumbnail_url || '/placeholder.png'}
               alt={game.name}
               className="w-full h-[200px] object-cover group-hover:scale-105 transition-transform duration-300"
