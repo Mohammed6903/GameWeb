@@ -85,7 +85,9 @@ export default async function GamePage({ params }: GamePageProps) {
             </Card>
 
             {/* Comments Section */}
-            <CommentSection gameId='1'/>
+            <div>
+              <CommentSection  gameId='1'/>
+            </div>
           </div>
 
           {/* Related Games Sidebar */}

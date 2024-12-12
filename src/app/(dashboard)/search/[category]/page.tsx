@@ -1,3 +1,6 @@
+"use client";
+
+import React,{useState} from 'react';
 import { Suspense } from 'react'
 import { Tag, Filter, Grid, List } from 'lucide-react'
 import { Button } from "@/components/ui/button"
@@ -5,6 +8,8 @@ import { FetchedGameData } from '@/types/games'
 import { getGamesByCategory } from '@/lib/controllers/games'
 import { Pagination } from '@/components/pagination'
 import GameNotFound from '@/components/game-not-found'
+import {FilterModal}  from "@/components/filterModal"
+
 // import Image from 'next/image'
 
 interface CategoryPageProps {
@@ -17,6 +22,8 @@ interface CategoryPageProps {
 }
 
 export default async function CategoryPage({ params, searchParams }: CategoryPageProps) {
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false)
+  const [filters, setFilters] = useState({ search: '', tags: [] as string[] })
   const category = decodeURIComponent(params.category);
   const currentPage = parseInt(searchParams.page || '1', 10);
   const gamesPerPage = 12;
@@ -31,6 +38,14 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
   }
 
   const totalPages = Math.ceil(total / gamesPerPage);
+
+  
+  const handleApplyFilters = (newFilters: { search: string; tags: string[] }) => {
+    setFilters(newFilters)
+    // Here you would typically filter your tasks based on the new filters
+    console.log('Applied filters:', newFilters)
+  }
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-purple-900 text-white p-6 md:p-8 lg:p-12">
@@ -56,10 +71,15 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
               <Button variant="ghost" size="icon" className="text-gray-300 hover:text-white">
                 <List className="size-6" />
               </Button>
-              <Button variant="outline" className="gap-2 text-gray-300 hover:text-white hover:bg-white/10">
+              <Button onClick={() => setIsFilterModalOpen(true)} variant="outline" className="gap-2 text-gray-300 hover:text-white hover:bg-white/10">
                 <Filter className="size-5 text-purple-500" />
                 Filters
               </Button>
+              <FilterModal
+                isOpen={isFilterModalOpen}
+                onClose={() => setIsFilterModalOpen(false)}
+                onApplyFilters={handleApplyFilters}
+              />
             </div>
           </div>
         </section>
