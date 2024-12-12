@@ -103,7 +103,8 @@ export async function getAllGames(): Promise<FetchedGameData[]> {
   const supabase = await createClient();
   const {data, error} = await supabase.from('games').select('*');
   if (error) {
-    throw Error('Error fetching all games.');
+    console.log(`Error fetching all games: ${error}`);
+    throw Error(`Error fetching all games.`);
   } else {    
     return data;
   }

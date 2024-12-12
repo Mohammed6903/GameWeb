@@ -11,7 +11,7 @@ interface AllGamesProps {
   games: FetchedGameData[]
 }
 
-export function   AllGames({ games }: AllGamesProps) {
+export function AllGames({ games }: AllGamesProps) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const router = useRouter();
   const openGame = (gameId: string) => {
@@ -37,7 +37,9 @@ export function   AllGames({ games }: AllGamesProps) {
               <Image
                 src={game.thumbnail_url || '/placeholder.png'}
                 alt={game.name}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                className="object-cover group-hover:scale-105 transition-transform duration-300"
+                fill
+                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, (max-width: 1280px) 25vw, (max-width: 1536px) 20vw, 12.5vw"
               />
               <motion.div 
                 className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent p-4 flex flex-col justify-end"
