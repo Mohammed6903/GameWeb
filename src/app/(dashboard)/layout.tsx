@@ -32,6 +32,7 @@ export default function DashboardLayout({
                 {children}
               </main>
             </div>
+            <Footer />
           </div>
         ) : (
           <div className="min-h-screen w-full bg-[#0f0f1a] text-white">
