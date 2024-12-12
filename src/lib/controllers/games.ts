@@ -98,9 +98,49 @@ export async function getGameById(gameId: string) {
   const supabase = await createClient();
   try {
     const game = await supabase.from('games').select().eq('id', gameId).single();
+    if (game.error) {
+      throw new Error(`Error fetching game: ${game.error}`)
+    }
     return game.data;
   } catch (error) {
     throw new Error(`Error fetching game: ${error}`);
+  }
+}
+
+function capitalizeFirstLetter(str: string): string {
+  if (!str) return str; // Handle empty or null strings
+  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+}
+
+export async function getGamesByCategory(category: string, { page = 1, limit = 10 } = {}) {
+  const supabase = await createClient();
+  try {
+    // Calculate the starting index for pagination
+    var cat = capitalizeFirstLetter(category);
+    const from = (page - 1) * limit;
+    const to = from + limit - 1;
+
+    const { data, error, count } = await supabase
+      .from('games')
+      .select('*', { count: 'exact' })
+      .contains('categories', [cat])
+      .range(from, to);
+
+    if (error) {
+      const { data: capData, error: capErr, count: capCount } = await supabase
+      .from('games')
+      .select('*', { count: 'exact' })
+      .contains('categories', [category])
+      .range(from, to);
+      if (capErr) {
+        throw new Error(`Error fetching games: ${capErr.message}`);
+      } else {
+        return {games: capData, total: capCount}
+      }
+    }
+    return { games: data, total: count };
+  } catch (error: any) {
+    throw new Error(`Error fetching games: ${error.message}`);
   }
 }
 

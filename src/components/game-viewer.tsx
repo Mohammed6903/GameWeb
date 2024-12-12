@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react"
 import { Maximize2, Minimize2 } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
+import GameNotFound from "./game-not-found"
 
 interface GameViewerProps {
   play_url: string
@@ -13,6 +14,7 @@ interface GameViewerProps {
 export function GameViewer({ play_url, thumbnail }: GameViewerProps) {
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [isPlaying, setIsPlaying] = useState(false)
+  const [iframeError, setIframeError] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -24,7 +26,7 @@ export function GameViewer({ play_url, thumbnail }: GameViewerProps) {
     return () => {
       document.removeEventListener('fullscreenchange', handleFullscreenChange)
     }
-  }, [])
+  }, []);
 
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
@@ -62,11 +64,16 @@ export function GameViewer({ play_url, thumbnail }: GameViewerProps) {
         </div>
       ) : (
         <div className={`relative ${isFullscreen ? 'w-screen h-screen' : 'aspect-video'}`}>
-          <iframe
-            src={play_url}
-            className="w-full h-full"
-            allow="fullscreen"
-          />
+          {!iframeError ? (
+            <iframe
+              src={play_url}
+              onError={() => setIframeError(true)}
+              className="w-full h-full"
+              title="Content"
+            />
+          ) : (
+            <GameNotFound />
+          )}
           <Button
             variant="ghost"
             size="icon"
