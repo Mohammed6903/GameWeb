@@ -40,7 +40,7 @@ const mainNavItems = [
 const items = [
   {
     name: "Action",
-    url: "#",
+    url: "/search/Action",
     icon: Home,
   },
   {

@@ -8,7 +8,8 @@ import {
   PlusCircle, 
   List, 
   Settings,
-  Menu
+  Menu,
+  Edit
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -53,6 +54,15 @@ export function Sidebar() {
       activeBackground: 'bg-orange-50',
       hoverColor: 'hover:text-orange-600',
       hoverBackground: 'hover:bg-orange-100'
+    },
+    { 
+      href: '/admin/edit-pages', 
+      icon: Edit, 
+      label: 'Edit Pages',
+      activeColor: 'text-red-500',
+      activeBackground: 'bg-red-50',
+      hoverColor: 'hover:text-red-600',
+      hoverBackground: 'hover:bg-red-100'
     }
   ];
 
