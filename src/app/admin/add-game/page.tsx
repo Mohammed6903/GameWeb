@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { ProviderForm, ProviderFormData, Provider } from '@/components/admin/ProviderForm';
-import { addProvider } from '@/lib/controllers/providers';
+import { addProvider, getAllProviders } from '@/lib/controllers/providers';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { GameFormData } from '@/types/games';
@@ -10,6 +10,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CreateGameForm } from '@/components/admin/CreateGameForm';
 import axios from 'axios';
+import { getAllCategories } from '@/lib/controllers/categories';
+import { getAllTags } from '@/lib/controllers/tags';
 
 export default function AddGamePage() {
   const [activeTab, setActiveTab] = useState('add-game');
@@ -20,12 +22,12 @@ export default function AddGamePage() {
 
   useEffect(() => {
     const fetchAll = async () => {
-      const result = await axios.get(`${process.env.NEXT_PUBLIC_SITE_URL}/api/providers`);
-      setProviders(result.data.providers);
-      const catRes = (await axios.get(`${process.env.NEXT_PUBLIC_SITE_URL}/api/categories`)).data.categories.map((item: any) => item.category);
-      setCategories(catRes);
-      const tagRes = (await axios.get(`${process.env.NEXT_PUBLIC_SITE_URL}/api/tags`)).data.tags.map((item: any) => item.tag);
-      setTags(tagRes);
+      const providers = await getAllProviders();
+      const categories = (await getAllCategories()).map((item: any) => item.category);
+      const tags = (await getAllTags()).map((item: any) => item.tag);
+      setProviders(providers);
+      setCategories(categories);
+      setTags(tags);
     }
     fetchAll();
   },[]);

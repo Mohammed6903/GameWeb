@@ -16,7 +16,6 @@ export default async function EditGamePage({
 
     const providers = await getAllProviders();
     const categories = (await getAllCategories()).map((item: any) => item.category);
-    console.log(categories);
     const tags = (await getAllTags()).map((item: any) => item.tag);
 
     if (!gameById) {
