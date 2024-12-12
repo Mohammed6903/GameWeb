@@ -11,10 +11,8 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { redirect } from "next/navigation";
 import { useEffect, useState } from 'react';
 import { useRouter } from "next/navigation";
-import {jwtDecode} from "jwt-decode";
  
 // Dynamically import ApexCharts to ensure client-side rendering
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });

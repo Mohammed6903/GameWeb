@@ -1,13 +1,16 @@
+import { getPageContent } from '@/lib/controllers/dynamicPages';
 import { PolicyLayout, SafeHTML } from '@/components/PolicyLayout'
 
 interface AboutUsContent {
   content: string
 }
 
-async function getAboutUsContent(): Promise<AboutUsContent> {
-  // This is a placeholder. In a real application, you would fetch this data from your API
-  return {
-    content: `
+async function fetchAboutUsContent(): Promise<string> {
+  try {
+    const res = await getPageContent('about');
+    return res.content;
+  } catch (error) {
+    return `
       <h2>Welcome to GameGrid</h2>
       <p>GameGrid is a cutting-edge online gaming platform that brings together gamers from all around the world. Our mission is to provide an immersive and enjoyable gaming experience for players of all skill levels.</p>
       <h3>Our Story</h3>
@@ -16,12 +19,12 @@ async function getAboutUsContent(): Promise<AboutUsContent> {
       <p>We envision a world where gaming is not just a pastime, but a way to connect, learn, and grow. GameGrid aims to be at the forefront of this revolution, constantly innovating and improving our platform to meet the evolving needs of gamers.</p>
       <h3>Join Us</h3>
       <p>Whether you're a casual gamer or a hardcore enthusiast, GameGrid has something for everyone. Join our community today and be part of the next big thing in online gaming!</p>
-    `
+    `;
   }
 }
 
 export default async function AboutPage() {
-  const { content } = await getAboutUsContent()
+  const content = await fetchAboutUsContent();
 
   return (
     <PolicyLayout title="About Us">
