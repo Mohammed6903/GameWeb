@@ -59,7 +59,7 @@ export function BaseGameForm({ initialData, providers = [], categories = [], tag
       description: initialData.description || "",
       play_url: initialData.play_url || "",
       tags: initialData.tags || [],
-      // status: (initialData.status === undefined) ? "active" : "inactive",
+      status: initialData.status,
       provider_id: initialData.provider_id || "",
       categories: initialData.categories || [],
       thumbnail_url: initialData.thumbnail_url || "",

@@ -3,9 +3,9 @@
 import { useState } from 'react';
 import { UpdateGameForm } from '@/components/admin/UpdateGameForm';
 import { toast } from 'sonner';
-import axios from 'axios';
-import { redirect } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { Game } from '@/types/games';
+import { updateGame } from '@/lib/controllers/games';
 
 export default function EditGameClient({
   initialGame,
@@ -18,6 +18,7 @@ export default function EditGameClient({
   categories: any[];
   tags: any[];
 }) {
+  const router = useRouter();
   const [game, setGame] = useState<Game>({
     id: initialGame?.id,
     name: initialGame?.name,
@@ -30,20 +31,21 @@ export default function EditGameClient({
     tags: initialGame?.tags,
   });
 
-  const handleAddGame = async (gameData: any) => {
+  const handleUpdateGame = async (gameData: any) => {
     try {
-      await axios.put(`${process.env.NEXT_PUBLIC_SITE_URL}/api/game/update/${game.id}`, {
+      console.log(gameData);
+      await updateGame(game.id, {
         name: gameData.name,
         description: gameData.description,
         play_url: gameData.play_url,
         tags: gameData.tags,
-        is_active: gameData.is_active,
+        status: gameData.status,
         provider_id: gameData.provider_id,
-        thumbnailUrl: gameData.thumbnail_url,
+        thumbnail_url: gameData.thumbnail_url,
         categories: gameData.categories,
       });
       toast.success('Game updated successfully');
-      return redirect('/admin/manage-games');
+      router.push('/admin/manage-games');
     } catch (error) {
       console.error('Failed to update game:', error);
       toast.error('Failed to update game');
@@ -56,7 +58,7 @@ export default function EditGameClient({
             providers={providers}
             categories={categories}
             tags={tags}
-            onSubmit={handleAddGame}
+            onSubmit={handleUpdateGame}
         />
   );
 }

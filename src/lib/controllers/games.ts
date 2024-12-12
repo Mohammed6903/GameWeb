@@ -62,21 +62,34 @@ export async function updateGame(
   gameId: string, 
   gameData: Partial<GameFormData>
 ): Promise<Game> {
-  const gameIndex = mockGames.findIndex(game => game.id === gameId);
-  if (gameIndex === -1) {
-    throw new Error('Game not found');
+  const supabase = await createClient();
+  try {
+    const { data, error } = await supabase
+      .from('games')
+      .update({
+        name: gameData.name,
+        description: gameData.description,
+        play_url: gameData.play_url,
+        thumbnail_url: gameData.thumbnail_url || null,
+        is_active: (gameData.status === 'active' ? true : false),
+        tags: gameData.tags,
+        categories: gameData.categories,
+        provider_id: gameData.provider_id,
+        updated_at: new Date()
+      })
+      .eq('id', gameId)
+      .select()
+      .single();
+
+    if (error) {
+      throw new Error(`Error updating game: ${error.message}`);
+    }
+    
+    return data;
+  } catch (error) {
+    console.error('Error updating game:', error);
+    throw error;
   }
-
-  mockGames[gameIndex] = {
-    ...mockGames[gameIndex],
-    ...gameData,
-    thumbnail_url: gameData.thumbnailFile 
-      ? 'https://via.placeholder.com/150' 
-      : mockGames[gameIndex].thumbnail_url,
-    updated_at: new Date()
-  };
-
-  return mockGames[gameIndex];
 }
 
 export async function deleteGame(gameId: string): Promise<void> {

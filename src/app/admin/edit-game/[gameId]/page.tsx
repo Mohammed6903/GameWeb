@@ -2,9 +2,9 @@ import { redirect } from 'next/navigation';
 import { getAllProviders } from '@/lib/controllers/providers';
 import { getAllCategories } from '@/lib/controllers/categories';
 import { getAllTags } from '@/lib/controllers/tags';
-import axios from 'axios';
-import EditGameClient from './EditGameClient'; // Move client logic here
+import EditGameClient from './EditGameClient';
 import { Card, CardContent } from '@/components/ui/card';
+import { getGameById } from '@/lib/controllers/games';
 
 export default async function EditGamePage({ 
   params 
@@ -12,12 +12,12 @@ export default async function EditGamePage({
   params: { gameId: string } 
 }) {
   try {
-    const response = await axios.get(`${process.env.NEXT_PUBLIC_SITE_URL}/api/game/byId/${params.gameId}`);
-    const gameById = response.data.game;
+    const gameById = await getGameById(params.gameId);
 
-    const providers = (await axios.get(`${process.env.NEXT_PUBLIC_SITE_URL}/api/providers`)).data.providers;
-    const categories = (await axios.get(`${process.env.NEXT_PUBLIC_SITE_URL}/api/categories`)).data.categories.map((item: any) => item.category);
-    const tags = (await axios.get(`${process.env.NEXT_PUBLIC_SITE_URL}/api/tags`)).data.tags.map((item: any) => item.tag);
+    const providers = await getAllProviders();
+    const categories = (await getAllCategories()).map((item: any) => item.category);
+    console.log(categories);
+    const tags = (await getAllTags()).map((item: any) => item.tag);
 
     if (!gameById) {
       return redirect('/admin/manage-games');
