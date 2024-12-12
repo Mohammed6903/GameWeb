@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { Card } from "@/components/ui/card"
 import { FetchedGameData } from "@/types/games"
-import Image from 'next/image'
+// import Image from 'next/image'
 
 interface RelatedGamesProps {
   categories: string[]
@@ -30,7 +30,7 @@ export const RelatedGames = ({ categories }: { categories: string[] }) => {
           {relatedGames.map((game) => (
             <Link key={game.id} href={`/games/${game.id}`}>
               <div className="flex items-center space-x-4 p-2 rounded-lg hover:bg-white/5 transition-colors">
-                <Image
+                <img
                   src={game.thumbnail || '/placeholder-game.jpg'}
                   alt={game.name}
                   className="w-16 h-16 object-cover rounded-md"

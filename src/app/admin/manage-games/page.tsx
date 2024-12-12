@@ -23,7 +23,7 @@ import {
 import { DeleteGameDialog } from '@/components/admin/DeleteGameDialog';
 import { getAllGames, deleteGame } from '@/lib/controllers/games';
 import { FetchedGameData, Game } from '@/types/games';
-import Image from 'next/image';
+// import Image from 'next/image';
 
 export default function ManageGamesPage() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -108,7 +108,7 @@ export default function ManageGamesPage() {
                 <TableRow key={game.id}>
                   <TableCell>
                     {game.thumbnail_url ? (
-                      <Image
+                      <img
                         src={game.thumbnail_url}
                         alt={`${game.name} thumbnail`}
                         className="w-16 h-16 object-cover rounded"

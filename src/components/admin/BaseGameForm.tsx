@@ -31,7 +31,6 @@ import { ScrollArea } from '../ui/scroll-area';
 import { Provider } from './ProviderForm';
 import { addCategory } from '@/lib/controllers/categories';
 import { addTag } from '@/lib/controllers/tags';
-import Image from 'next/image';
 // import { createClient } from '@/lib/utils/supabase/client';
 
 interface BaseGameFormProps {
@@ -60,7 +59,7 @@ export function BaseGameForm({ initialData, providers = [], categories = [], tag
       description: initialData.description || "",
       play_url: initialData.play_url || "",
       tags: initialData.tags || [],
-      status: initialData.status ? "active" : "inactive",
+      // status: (initialData.status === undefined) ? "active" : "inactive",
       provider_id: initialData.provider_id || "",
       categories: initialData.categories || [],
       thumbnail_url: initialData.thumbnail_url || "",
@@ -87,15 +86,15 @@ export function BaseGameForm({ initialData, providers = [], categories = [], tag
     setThumbnailPreview(url);
   };
 
-  const formWatch = form.watch("thumbnail_url");
   useEffect(() => {
     const thumbnail_url = form.watch("thumbnail_url");
     if (thumbnail_url) {
       setThumbnailPreview(thumbnail_url);
     }
-  }, [formWatch, form]);
+  }, [form.watch("thumbnail_url")]);
 
   const handleSubmit = async (data: GameFormData) => {
+    console.log('Inside handleSubmit')
     try {
       const validation = validateGameForm(data);
       if (!validation.success) {
@@ -459,7 +458,7 @@ export function BaseGameForm({ initialData, providers = [], categories = [], tag
         {thumbnailPreview && (
           <div className="mt-4">
             <FormLabel>Thumbnail Preview</FormLabel>
-            <Image
+            <img
               src={thumbnailPreview}
               alt="Thumbnail Preview"
               className="mt-2 max-w-[200px] rounded"

@@ -5,7 +5,7 @@ import { FetchedGameData } from '@/types/games'
 import { getGamesByCategory } from '@/lib/controllers/games'
 import { Pagination } from '@/components/pagination'
 import GameNotFound from '@/components/game-not-found'
-import Image from 'next/image'
+// import Image from 'next/image'
 
 interface CategoryPageProps {
   params: {
@@ -74,7 +74,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
               >
                 <div className="aspect-video relative">
                   {game.thumbnail_url && (
-                    <Image
+                    <img
                       src={game.thumbnail_url} 
                       alt={game.name} 
                       className="w-full h-full object-cover"

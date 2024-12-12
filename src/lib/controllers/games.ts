@@ -44,12 +44,14 @@ export async function addGame(gameData: GameFormData) {
       tags: gameData.tags,
       categories: gameData.categories,
       provider_id: Number(gameData.provider_id),
-    });
+    }).select().single();
+    console.log('added game')
 
     if (error) {
       throw new Error(`Error inserting game: ${error.message}`);
+    } else {
+      return data;
     }
-
   } catch (err) {
     console.error('Error adding game:', err);
     throw err;

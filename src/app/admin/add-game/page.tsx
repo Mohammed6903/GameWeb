@@ -30,26 +30,6 @@ export default function AddGamePage() {
     fetchAll();
   },[]);
 
-  const handleAddGame = async (gameData: GameFormData) => {
-    try {
-      await axios.post(`${process.env.NEXT_PUBLIC_SITE_URL}/api/game/create`, {
-        name: gameData.name,
-        description: gameData.description,
-        play_url: gameData.play_url,
-        tags: gameData.tags,
-        is_active: gameData.status === 'active' ? true : false,
-        provider_id: gameData.provider_id,
-        thumbnailUrl: gameData.thumbnail_url,
-        categories: gameData.categories,
-      })
-      toast.success('Game added successfully');
-      router.push('/admin/manage-games');
-    } catch (error) {
-      console.error('Failed to add game:', error);
-      toast.error('Failed to add game');
-    }
-  };
-
   const handleAddProvider = async (providerData: ProviderFormData) => {
     try {
       const newProvider = await addProvider(providerData);
@@ -75,7 +55,7 @@ export default function AddGamePage() {
           </TabsList>
           <CardContent className="p-6">
             <TabsContent value="add-game">  
-              <CreateGameForm onSubmit={handleAddGame} providers={providers} categories={categories} tags={tags} />
+              <CreateGameForm providers={providers} categories={categories} tags={tags} />
             </TabsContent>
             <TabsContent value="add-provider">
               <ProviderForm onSubmit={handleAddProvider} />

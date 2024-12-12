@@ -2,22 +2,39 @@
 import { BaseGameForm } from './BaseGameForm';
 import { GameFormData } from '@/types/games';
 import { Provider } from '@/components/admin/ProviderForm';
+import axios from 'axios';
+import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
+import { addGame } from '@/lib/controllers/games';
 
 interface CreateGameFormProps {
   providers: Provider[];
   categories: string[];
   tags: string[];
-  onSubmit: (data: GameFormData) => Promise<void>;
+  // onSubmit: (data: GameFormData) => Promise<void>;
 }
 
-export function CreateGameForm({ providers, categories, tags, onSubmit }: CreateGameFormProps) {
+export function CreateGameForm({ providers, categories, tags }: CreateGameFormProps) {
+  const router = useRouter();
+  const handleAddGame = async (gameData: GameFormData) => {
+    try {
+      // const newGame = await addGame(gameData);
+      const newGame = await addGame(gameData);
+      toast.success('Game added successfully');
+      router.push('/admin/manage-games');
+    } catch (error) {
+      console.error('Failed to add game:', error);
+      toast.error('Failed to add game');
+    }
+  };
+
   return (
     <BaseGameForm
       initialData={{}}
       providers={providers}
       categories={categories}
       tags={tags}
-      onSubmit={onSubmit}
+      onSubmit={handleAddGame}
       submitButtonText="Add Game"
     />
   );
