@@ -47,7 +47,7 @@ export function AllGames({ games }: GamesCarouselProps) {
     const maxIndex = games.length;
     
     setCurrentIndex((prevIndex) => {
-      let newIndex = prevIndex + (direction * cardsToShow);
+      const newIndex = prevIndex + (direction * cardsToShow);
       
       // Wrap around logic
       if (newIndex < 0) return maxIndex - (maxIndex % cardsToShow || cardsToShow);
