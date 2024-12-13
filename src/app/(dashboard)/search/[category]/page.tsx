@@ -1,6 +1,6 @@
 "use client";
 
-import React,{useState} from 'react';
+import React,{useEffect, useState} from 'react';
 import { Suspense } from 'react'
 import { Tag, Filter, Grid, List } from 'lucide-react'
 import { Button } from "@/components/ui/button"
@@ -9,8 +9,6 @@ import { getGamesByCategory } from '@/lib/controllers/games'
 import { Pagination } from '@/components/pagination'
 import GameNotFound from '@/components/game-not-found'
 import {FilterModal}  from "@/components/filterModal"
-
-// import Image from 'next/image'
 
 interface CategoryPageProps {
   params: {
@@ -21,25 +19,31 @@ interface CategoryPageProps {
   }
 }
 
-export default async function CategoryPage({ params, searchParams }: CategoryPageProps) {
+export default function CategoryPage({ params, searchParams }: CategoryPageProps) {
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false)
   const [filters, setFilters] = useState({ search: '', tags: [] as string[] })
   const category = decodeURIComponent(params.category);
   const currentPage = parseInt(searchParams.page || '1', 10);
+  const [games, setGames] = useState<any[]>();
+  const [total, setTotal] = useState<number>(0);
   const gamesPerPage = 12;
 
-  const { games, total } = await getGamesByCategory(category, {
-    page: currentPage,
-    limit: gamesPerPage
-  });
-
-  if (!games || total === null) {
-    return <GameNotFound />
-  }
+  useEffect(() => {
+    const fetchData = async () => {
+      const { games, total } = await getGamesByCategory(category, {
+        page: currentPage,
+        limit: gamesPerPage
+      });
+      if (!games || total === null) {
+        return <GameNotFound />
+      }
+      setGames(games);
+      setTotal(total);
+    }
+  })
 
   const totalPages = Math.ceil(total / gamesPerPage);
 
-  
   const handleApplyFilters = (newFilters: { search: string; tags: string[] }) => {
     setFilters(newFilters)
     // Here you would typically filter your tasks based on the new filters
@@ -87,7 +91,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
         {/* Games Grid */}
         <Suspense fallback={<div className="h-96 bg-white/5 rounded-3xl animate-pulse"></div>}>
           <section className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {games.map((game: FetchedGameData) => (
+            {games && games.map((game: FetchedGameData) => (
               <div 
                 key={game.id} 
                 className="bg-white/10 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
