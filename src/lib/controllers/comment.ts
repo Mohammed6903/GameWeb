@@ -1,7 +1,7 @@
 "use server"
 import { createClient } from "../utils/supabase/server";
 
-export const fetchComments = async (gameId: string) => {
+export const fetchComments = async (gameId: number) => {
     const supabase = await createClient();
     try {
       const { data, error } = await supabase
@@ -18,8 +18,8 @@ export const fetchComments = async (gameId: string) => {
       const commentsWithUsernames = await Promise.all(
         data.map(async (comment) => {
           const { data: userData, error: userError } = await supabase
-            .from('user')
-            .select('username')
+            .from('users')
+            .select('email')
             .eq('id', comment.user_id)
             .single();
   
@@ -35,7 +35,7 @@ export const fetchComments = async (gameId: string) => {
   
           return {
             id: comment.id,
-            user: userData?.username || 'Unknown', 
+            user: userData?.email || 'Unknown', 
             content: comment.content,
             createdAt: comment.created_at,
           };
@@ -50,7 +50,7 @@ export const fetchComments = async (gameId: string) => {
   };
   
 
-export const postComment = async (gameId: string, content: string) => {
+export const postComment = async (gameId: number, content: string) => {
     const supabase = await createClient();
     
     try {
@@ -61,12 +61,15 @@ export const postComment = async (gameId: string, content: string) => {
             return { error: 'User not authenticated' };
         }
 
+        console.log(gameId);
+
         const { data, error } = await supabase
             .from('comments')
             .insert({
                 user_id: user.id,
-                game_id: gameId,
+                game_id: Number(gameId),
                 content: content,
+                created_at: new Date().toISOString()
             })
             .select()
             .single();

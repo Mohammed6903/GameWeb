@@ -86,7 +86,7 @@ export default async function GamePage({ params }: GamePageProps) {
 
             {/* Comments Section */}
             <div>
-              <CommentSection  gameId='1'/>
+              <CommentSection  gameId={Number(game.id)}/>
             </div>
           </div>
 

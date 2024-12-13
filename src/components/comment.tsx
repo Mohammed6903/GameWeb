@@ -8,14 +8,14 @@ import { fetchComments, postComment } from "@/lib/controllers/comment";
 import { createClient } from "@supabase/supabase-js";
 
 interface Comment {
-  id: string;
+  id: number;
   user: string;  
   content: string;
   createdAt: string;
 }
 
 interface CommentSectionProps {
-  gameId: string;
+  gameId: number;
 }
 
 export function CommentSection({ gameId }: CommentSectionProps) {
@@ -73,20 +73,22 @@ export function CommentSection({ gameId }: CommentSectionProps) {
         </div>
       </form>
       <div className="space-y-4">
-        {comments.map((comment) => (
+      {comments.map((comment) => {
+        const userTimeZoneDate = new Date(comment.createdAt).toLocaleString(undefined, {
+          timeZoneName: 'short',
+        });
+
+        return (
           <div key={comment.id} className="flex space-x-4">
-            <Avatar>
-              <AvatarFallback>{comment.user[0]}</AvatarFallback> {/* Display first letter of user name */}
-            </Avatar>
             <div className="flex-1">
               <p className="font-semibold">{comment.user}</p>
-              <p className="text-sm text-gray-400">
-                {new Date(comment.createdAt).toLocaleString()}
-              </p>
+              <p className="text-sm text-gray-400">{userTimeZoneDate}</p>
               <p className="mt-1">{comment.content}</p>
             </div>
           </div>
-        ))}
+        );
+      })}
+
       </div>
     </div>
   );

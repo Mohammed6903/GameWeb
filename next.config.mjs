@@ -23,6 +23,13 @@ const nextConfig = {
               pathname: '/**',
               search: '',
             },
+            {
+              protocol: 'https',
+              hostname: 'www.mahjong.com',
+              port: '',
+              pathname: '/**',
+              search: '',
+            },
         ],
     },
 };
