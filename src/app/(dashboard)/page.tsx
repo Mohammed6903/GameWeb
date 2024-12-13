@@ -3,12 +3,39 @@ import { Gamepad2, Laptop2, Users2, Sparkles } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { FeaturedGames } from '@/components/featured-games'
 import { AllGames } from '@/components/all-games'
-import { FetchedGameData } from '@/types/games'
+import { FetchedGameData, Game } from '@/types/games'
 import { getAllGames } from '@/lib/controllers/games'
 
+export async function getGamesByCategory(games: FetchedGameData[]): Promise<Record<string, FetchedGameData[]>> {
+  const categorizedGames: Record<string, FetchedGameData[]> = {};
+
+  games.forEach((game) => {
+    game.categories.forEach((category) => {
+      if (!categorizedGames[category]) {
+        categorizedGames[category] = [];
+      }
+      categorizedGames[category].push({
+        id: game.id,
+        name: game.name,
+        description: game.description,
+        thumbnail_url: game.thumbnail_url,
+        play_url: game.play_url,
+        tags: game.tags,
+        provider_id: game.provider_id,
+        categories: game.categories,
+        is_active: game.is_active,
+        created_at: game.created_at,
+        updated_at: game.updated_at,
+      });
+    });
+  });
+
+  return categorizedGames;
+}
 
 export default async function DashboardPage() {
   const games = await getAllGames();
+  const categories = await getGamesByCategory(games);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-purple-900 text-white p-6 md:p-8 lg:p-12">
@@ -55,54 +82,16 @@ export default async function DashboardPage() {
         </section>
 
         {/* All Games Grid */}
-        <section>
-          <h2 className="text-2xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500">
-            Action
-          </h2>
-          <Suspense fallback={<div className="h-96 bg-white/5 rounded-3xl animate-pulse"></div>}>
-            <AllGames games={games} />
-          </Suspense>
-        </section>
-        <section>
-          <h2 className="text-2xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500">
-            Adventure 
-          </h2>
-          <Suspense fallback={<div className="h-96 bg-white/5 rounded-3xl animate-pulse"></div>}>
-            <AllGames games={games} />
-          </Suspense>
-        </section>
-        <section>
-          <h2 className="text-2xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500">
-            Arcade 
-          </h2>
-          <Suspense fallback={<div className="h-96 bg-white/5 rounded-3xl animate-pulse"></div>}>
-            <AllGames games={games} />
-          </Suspense>
-        </section>
-        <section>
-          <h2 className="text-2xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500">
-            BoardGame
-          </h2>
-          <Suspense fallback={<div className="h-96 bg-white/5 rounded-3xl animate-pulse"></div>}>
-            <AllGames games={games} />
-          </Suspense>
-        </section>
-        <section>
-          <h2 className="text-2xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500">
-            Driving
-          </h2>
-          <Suspense fallback={<div className="h-96 bg-white/5 rounded-3xl animate-pulse"></div>}>
-            <AllGames games={games} />
-          </Suspense>
-        </section>
-        <section>
-          <h2 className="text-2xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500">
-            Multiplayer
-          </h2>
-          <Suspense fallback={<div className="h-96 bg-white/5 rounded-3xl animate-pulse"></div>}>
-            <AllGames games={games} />
-          </Suspense>
-        </section>  
+        {Object.entries(categories).map(([category, games]) => (
+          <section key={category}>
+            <h2 className="text-2xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500">
+              {category}
+            </h2>
+            <Suspense fallback={<div className="h-96 bg-white/5 rounded-3xl animate-pulse"></div>}>
+              <AllGames games={games} />
+            </Suspense>
+          </section>
+        ))}
       </div>
     </div>
   )

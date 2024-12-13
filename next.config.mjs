@@ -9,6 +9,20 @@ const nextConfig = {
               pathname: '/storage/v1/object/public/**',
               search: '',
             },
+            {
+              protocol: 'https',
+              hostname: 'www.htmlgames.com',
+              port: '',
+              pathname: '/**',
+              search: '',
+            },
+            {
+              protocol: 'https',
+              hostname: 'cdn.htmlgames.com',
+              port: '',
+              pathname: '/**',
+              search: '',
+            },
         ],
     },
 };

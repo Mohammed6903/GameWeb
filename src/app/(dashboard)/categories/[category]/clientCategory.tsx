@@ -9,47 +9,40 @@ import { getGamesByCategory } from '@/lib/controllers/games'
 import { Pagination } from '@/components/pagination'
 import GameNotFound from '@/components/game-not-found'
 import {FilterModal}  from "@/components/filterModal"
+import { useRouter } from 'next/navigation';
 
-interface CategoryPageProps {
-  params: {
-    category: string
-  },
-  searchParams: {
-    page?: string
-  }
+interface ClientCategoryProps {
+  category: string,
+  gameProp: FetchedGameData[],
+  totalProp: number,
+  handlePageChange: (page: number) => Promise<{games: any[], total: number | null}>
 }
 
-export default function CategoryPage({ params, searchParams }: CategoryPageProps) {
-  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false)
+export default function ClientCategoryPage({ category, gameProp, totalProp, handlePageChange }: ClientCategoryProps) {
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState<number>(1);
   const [filters, setFilters] = useState({ search: '', tags: [] as string[] })
-  const category = decodeURIComponent(params.category);
-  const currentPage = parseInt(searchParams.page || '1', 10);
-  const [games, setGames] = useState<any[]>();
-  const [total, setTotal] = useState<number>(0);
+  const [games, setGames] = useState<any []>(gameProp);
+  const [total, setTotal] = useState<number>(totalProp);
   const gamesPerPage = 12;
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const { games, total } = await getGamesByCategory(category, {
-        page: currentPage,
-        limit: gamesPerPage
-      });
-      if (!games || total === null) {
-        return <GameNotFound />
-      }
-      setGames(games);
-      setTotal(total);
-    }
-  })
-
   const totalPages = Math.ceil(total / gamesPerPage);
+  const router = useRouter();
 
   const handleApplyFilters = (newFilters: { search: string; tags: string[] }) => {
     setFilters(newFilters)
-    // Here you would typically filter your tasks based on the new filters
-    console.log('Applied filters:', newFilters)
   }
 
+  useEffect(() => {
+    const fetchNew = async () => {
+        const res = await handlePageChange(currentPage);
+        if (res.games && res.total) {
+            setGames(res.games);
+            setTotal(res.total);
+        }
+        router.refresh();
+    }
+    fetchNew();
+  }, [currentPage])
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-purple-900 text-white p-6 md:p-8 lg:p-12">
@@ -105,7 +98,7 @@ export default function CategoryPage({ params, searchParams }: CategoryPageProps
                     />
                   )}
                   <div className="absolute inset-0 bg-black/20 hover:bg-black/40 transition-all duration-300 flex items-center justify-center opacity-0 hover:opacity-100">
-                    <Button className="bg-white/30 hover:bg-white/50 text-white">
+                    <Button className="bg-white/30 hover:bg-white/50 text-white" onClick={() => router.push(`/play/${game.id}`)}>
                       Play Now
                     </Button>
                   </div>
@@ -134,6 +127,7 @@ export default function CategoryPage({ params, searchParams }: CategoryPageProps
             <Pagination 
               currentPage={currentPage} 
               totalPages={totalPages} 
+              setCurrentPage={setCurrentPage}
               baseUrl={`/search/${category}`}
             />
           </div>

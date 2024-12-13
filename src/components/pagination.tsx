@@ -6,9 +6,10 @@ interface PaginationProps {
   currentPage: number
   totalPages: number
   baseUrl: string
+  setCurrentPage:  React.Dispatch<React.SetStateAction<number>>
 }
 
-export function Pagination({ currentPage, totalPages, baseUrl }: PaginationProps) {
+export function Pagination({ currentPage, totalPages, baseUrl, setCurrentPage }: PaginationProps) {
   const generatePageNumbers = () => {
     const pages = [];
     const maxPagesToShow = 5;
@@ -33,20 +34,18 @@ export function Pagination({ currentPage, totalPages, baseUrl }: PaginationProps
     <div className="flex items-center space-x-2">
       {/* Previous Button */}
       {currentPage > 1 && (
-        <Link href={`${baseUrl}?page=${currentPage - 1}`}>
           <Button 
             variant="outline" 
             size="icon" 
             className="text-gray-300 hover:text-white hover:bg-white/10"
+            onClick={() => setCurrentPage(currentPage - 1)}
           >
             <ChevronLeft className="size-5" />
           </Button>
-        </Link>
       )}
 
       {/* Page Numbers */}
       {pageNumbers.map((page) => (
-        <Link key={page} href={`${baseUrl}?page=${page}`}>
           <Button
             variant={page === currentPage ? "default" : "outline"}
             className={`
@@ -54,23 +53,23 @@ export function Pagination({ currentPage, totalPages, baseUrl }: PaginationProps
                 ? 'bg-violet-600 text-white' 
                 : 'text-gray-300 hover:text-white hover:bg-white/10'}
             `}
+            onClick={() => setCurrentPage(page)}
+            key={page}
           >
             {page}
           </Button>
-        </Link>
       ))}
 
       {/* Next Button */}
       {currentPage < totalPages && (
-        <Link href={`${baseUrl}?page=${currentPage + 1}`}>
           <Button 
             variant="outline" 
             size="icon" 
             className="text-gray-300 hover:text-white hover:bg-white/10"
+            onClick={() => setCurrentPage(currentPage + 1)}
           >
             <ChevronRight className="size-5" />
           </Button>
-        </Link>
       )}
     </div>
   )

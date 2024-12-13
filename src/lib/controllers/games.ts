@@ -135,25 +135,25 @@ export async function getGamesByCategory(category: string, { page = 1, limit = 1
     const from = (page - 1) * limit;
     const to = from + limit - 1;
 
-    const { data, error, count } = await supabase
-      .from('games')
-      .select('*', { count: 'exact' })
-      .contains('categories', [cat])
-      .range(from, to);
-
-    if (error) {
-      const { data: capData, error: capErr, count: capCount } = await supabase
-      .from('games')
-      .select('*', { count: 'exact' })
-      .contains('categories', [category])
-      .range(from, to);
-      if (capErr) {
+    const { data: capData, error: capErr, count: capCount } = await supabase
+    .from('games')
+    .select('*', { count: 'exact' })
+    .contains('categories', [category])
+    .range(from, to);
+    
+    if (capErr) {
+      const { data, error, count } = await supabase
+        .from('games')
+        .select('*', { count: 'exact' })
+        .contains('categories', [cat])
+        .range(from, to);
+      if (error) {
         throw new Error(`Error fetching games: ${capErr.message}`);
-      } else {
-        return {games: capData, total: capCount}
       }
+      return { games: data, total: count };
+    } else {
+      return {games: capData, total: capCount}
     }
-    return { games: data, total: count };
   } catch (error: any) {
     throw new Error(`Error fetching games: ${error.message}`);
   }
