@@ -1,9 +1,4 @@
-import { Suspense } from 'react'
-import { Tag, Filter, Grid, List } from 'lucide-react'
-import { Button } from "@/components/ui/button"
-import { FetchedGameData } from '@/types/games'
 import { getGamesByCategory } from '@/lib/controllers/games'
-import { Pagination } from '@/components/pagination'
 import GameNotFound from '@/components/game-not-found'
 import ClientCategoryPage from './clientCategory'
 

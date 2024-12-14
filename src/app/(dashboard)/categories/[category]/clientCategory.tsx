@@ -5,10 +5,8 @@ import { Suspense } from 'react'
 import { Tag, Filter, Grid, List } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { FetchedGameData } from '@/types/games'
-import { getGamesByCategory } from '@/lib/controllers/games'
 import { Pagination } from '@/components/pagination'
-import GameNotFound from '@/components/game-not-found'
-import {FilterModal}  from "@/components/filterModal"
+// import {FilterModal}  from "@/components/filterModal"
 import { useRouter } from 'next/navigation';
 
 interface ClientCategoryProps {
@@ -28,9 +26,9 @@ export default function ClientCategoryPage({ category, gameProp, totalProp, hand
   const totalPages = Math.ceil(total / gamesPerPage);
   const router = useRouter();
 
-  const handleApplyFilters = (newFilters: { search: string; tags: string[] }) => {
-    setFilters(newFilters)
-  }
+  // const handleApplyFilters = (newFilters: { search: string; tags: string[] }) => {
+  //   setFilters(newFilters)
+  // }
 
   useEffect(() => {
     const fetchNew = async () => {
@@ -61,13 +59,7 @@ export default function ClientCategoryPage({ category, gameProp, totalProp, hand
                 {total} games in this category
               </p>
             </div>
-            <div className="flex items-center space-x-4">
-              <Button variant="ghost" size="icon" className="text-gray-300 hover:text-white">
-                <Grid className="size-6" />
-              </Button>
-              <Button variant="ghost" size="icon" className="text-gray-300 hover:text-white">
-                <List className="size-6" />
-              </Button>
+            {/* <div className="flex items-center space-x-4">
               <Button onClick={() => setIsFilterModalOpen(true)} variant="outline" className="gap-2 text-gray-300 hover:text-white hover:bg-white/10">
                 <Filter className="size-5 text-purple-500" />
                 Filters
@@ -77,7 +69,7 @@ export default function ClientCategoryPage({ category, gameProp, totalProp, hand
                 onClose={() => setIsFilterModalOpen(false)}
                 onApplyFilters={handleApplyFilters}
               />
-            </div>
+            </div> */}
           </div>
         </section>
 
@@ -103,7 +95,7 @@ export default function ClientCategoryPage({ category, gameProp, totalProp, hand
                     </Button>
                   </div>
                 </div>
-                <div className="p-4">
+                <div className="p-4 hidden sm:block">
                   <h3 className="text-lg font-semibold truncate">{game.name}</h3>
                   <div className="flex flex-wrap gap-2 mt-2">
                     {game.categories.slice(0, 2).map((cat: string) => (
@@ -128,7 +120,7 @@ export default function ClientCategoryPage({ category, gameProp, totalProp, hand
               currentPage={currentPage} 
               totalPages={totalPages} 
               setCurrentPage={setCurrentPage}
-              baseUrl={`/search/${category}`}
+              baseUrl={`/categories/${category}`}
             />
           </div>
         )}
