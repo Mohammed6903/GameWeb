@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { signOutAction } from "@/lib/actions/authActions"
+import { getMeta } from "@/lib/controllers/meta"
 
 interface publicUserSchema {
   id: string,
@@ -27,6 +28,7 @@ interface publicUserSchema {
 export function NavBar() {
   const [isSearchVisible, setIsSearchVisible] = useState(false)
   const [user, setUser] = useState<any>();
+  const [siteName, setSiteName] = useState<string>('');
   const [emailInfo, setEmailInfo] = useState<any>();
   const router = useRouter();
   const supabase = createClient();
@@ -42,7 +44,16 @@ export function NavBar() {
     };
   
     fetchUser();
-  }, [supabase]); // Ensure supabase is included as a dependency if it can change.
+  }, [supabase]);
+
+  useEffect(() => {
+    const fetch = async () => {
+      const metaResult = await getMeta();
+      const metaData = metaResult.status === 200 && metaResult.data ? metaResult.data : {};
+      setSiteName(metaData.site_name);
+    };
+    fetch();
+  }, [siteName])
   
   useEffect(() => {
     const fetchEmailInfo = async () => {
@@ -80,9 +91,9 @@ export function NavBar() {
           <SidebarTrigger className="text-white/80 hover:text-white" />
           <Link href="/" className="flex items-center gap-2">
             <div className="size-8 rounded-lg bg-white/20 flex items-center justify-center">
-              <span className="text-sm font-bold text-white">GG</span>
+              <img src="/favicon.ico" alt="icon" />
             </div>
-            <span className="font-semibold text-white">GameGrid</span>
+            <span className="font-semibold text-white">{siteName ? siteName : 'Paneer Gaming'}</span>
           </Link>
         </div>
         
