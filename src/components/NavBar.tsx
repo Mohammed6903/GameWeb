@@ -140,7 +140,7 @@ export function NavBar() {
                   <div className="text-sm font-medium">{emailInfo ? (emailInfo.first_name + " " + emailInfo.last_name) : user.user_metadata.name}</div>
                   <div className="text-xs text-muted-foreground">{user.email}</div>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={signOutAction}>
+                <DropdownMenuItem onClick={async () => await signOutAction()}>
                   <LogOut className="mr-2 h-4 w-4" />
                   <span>Log out</span>
                 </DropdownMenuItem>
