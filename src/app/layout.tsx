@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import Script from "next/script";
 import { getMeta } from "@/lib/controllers/meta";
+import { GoogleAnalytics } from '@next/third-parties/google'
 
 const geistSans = localFont({
   src: "fonts/GeistVF.woff",
@@ -41,8 +42,8 @@ export default async function RootLayout({
   const metaResult = await getMeta();
 
   const metaData = metaResult.status === 200 && metaResult.data ? metaResult.data : {};
-  const siteTitle = metaData.site_name || "Default Site Name";
-  const siteDescription = metaData.description || "Default Site Description";
+  const siteTitle = metaData.site_name || "Paneer World";
+  const siteDescription = metaData.description || "A Gaming website for people of all ages";
 
   metadata.title = siteTitle;
   metadata.description = siteDescription;
@@ -50,8 +51,8 @@ export default async function RootLayout({
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         {children}
-        <Script src="https://accounts.google.com/gsi/client" strategy="beforeInteractive" />
       </body>
+      <GoogleAnalytics gaId="G-0TVV790ZXC" />
     </html>
   );
 }
