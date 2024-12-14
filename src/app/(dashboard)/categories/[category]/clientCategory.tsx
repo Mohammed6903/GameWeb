@@ -16,10 +16,17 @@ interface ClientCategoryProps {
   handlePageChange: (page: number) => Promise<{games: any[], total: number | null}>
 }
 
+export function capitalizeCategory(category: string) {
+  return category
+      .split(' ') // Split the string into words
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize the first letter of each word
+      .join(' '); // Join the words back into a single string
+}
+
 export default function ClientCategoryPage({ category, gameProp, totalProp, handlePageChange }: ClientCategoryProps) {
-  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+  // const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [filters, setFilters] = useState({ search: '', tags: [] as string[] })
+  // const [filters, setFilters] = useState({ search: '', tags: [] as string[] })
   const [games, setGames] = useState<any []>(gameProp);
   const [total, setTotal] = useState<number>(totalProp);
   const gamesPerPage = 12;
@@ -53,7 +60,7 @@ export default function ClientCategoryPage({ category, gameProp, totalProp, hand
             </div>
             <div className="flex-grow">
               <h1 className="text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500">
-                {category} Games
+                {capitalizeCategory(category)} Games
               </h1>
               <p className="text-purple-300 mt-2">
                 {total} games in this category
