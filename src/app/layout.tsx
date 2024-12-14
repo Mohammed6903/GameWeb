@@ -49,6 +49,9 @@ export default async function RootLayout({
   metadata.description = siteDescription;
   return (
     <html lang="en">
+      <head>
+        <meta name="google-adsense-account" content="ca-pub-4863652914816266" />
+      </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         {children}
       </body>
