@@ -4,12 +4,16 @@ import { encodedRedirect } from "@/lib/utils/utils";
 import { createClient } from "@/lib/utils/supabase/server";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { supabaseAdmin } from "../utils/supabase/admin";
 
 export const signUpAction = async (formData: FormData) => {
   const email = formData.get("email")?.toString();
   const password = formData.get("password")?.toString();
+  const first_name = formData.get('firstName');
+  const last_name = formData.get('lastName');
   const supabase = await createClient();
   const origin = (await headers()).get("origin");
+  console.log(origin);
 
   if (!email || !password) {
     return encodedRedirect(
@@ -31,6 +35,15 @@ export const signUpAction = async (formData: FormData) => {
     console.error(error.code + " " + error.message);
     return encodedRedirect("error", "/sign-up", error.message);
   } else {
+    const response = await supabaseAdmin.from('emailUser').upsert({
+      email,
+      first_name: first_name,
+      last_name: last_name,
+    }, {onConflict: 'email'});
+    if (response.error) {
+      console.error(response.error.code + " " + response.error.message);
+      return encodedRedirect("error", "/sign-up", response.error.message);
+    }
     return encodedRedirect(
       "success",
       "/sign-up",
@@ -135,3 +148,12 @@ export const signOutAction = async () => {
   await supabase.auth.signOut();
   return redirect("/sign-in");
 };
+
+export const getEmailInfo = async (id: string) => {
+  const supabase = await createClient();
+  const {error, data} = await supabase.from("users").select().eq('id', id);
+  if (error) {
+    throw new Error('Error getting user name');
+  }
+  return {data};
+}

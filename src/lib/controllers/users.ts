@@ -1,12 +1,6 @@
 "user server";
-import { createClient } from "@supabase/supabase-js";
-
-// Create the Supabase admin client
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
-
+import { createClient } from "../utils/supabase/server";
+import { supabaseAdmin } from "../utils/supabase/admin";
 /**
  * Fetch all users from Supabase auth
  */
