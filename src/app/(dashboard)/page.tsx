@@ -6,7 +6,7 @@ import { AllGames } from '@/components/all-games'
 import { FetchedGameData, Game } from '@/types/games'
 import { getAllGames } from '@/lib/controllers/games'
 
-export async function getGamesByCategory(games: FetchedGameData[]): Promise<Record<string, FetchedGameData[]>> {
+async function getGamesByCategory(games: FetchedGameData[]): Promise<Record<string, FetchedGameData[]>> {
   const categorizedGames: Record<string, FetchedGameData[]> = {};
 
   games.forEach((game) => {
