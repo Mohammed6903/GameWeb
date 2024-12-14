@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import siteConfig from "@/lib/config/siteConfig";
 import Script from "next/script";
+import { getMeta } from "@/lib/controllers/meta";
 
 const geistSans = localFont({
   src: "fonts/GeistVF.woff",
@@ -17,8 +17,8 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: siteConfig.general.siteName,
-  description: siteConfig.seo.description,
+  title: 'Paneer Gaming',
+  description: 'A site for enjoying games.',
   icons: {
     icon: [
       { url: '/favicon.ico' },
@@ -29,18 +29,23 @@ export const metadata: Metadata = {
     ],
     apple: [
       { url: '/apple-touch-icon.png' }
-    ],
-    other: [
-
     ]
   }
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const metaResult = await getMeta();
+
+  const metaData = metaResult.status === 200 && metaResult.data ? metaResult.data : {};
+  const siteTitle = metaData.site_name || "Default Site Name";
+  const siteDescription = metaData.description || "Default Site Description";
+
+  metadata.title = siteTitle;
+  metadata.description = siteDescription;
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>

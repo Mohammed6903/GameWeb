@@ -37,7 +37,6 @@ export function NavBar() {
       if (response.error) {
         setUser(null);
       } else {
-        console.log("Setting user:", response.data.user);
         setUser(response.data.user);
       }
     };
@@ -59,11 +58,6 @@ export function NavBar() {
           setUser(null);
         } else {
           setEmailInfo({
-            id: user?.id,
-            first_name: response.data.first_name,
-            last_name: response.data.last_name,
-          });
-          console.log("Email Info:", {
             id: user?.id,
             first_name: response.data.first_name,
             last_name: response.data.last_name,

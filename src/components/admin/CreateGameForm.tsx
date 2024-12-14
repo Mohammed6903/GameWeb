@@ -2,7 +2,7 @@
 import { BaseGameForm } from './BaseGameForm';
 import { GameFormData } from '@/types/games';
 import { Provider } from '@/components/admin/ProviderForm';
-import { toast } from 'sonner';
+import { toast, Toaster } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { addGame } from '@/lib/controllers/games';
 
@@ -26,13 +26,16 @@ export function CreateGameForm({ providers, categories, tags }: CreateGameFormPr
   };
 
   return (
-    <BaseGameForm
-      initialData={{}}
-      providers={providers}
-      categories={categories}
-      tags={tags}
-      onSubmit={handleAddGame}
-      submitButtonText="Add Game"
-    />
+    <>    
+      <BaseGameForm
+        initialData={{}}
+        providers={providers}
+        categories={categories}
+        tags={tags}
+        onSubmit={handleAddGame}
+        submitButtonText="Add Game"
+      />
+      <Toaster position='bottom-right' />
+    </>
   );
 }

@@ -1,4 +1,3 @@
-// src/components/admin/DeleteGameDialog.tsx
 'use client';
 
 import { useState } from 'react';

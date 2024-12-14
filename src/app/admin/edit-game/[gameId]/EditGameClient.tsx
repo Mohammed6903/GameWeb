@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { UpdateGameForm } from '@/components/admin/UpdateGameForm';
-import { toast } from 'sonner';
+import { toast, Toaster } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { Game } from '@/types/games';
 import { updateGame } from '@/lib/controllers/games';
@@ -53,12 +53,15 @@ export default function EditGameClient({
   };
 
   return (
-        <UpdateGameForm
-            initialData={game}
-            providers={providers}
-            categories={categories}
-            tags={tags}
-            onSubmit={handleUpdateGame}
-        />
+    <>    
+      <UpdateGameForm
+          initialData={game}
+          providers={providers}
+          categories={categories}
+          tags={tags}
+          onSubmit={handleUpdateGame}
+      />
+      <Toaster position='bottom-right' />
+    </>
   );
 }

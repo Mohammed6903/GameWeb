@@ -25,12 +25,24 @@ export default function Signup(props: {
   const toggleConfirmPasswordVisibility = () => setShowConfirmPassword(!showConfirmPassword);
 
   useEffect(() => {
-    const fetch = async () => {
-      const response = await props.searchParams;
-      setSearchParams(response);
+    const fetchParams = async () => {
+      try {
+        const response = await props.searchParams;
+        setSearchParams(response);
+      } catch (error) {
+        console.error("Error fetching search params:", error);
+      }
     }
-    fetch();
-  }, [])
+    fetchParams();
+  }, [props.searchParams]);
+
+  if (searchParams && "message" in searchParams) {
+    return (
+      <div className="w-full flex-1 flex items-center h-screen sm:max-w-md justify-center gap-2 p-4">
+        <FormMessage message={searchParams} />
+      </div>
+    );
+  }
 
   return (
     <>
@@ -125,7 +137,7 @@ export default function Signup(props: {
               Sign up
             </SubmitButton>
           </form>
-          {searchParams && (<FormMessage message={searchParams} />)}
+          {searchParams && <FormMessage message={searchParams} />}
           <p className="text-sm text-gray-600">
             Already have an account?{" "}
             <Link className="text-purple-500 hover:text-purple-600 underline" href="/sign-in">

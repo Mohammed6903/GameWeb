@@ -45,7 +45,6 @@ export async function addGame(gameData: GameFormData) {
       categories: gameData.categories,
       provider_id: Number(gameData.provider_id),
     }).select().single();
-    console.log('added game')
 
     if (error) {
       throw new Error(`Error inserting game: ${error.message}`);
@@ -103,7 +102,6 @@ export async function getAllGames(): Promise<FetchedGameData[]> {
   const supabase = await createClient();
   const {data, error} = await supabase.from('games').select('*');
   if (error) {
-    console.log(`Error fetching all games: ${error}`);
     throw Error(`Error fetching all games.`);
   } else {    
     return data;

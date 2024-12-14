@@ -13,7 +13,6 @@ export const signUpAction = async (formData: FormData) => {
   const last_name = formData.get('lastName');
   const supabase = await createClient();
   const origin = (await headers()).get("origin");
-  console.log(origin);
 
   if (!email || !password) {
     return encodedRedirect(

@@ -61,8 +61,6 @@ export const postComment = async (gameId: number, content: string) => {
             return { error: 'User not authenticated' };
         }
 
-        console.log(gameId);
-
         const { data, error } = await supabase
             .from('comments')
             .insert({

@@ -94,7 +94,6 @@ export function BaseGameForm({ initialData, providers = [], categories = [], tag
   }, [form.watch("thumbnail_url")]);
 
   const handleSubmit = async (data: GameFormData) => {
-    console.log('Inside handleSubmit')
     try {
       const validation = validateGameForm(data);
       if (!validation.success) {

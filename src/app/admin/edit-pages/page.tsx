@@ -17,7 +17,6 @@ const MonacoEditor = dynamic(() => import("@monaco-editor/react"), { ssr: false 
 
 const saveContent = async (page: string, content: string) => {
   const data = await updatePage(page, content);
-  console.log(data);  
   return new Promise(resolve => setTimeout(resolve, 1000));
 };
 
@@ -345,44 +344,6 @@ export default function PolicyEditorPage() {
           </Button>
         </CardContent>
       </Card>
-
-      {/* Rest of the components remain the same */}
-      <Card className="bg-gray-50 border-none">
-        <CardHeader>
-          <CardTitle className="text-lg font-semibold text-gray-700">
-            Policy Page Management
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <p className="text-gray-600">
-            Manage visibility and URLs for policy pages.
-          </p>
-          <div className="grid grid-cols-2 gap-4">
-            <Button variant="outline">Manage Page Visibility</Button>
-            <Button variant="outline">Edit Page URLs</Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card className="bg-gray-50 border-none">
-        <CardHeader>
-          <CardTitle className="text-lg font-semibold text-gray-700">
-            Version History
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-gray-600">
-            View and restore previous versions of policy pages.
-          </p>
-          <Button variant="outline">View Version History</Button>
-        </CardContent>
-      </Card>
-
-      <div className="flex justify-end">
-        <Button className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600">
-          Publish All Changes
-        </Button>
-      </div>
     </div>
   );
 }
