@@ -18,25 +18,19 @@ interface ClientCategoryProps {
 
 export function capitalizeCategory(category: string) {
   return category
-      .split(' ') // Split the string into words
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize the first letter of each word
-      .join(' '); // Join the words back into a single string
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
 }
 
 export default function ClientCategoryPage({ category, gameProp, totalProp, handlePageChange }: ClientCategoryProps) {
-  // const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  // const [filters, setFilters] = useState({ search: '', tags: [] as string[] })
   const [games, setGames] = useState<any []>(gameProp);
   const [total, setTotal] = useState<number>(totalProp);
   const gamesPerPage = 12;
   const totalPages = Math.ceil(total / gamesPerPage);
   const router = useRouter();
-
-  // const handleApplyFilters = (newFilters: { search: string; tags: string[] }) => {
-  //   setFilters(newFilters)
-  // }
-
+  
   useEffect(() => {
     const fetchNew = async () => {
         const res = await handlePageChange(currentPage);

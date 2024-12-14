@@ -13,7 +13,7 @@ import {
   SidebarHeader,
   useSidebar
 } from "@/components/ui/sidebar"
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { getUsedCategories } from '@/lib/controllers/categories'
 import { toast, Toaster } from 'sonner'
 import { capitalizeCategory } from '@/app/(dashboard)/categories/[category]/clientCategory'
@@ -26,25 +26,13 @@ const mainNavItems = [
   { name: "Updated", url: "/updated", icon: RefreshCw },
 ]
 
-export function AppSideBar() {
-  const [categories, setCategories] = useState<{category:string, count: number}[]>([]);
-  const [siteName, setSiteName] = useState<string>('');
-  const { open } = useSidebar();
+interface sidebarProps{
+  siteName: string
+}
 
-  useEffect(() => {
-    const fetch = async () => {
-      const res = await getUsedCategories();
-      const metaResult = await getMeta();
-      const metaData = metaResult.status === 200 && metaResult.data ? metaResult.data : {};
-      setSiteName(metaData.site_name);
-      if (res?.[0] === null){
-        toast('OOPS! It seems that there are no games added yet!');
-      } else {
-        setCategories(res);
-      }
-    };
-    fetch();
-  }, [siteName])
+export const AppSideBar: React.FC<sidebarProps> = ({siteName}) => {
+  const [categories, setCategories] = useState<{category:string, count: number}[]>([]);
+  const { open } = useSidebar();
 
   return (
     <Sidebar 

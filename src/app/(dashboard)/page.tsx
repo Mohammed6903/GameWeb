@@ -5,6 +5,14 @@ import { FeaturedGames } from '@/components/featured-games'
 import { AllGames } from '@/components/all-games'
 import { FetchedGameData, Game } from '@/types/games'
 import { getAllGames } from '@/lib/controllers/games'
+import { getMeta } from '@/lib/controllers/meta'
+
+function capitalizeCategory(category: string) {
+  return category
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+}
 
 async function getGamesByCategory(games: FetchedGameData[]): Promise<Record<string, FetchedGameData[]>> {
   const categorizedGames: Record<string, FetchedGameData[]> = {};
@@ -36,6 +44,8 @@ async function getGamesByCategory(games: FetchedGameData[]): Promise<Record<stri
 export default async function DashboardPage() {
   const games = await getAllGames();
   const categories = await getGamesByCategory(games);
+  const metaResult = await getMeta();
+  const metaData = metaResult.status === 200 && metaResult.data ? metaResult.data : {};
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-purple-900 text-white p-6 md:p-8 lg:p-12">
@@ -49,7 +59,7 @@ export default async function DashboardPage() {
               </div>
               <div>
                 <h1 className="text-2xl md:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500">
-                  Welcome to CrazyGames
+                  Welcome to {metaData.site_name ? capitalizeCategory(metaData.site_name) : 'Paneer World'}
                 </h1>
                 <p className="text-purple-300 mt-2">Play instantly, no downloads needed</p>
               </div>

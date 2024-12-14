@@ -5,9 +5,10 @@ import { Bell, Heart, Search, Menu, LogOut } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { SidebarTrigger } from "@/components/ui/sidebar"
-import { useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/utils/supabase/client"
+import { useMetadataStore } from '@/hooks/stores/meta';
 import { User } from "@supabase/supabase-js"
 import {
   DropdownMenu,
@@ -19,16 +20,13 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { signOutAction } from "@/lib/actions/authActions"
 import { getMeta } from "@/lib/controllers/meta"
 
-interface publicUserSchema {
-  id: string,
-  first_name: any,
-  last_name: any
+interface NavBarprops {
+  siteName: string
 }
 
-export function NavBar() {
+export const NavBar: React.FC<NavBarprops> = ({siteName}) => {
   const [isSearchVisible, setIsSearchVisible] = useState(false)
   const [user, setUser] = useState<any>();
-  const [siteName, setSiteName] = useState<string>('');
   const [emailInfo, setEmailInfo] = useState<any>();
   const router = useRouter();
   const supabase = createClient();
@@ -45,15 +43,6 @@ export function NavBar() {
   
     fetchUser();
   }, [supabase]);
-
-  useEffect(() => {
-    const fetch = async () => {
-      const metaResult = await getMeta();
-      const metaData = metaResult.status === 200 && metaResult.data ? metaResult.data : {};
-      setSiteName(metaData.site_name);
-    };
-    fetch();
-  }, [siteName])
   
   useEffect(() => {
     const fetchEmailInfo = async () => {
