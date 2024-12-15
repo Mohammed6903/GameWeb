@@ -121,7 +121,7 @@ export function AllGames({ games, adFrequency = 3 }: GamesCarouselProps) {
             ) : (
               <Card 
                 className="group relative overflow-hidden rounded-xl bg-white/5 border-transparent hover:bg-white/10 transition-all duration-300 cursor-pointer"
-                onClick={() => {(item.game) && openGame( item.game.id)}}
+                onClick={() => (item.game && openGame(item.game.id))}
               >
                   {item.game && (
                     <div className="aspect-square relative">
