@@ -1,5 +1,5 @@
 'use server'
-import { ContactInfo } from "@/app/pages/contacts/page";
+import { ContactInfo } from "@/app/(dashboard)/pages/contacts/page";
 import { createClient } from "../utils/supabase/server";
 
 export async function getPageContent(slug: string): Promise<{ content: string }> {
