@@ -11,7 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import dynamic from 'next/dynamic';
 import { getAllPages, getContactInfo, getPageContent, updatePage, upsertContactInfo } from "@/lib/controllers/dynamicPages";
 import { PlusCircle, Trash2 } from 'lucide-react';
-import { ContactInfo } from "@/app/pages/contacts/page";
+import { ContactInfo } from "@/app/(dashboard)/pages/contacts/page";
 
 const MonacoEditor = dynamic(() => import("@monaco-editor/react"), { ssr: false });
 
