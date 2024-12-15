@@ -91,10 +91,23 @@ export async function updateGame(
   }
 }
 
-export async function deleteGame(gameId: string): Promise<void> {
-  const index = mockGames.findIndex(game => game.id === gameId);
-  if (index !== -1) {
-    mockGames.splice(index, 1);
+export async function deleteGame(gameId: string) {
+  const supabase = await createClient();
+  
+  try {
+    const { error } = await supabase
+      .from('games')
+      .delete()
+      .eq('id', gameId);
+
+    if (error) {
+      console.error(`Error deleting game: ${error.message}`);
+    }
+
+    return {status: 200, message: 'Deleted game successfully!'};
+  } catch (err) {
+    console.error('Error deleting game:', err);
+    return {status: 500, message: 'Error deleting game'};
   }
 }
 
@@ -106,6 +119,37 @@ export async function getAllGames(): Promise<FetchedGameData[]> {
   } else {    
     return data;
   }
+}
+
+export async function getPaginatedGames(page: number, pageSize: number): Promise<FetchedGameData[]> {
+  const supabase = await createClient();
+  
+  const offset = (page - 1) * pageSize;
+
+  const { data, error } = await supabase
+    .from('games')
+    .select('*')
+    .range(offset, offset + pageSize - 1);
+
+  if (error) {
+    throw new Error(`Error fetching games: ${error.message}`);
+  } else {
+    return data as FetchedGameData[];
+  }
+}
+
+export async function getTotalGamesCount(): Promise<number> {
+  const supabase = await createClient();
+  
+  const { count, error } = await supabase
+    .from('games')
+    .select('*', { count: 'exact', head: true });
+
+  if (error) {
+    throw new Error(`Error fetching total games count: ${error.message}`);
+  }
+
+  return count || 0;
 }
 
 export async function getGameById(gameId: string) {

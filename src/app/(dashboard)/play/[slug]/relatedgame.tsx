@@ -1,7 +1,5 @@
 import Link from 'next/link'
 import { Card } from "@/components/ui/card"
-import { FetchedGameData } from "@/types/games"
-// import Image from 'next/image'
 
 interface RelatedGamesProps {
   categories: string[]

@@ -4,8 +4,8 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { CommentSection } from '@/components/comment';
-import { RelatedGames } from './relatedgame';
 import { GameViewer } from '@/components/game-viewer';
+import { GamePageAd } from '@/components/adSense/GamePageAds';
 import { ArrowLeft, ThumbsUp, ThumbsDown, Tag } from 'lucide-react';
 import { toast } from 'sonner';
 import { dislikeGame, getLikedOrDisliked, likeGame } from '@/lib/controllers/like';
@@ -26,6 +26,14 @@ interface GamePageProps {
 
 export default function GamePage({ game, user }: GamePageProps) {
     const [like, setLike] = useState<boolean | null>(null);
+    const [adsConfig, setAdsConfig] = useState({
+        adSlots: ["1234567890", "0987654321", "1357924680", "2468013579"],
+        adFormat: "auto",
+        dataFullWidthResponsive: true,
+        sidebarAdCount: 1,
+    });
+
+    const [showAds, setShowAds] = useState(true);
 
     useEffect(() => {
         const fetchStatus = async () => {
@@ -33,9 +41,22 @@ export default function GamePage({ game, user }: GamePageProps) {
                 const response = await getLikedOrDisliked(game.id, user.id);
                 setLike(response?.is_like);
             }
-        }
+        };
         fetchStatus();
-    }, [like]);
+
+        // Example: Simulate fetching ad configurations dynamically from a server
+        const fetchAdsConfig = async () => {
+            const fetchedConfig = {
+                adSlots: ["1234567890", "0987654321", "1357924680", "2468013579"],
+                adFormat: "auto",
+                dataFullWidthResponsive: true,
+                sidebarAdCount: 1,
+            };
+            setAdsConfig(fetchedConfig);
+        };
+
+        fetchAdsConfig();
+    }, [like, game.id, user]);
 
     const likeHandler = async () => {
         if (user) {
@@ -46,7 +67,7 @@ export default function GamePage({ game, user }: GamePageProps) {
         } else {
             toast('Sign in to like games');
         }
-    }
+    };
 
     const dislikeHandler = async () => {
         if (user) {
@@ -57,7 +78,7 @@ export default function GamePage({ game, user }: GamePageProps) {
         } else {
             toast('Sign in to dislike games');
         }
-    }
+    };
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-[#120a2c] to-[#1e1540] text-white p-6 md:p-8 lg:p-12">
@@ -75,9 +96,7 @@ export default function GamePage({ game, user }: GamePageProps) {
                             </h1>
                             <div className="flex items-center space-x-2">
                                 <Button
-                                    onClick={async () => {
-                                        await likeHandler()
-                                    }}
+                                    onClick={likeHandler}
                                     variant="outline"
                                     size="icon"
                                     className={`text-black bg-white hover:bg-purple-700 hover:text-white ${like ? "bg-purple-700 text-white" : ""}`}
@@ -85,17 +104,25 @@ export default function GamePage({ game, user }: GamePageProps) {
                                     <ThumbsUp className="h-5 w-5" />
                                 </Button>
                                 <Button
-                                    onClick={async () => {
-                                        await dislikeHandler()
-                                    }}
+                                    onClick={dislikeHandler}
                                     variant="outline"
                                     size="icon"
-                                    className={`text-black bg-white hover:bg-purple-700 hover:text-white ${like ? "" : "bg-purple-700 text-white"}`}
+                                    className={`text-black bg-white hover:bg-purple-700 hover:text-white ${(like === false) ? "bg-purple-700 text-white" : ""}`}
                                 >
                                     <ThumbsDown className="h-5 w-5" />
                                 </Button>
                             </div>
                         </div>
+
+                        {/* Ad space before Game Viewer */}
+                        {showAds && (
+                            <GamePageAd
+                                adSlot={adsConfig.adSlots[0]}
+                                adFormat={adsConfig.adFormat}
+                                dataFullWidthResponsive={adsConfig.dataFullWidthResponsive}
+                                className="mb-6"
+                            />
+                        )}
 
                         {/* Game Viewer */}
                         <div className="rounded-2xl overflow-hidden shadow-2xl border-4 border-purple-800/50">
@@ -128,15 +155,33 @@ export default function GamePage({ game, user }: GamePageProps) {
                             </CardContent>
                         </Card>
 
+                        {/* Ad space before Comments Section */}
+                        {showAds && (
+                            <GamePageAd
+                                adSlot={adsConfig.adSlots[1]}
+                                adFormat={adsConfig.adFormat}
+                                dataFullWidthResponsive={adsConfig.dataFullWidthResponsive}
+                                className="my-6"
+                            />
+                        )}
+
                         {/* Comments Section */}
                         <div>
                             <CommentSection gameId={game.id} />
                         </div>
                     </div>
 
-                    {/* Related Games Sidebar */}
-                    <div className="lg:col-span-1">
-                        <RelatedGames categories={game.categories} />
+                    {/* Sidebar Ads */}
+                    <div className="lg:col-span-1 space-y-6">
+                        {Array.from({ length: adsConfig.sidebarAdCount }).map((_, index) => (
+                            <GamePageAd
+                                key={index}
+                                adSlot={adsConfig.adSlots[2]}
+                                adFormat={adsConfig.adFormat}
+                                dataFullWidthResponsive={false}
+                                className="sticky top-6"
+                            />
+                        ))}
                     </div>
                 </div>
             </div>
