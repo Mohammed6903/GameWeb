@@ -8,8 +8,6 @@ import { SidebarTrigger } from "@/components/ui/sidebar"
 import React, { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/utils/supabase/client"
-import { useMetadataStore } from '@/hooks/stores/meta';
-import { User } from "@supabase/supabase-js"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,7 +16,6 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { signOutAction } from "@/lib/actions/authActions"
-import { getMeta } from "@/lib/controllers/meta"
 
 interface NavBarprops {
   siteName: string

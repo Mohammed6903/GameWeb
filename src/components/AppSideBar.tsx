@@ -34,6 +34,18 @@ export const AppSideBar: React.FC<sidebarProps> = ({siteName}) => {
   const [categories, setCategories] = useState<{category:string, count: number}[]>([]);
   const { open } = useSidebar();
 
+  useEffect(() => {
+    const fetch = async () => {
+      const res = await getUsedCategories();
+      if (res?.[0] === null){
+        toast('OOPS! It seems that there are no games added yet!');
+      } else {
+        setCategories(res);
+      }
+    };
+    fetch();
+  }, [])
+
   return (
     <Sidebar 
       className={`
