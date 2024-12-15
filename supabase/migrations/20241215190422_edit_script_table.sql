@@ -1,13 +1,15 @@
 DROP TABLE IF EXISTS adsense_scripts CASCADE;
 CREATE TABLE adsense_scripts (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    name TEXT NOT NULL,
-    element TEXT NOT NULL,
-    position TEXT CHECK (position IN ('before', 'after')) NOT NULL,
-    script TEXT NOT NULL,
+    name TEXT NOT NULL UNIQUE,
+    element JSONB NOT NULL,
+    position TEXT NOT NULL DEFAULT 'after' CHECK (position IN ('before', 'after')), -- Default position
+    script TEXT NOT NULL,      -- The JavaScript code to inject
+    description TEXT,          -- Optional description for the script
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
+
 
 ALTER TABLE adsense_scripts ENABLE ROW LEVEL SECURITY;
 

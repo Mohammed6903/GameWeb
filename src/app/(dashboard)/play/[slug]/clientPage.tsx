@@ -115,14 +115,14 @@ export default function GamePage({ game, user }: GamePageProps) {
                         </div>
 
                         {/* Ad space before Game Viewer */}
-                        {showAds && (
+                        {/* {showAds && (
                             <GamePageAd
                                 adSlot={adsConfig.adSlots[0]}
                                 adFormat={adsConfig.adFormat}
                                 dataFullWidthResponsive={adsConfig.dataFullWidthResponsive}
                                 className="mb-6"
                             />
-                        )}
+                        )} */}
 
                         {/* Game Viewer */}
                         <div className="rounded-2xl overflow-hidden shadow-2xl border-4 border-purple-800/50">

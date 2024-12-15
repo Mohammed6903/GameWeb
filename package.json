@@ -30,6 +30,7 @@
     "@supabase/supabase-js": "^2.47.2",
     "@types/cors": "^2.8.17",
     "@types/google-one-tap": "^1.2.6",
+    "@types/jsdom": "^21.1.7",
     "apexcharts": "^4.1.0",
     "autoprefixer": "^10.4.20",
     "axios": "^1.7.9",

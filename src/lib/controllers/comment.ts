@@ -18,9 +18,9 @@ export const fetchComments = async (gameId: number) => {
       const commentsWithUsernames = await Promise.all(
         data.map(async (comment) => {
           const { data: userData, error: userError } = await supabase
-            .from('users')
+            .from('user_roles')
             .select('email')
-            .eq('id', comment.user_id)
+            .eq('user_id', comment.user_id)
             .single();
   
           if (userError) {

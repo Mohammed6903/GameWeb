@@ -10,7 +10,7 @@ import { ChevronDown, ChevronUp, Pencil, Trash2 } from 'lucide-react';
 import { UserList } from "@/components/admin/UserList";
 import { listAllUsers, promoteUser } from "@/lib/controllers/users";
 import { getMeta, insertMeta } from "@/lib/controllers/meta";
-import { getAdSettings, updateAdSettings } from "@/lib/controllers/ads";
+import { getAdSettings, parseElementAttributesFromText, saveScript, updateAdSettings } from "@/lib/controllers/ads";
 import { toast, Toaster } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AdTypeSettings } from '@/components/AdTypeSettings';
@@ -53,12 +53,16 @@ export interface AdSettings {
   sidebar_ad_count: number;
 }
 
-interface SavedScript {
+export interface SavedScript {
   id: string;
   name: string;
   element: string;
   position: string;
   script: string;
+  parsedElement: {
+    attributes: Record<string, string>;
+    type: string;
+  };
 }
 
 export default function SettingsPage() {
@@ -190,21 +194,28 @@ export default function SettingsPage() {
   const saveAdSenseScript = async () => {
     // This is a dummy function for demonstration purposes
     // In a real application, you would save this to your Supabase table
-    const newScript: SavedScript = {
+    const parsedElement = await parseElementAttributesFromText(adSenseTargetElement);
+    const pushScript: SavedScript = {
       id: Date.now().toString(),
       name: adSenseScriptName,
       element: adSenseTargetElement,
       position: adSenseInjectionPosition,
+      parsedElement: parsedElement,
       script: adSenseScript
     };
-    setSavedScripts([...savedScripts, newScript]);
-    toast.success("Successfully saved the script");
-    
-    // Reset form fields
-    setAdSenseScriptName("");
-    setAdSenseScript("");
-    setAdSenseTargetElement("");
-    setAdSenseInjectionPosition("before");
+    const response = await saveScript(pushScript);
+    if (response.message) {
+      toast.error('Error saving the script');
+      console.error(response.message);
+    } else if (response.data) {
+      setSavedScripts([...savedScripts, response.data]);
+      toast.success("Successfully saved the script");
+      // Reset form fields
+      setAdSenseScriptName("");
+      setAdSenseScript("");
+      setAdSenseTargetElement("");
+      setAdSenseInjectionPosition("before");
+    }
   };
 
   const updateSavedScript = (updatedScript: SavedScript) => {
@@ -342,7 +353,7 @@ export default function SettingsPage() {
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select injection position" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-white">
                     <SelectItem value="before">Before</SelectItem>
                     <SelectItem value="after">After</SelectItem>
                   </SelectContent>
