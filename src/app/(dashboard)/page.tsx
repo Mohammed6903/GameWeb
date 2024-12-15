@@ -51,35 +51,35 @@ export default async function DashboardPage() {
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-purple-900 text-white p-6 md:p-8 lg:p-12">
       <div className="max-w-7xl mx-auto space-y-12">
         {/* Welcome Section */}
-        <section className="bg-white/10 bg-gradient-to-br from-purple-700 to-purple-700 rounded-3xl p-2 md:p-4 shadow-xl">
-          <div className="flex flex-col lg:flex-row lg:items-center gap-6">
-            <div className="flex items-center gap-6">
-              <div className="size-10 rounded-2xl bg-white flex items-center justify-center shrink-0 shadow-lg">
-                <Gamepad2 className="size-8 text-purple-700" />
-              </div>
-              <div>
-                <h1 className="text-2xl md:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500">
-                  Welcome to {metaData.site_name ? capitalizeCategory(metaData.site_name) : 'Paneer World'}
-                </h1>
-                <p className="text-purple-300 mt-2">Play instantly, no downloads needed</p>
-              </div>
+        <section className="bg-gradient-to-br from-purple-700 to-purple-900 rounded-3xl p-4 md:p-6 lg:p-8 shadow-xl">
+        <div className="flex flex-row justify-between gap-6">
+          <div className="flex items-center gap-4 sm:gap-6">
+            <div className="size-10 sm:size-12 rounded-2xl bg-white flex items-center justify-center shrink-0 shadow-lg">
+              <Gamepad2 className="size-8 sm:size-10 text-purple-700" />
             </div>
-            <div className="flex flex-wrap lg:ml-auto gap-3">
-              <Button variant="ghost" size="lg" className="gap-2 text-gray-300 hover:text-white hover:bg-white/10">
-                <Laptop2 className="text-pink-500 size-5" />
-                {games.length}+ games
-              </Button>
-              <Button variant="ghost" size="lg" className="gap-2 text-gray-300 hover:text-white hover:bg-white/10">
-                <Users2 className="text-purple-500 size-5" />
-                Play with friends
-              </Button>
-              <Button variant="ghost" size="lg" className="gap-2 text-gray-300 hover:text-white hover:bg-white/10">
-                <Sparkles className="text-yellow-500 size-5" />
-                All for free
-              </Button>
+            <div>
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-purple-300">
+                {metaData.site_name ? capitalizeCategory(metaData.site_name) : 'Gamers Arena'}
+              </h1>
+              <p className="text-purple-200 mt-1 sm:mt-2 text-base sm:text-lg">Play instantly, no downloads needed</p>
             </div>
           </div>
-        </section>
+          <div className="flex flex-row flex-wrap items-center justify-center gap-3 sm:gap-4 mt-4">
+            <Button variant="ghost" className="gap-2 text-white hover:bg-white/20">
+              <Laptop2 className="text-pink-400 size-5 sm:size-6" />
+              {games.length}+ games
+            </Button>
+            <Button variant="ghost" className="gap-2 text-white hover:bg-white/20">
+              <Users2 className="text-purple-400 size-5 sm:size-6" />
+              Play with friends
+            </Button>
+            <Button variant="ghost" className="gap-2 text-white hover:bg-white/20">
+              <Sparkles className="text-yellow-400 size-5 sm:size-6" />
+              All for free
+            </Button>
+          </div>
+        </div>
+      </section>
 
         {/* Featured Games */}
         <section>
@@ -93,7 +93,7 @@ export default async function DashboardPage() {
 
         {/* All Games Grid */}
         {Object.entries(categories).map(([category, games]) => (
-          <section key={category}>
+          <section key={category} id={category.toLowerCase().replace(/\s+/g, '-')}>
             <h2 className="text-2xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500">
               {category}
             </h2>
