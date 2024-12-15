@@ -65,3 +65,5 @@ export async function updateAdSettings(adSettings: AdSettings) {
         return { data: null, error };
     }
 }
+
+// async function getGoogleAdsenseId
