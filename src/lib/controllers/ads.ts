@@ -1,12 +1,13 @@
 'use server'
 import { AdSettings } from "@/app/admin/settings/page";
 import { createClient } from "../utils/supabase/server";
+import { PostgrestError } from "@supabase/supabase-js";
 
 /**
  * Fetch ad settings from the database.
  * @returns {Promise<{data: any, error: any}>}
  */
-export async function getAdSettings() {
+export async function getAdSettings(): Promise<{data: any, error: PostgrestError | null | any}> {
     const supabase = await createClient()
     try {
         const { data, error } = await supabase
@@ -15,8 +16,8 @@ export async function getAdSettings() {
         .single();
 
         if (error) {
-        console.error('Error fetching ad settings:', error);
-        return { data: null, error };
+            console.error('Error fetching ad settings:', error);
+            return { data: null, error };
         }
 
         return { data, error: null };

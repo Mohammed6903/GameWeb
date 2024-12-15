@@ -17,7 +17,7 @@ import { DeleteGameDialog } from '@/components/admin/DeleteGameDialog';
 import { getPaginatedGames, deleteGame, getTotalGamesCount } from '@/lib/controllers/games';
 import { FetchedGameData } from '@/types/games';
 import { Pagination } from '@/components/pagination';
-import { toast } from 'sonner';
+import { toast, Toaster } from 'sonner';
 
 export default function ManageGamesPage() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -196,6 +196,7 @@ export default function ManageGamesPage() {
           </Link>
         </div>
       )}
+      <Toaster position='bottom-right' />
     </div>
   );
 }
