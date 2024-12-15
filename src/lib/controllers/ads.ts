@@ -37,20 +37,29 @@ export async function updateAdSettings(adSettings: AdSettings) {
     try {
         const {data: lastSetting, error: previousError} = await supabase.from('ad_settings').select('*').single();
         if (previousError) {
-            console.error('Error getting last setting', lastSetting);
+            console.error('Error getting last setting: ', previousError);
         }
-        if (lastSetting) {
+        else if (lastSetting) {
+            console.log(lastSetting);
             const { data, error } = await supabase
             .from('ad_settings')
-            .insert(adSettings)
+            .update(adSettings)
             .eq('id', lastSetting.id);
             if (error) {
                 console.error('Error updating ad settings:', error);
                 return { data: null, error };
             }
         }
+        const { data, error } = await supabase
+        .from('ad_settings')
+        .insert(adSettings)
+        if (error) {
+            console.error('Error updating ad settings:', error);
+            return { data: null, error };
+        } else {
+            return { lastSetting, error: null };
+        }
 
-        return { lastSetting, error: null };
     } catch (error) {
         console.error('Unexpected error updating ad settings:', error);
         return { data: null, error };

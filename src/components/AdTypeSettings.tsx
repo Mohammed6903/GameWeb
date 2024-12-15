@@ -1,3 +1,4 @@
+'use client'
 import React from 'react';
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -11,6 +12,7 @@ interface AdTypeSettingsProps {
     format: string;
     fullWidth: boolean;
     frequency?: number;
+    count?: number;
   };
   onSettingsChange: (newSettings: any) => void;
 }
@@ -41,6 +43,23 @@ export function AdTypeSettings({ adType, settings, onSettingsChange }: AdTypeSet
             value={settings.frequency}
             onChange={(e) => updateSetting('frequency', parseInt(e.target.value))}
             placeholder="Enter frequency"
+            className="border-gray-300"
+          />
+        </div>
+      )}
+      {adType === "sidebar" && (
+        <div>
+          <Label htmlFor={`${adType}_ad_count`} className="text-gray-700">
+            {adType.charAt(0).toUpperCase() + adType.slice(1)} Ad Count
+          </Label>
+          <Input
+            id={`${adType}_ad_count`}
+            type="number"
+            value={settings.count || 0}
+            onChange={(e) =>
+              onSettingsChange({ ...settings, count: parseInt(e.target.value, 10) || 0 })
+            }
+            placeholder="Enter ad count"
             className="border-gray-300"
           />
         </div>

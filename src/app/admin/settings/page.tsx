@@ -6,7 +6,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { UserList } from "@/components/admin/UserList";
 import { listAllUsers, promoteUser } from "@/lib/controllers/users";
@@ -14,27 +13,28 @@ import { getMeta, insertMeta } from "@/lib/controllers/meta";
 import { getAdSettings, updateAdSettings } from "@/lib/controllers/ads";
 import { toast, Toaster } from "sonner";
 import { AdTypeSettings } from '@/components/AdTypeSettings';
-import { PostgrestError } from "@supabase/supabase-js";
 
 export interface AdSettings {
-  googleClientId: string;
-  carouselAdFrequency: number;
-  carouselAdSlot: string;
-  carouselAdFormat: string;
-  carouselAdFullWidth: boolean;
-  sidebarAdSlot: string;
-  sidebarAdFormat: string;
-  sidebarAdFullWidth: boolean;
-  gameViewAdSlot: string;
-  gameViewAdFormat: string;
-  gameViewAdFullWidth: boolean;
-  commentSectionAdSlot: string;
-  commentSectionAdFormat: string;
-  commentSectionAdFullWidth: boolean;
-  showCarouselAds: boolean;
-  showSidebarAds: boolean;
-  showGameViewAds: boolean;
-  showCommentSectionAds: boolean;
+  id?: number;
+  google_client_id: string;
+  carousel_ad_frequency: number;
+  carousel_ad_slot: string;
+  carousel_ad_format: string;
+  carousel_ad_full_width: boolean;
+  sidebar_ad_slot: string;
+  sidebar_ad_format: string;
+  sidebar_ad_full_width: boolean;
+  game_view_ad_slot: string;
+  game_view_ad_format: string;
+  game_view_ad_full_width: boolean;
+  comment_section_ad_slot: string;
+  comment_section_ad_format: string;
+  comment_section_ad_full_width: boolean;
+  show_carousel_ads: boolean;
+  show_sidebar_ads: boolean;
+  show_game_view_ads: boolean;
+  show_comment_section_ads: boolean;
+  sidebar_ad_count: number;
 }
 
 export default function SettingsPage() {
@@ -50,24 +50,25 @@ export default function SettingsPage() {
   const [siteDescription, setSiteDescription] = useState("");
 
   const [adSettings, setAdSettings] = useState<AdSettings>({
-    googleClientId: "",
-    carouselAdFrequency: 5,
-    carouselAdSlot: "",
-    carouselAdFormat: "auto",
-    carouselAdFullWidth: true,
-    sidebarAdSlot: "",
-    sidebarAdFormat: "auto",
-    sidebarAdFullWidth: false,
-    gameViewAdSlot: "",
-    gameViewAdFormat: "auto",
-    gameViewAdFullWidth: true,
-    commentSectionAdSlot: "",
-    commentSectionAdFormat: "auto",
-    commentSectionAdFullWidth: true,
-    showCarouselAds: true,
-    showSidebarAds: true,
-    showGameViewAds: true,
-    showCommentSectionAds: true,
+    google_client_id: "",
+    carousel_ad_frequency: 5,
+    carousel_ad_slot: "",
+    carousel_ad_format: "auto",
+    carousel_ad_full_width: true,
+    sidebar_ad_slot: "",
+    sidebar_ad_format: "auto",
+    sidebar_ad_full_width: false,
+    game_view_ad_slot: "",
+    game_view_ad_format: "auto",
+    game_view_ad_full_width: true,
+    comment_section_ad_slot: "",
+    comment_section_ad_format: "auto",
+    comment_section_ad_full_width: true,
+    show_carousel_ads: true,
+    show_sidebar_ads: true,
+    show_game_view_ads: true,
+    show_comment_section_ads: true,
+    sidebar_ad_count: 2
   });
 
   useEffect(() => {
@@ -118,8 +119,6 @@ export default function SettingsPage() {
   }, []);
 
   const handleDeleteUser = async (id: string) => {
-    // Implement delete user logic here
-    // After successful deletion, refetch the current page
     const result = await listAllUsers(currentPage);
     if ('error' in result) {
       console.error(result.error);
@@ -219,11 +218,11 @@ export default function SettingsPage() {
           {showAdSettings && (
             <>
               <div className="flex flex-col space-y-2">
-                <Label htmlFor="google-client-id" className="text-gray-700">Google Client ID</Label>
+                <Label htmlFor="google_client_id" className="text-gray-700">Google Client ID</Label>
                 <Input
-                  id="google-client-id"
-                  value={adSettings.googleClientId}
-                  onChange={(e) => setAdSettings({...adSettings, googleClientId: e.target.value})}
+                  id="google_client_id"
+                  value={adSettings.google_client_id}
+                  onChange={(e) => setAdSettings({...adSettings, google_client_id: e.target.value})}
                   placeholder="Enter your Google Client ID"
                   className="border-gray-300"
                 />
@@ -232,70 +231,72 @@ export default function SettingsPage() {
               <AdTypeSettings
                 adType="carousel"
                 settings={{
-                  show: adSettings.showCarouselAds,
-                  slot: adSettings.carouselAdSlot,
-                  format: adSettings.carouselAdFormat,
-                  fullWidth: adSettings.carouselAdFullWidth,
-                  frequency: adSettings.carouselAdFrequency,
+                  show: adSettings.show_carousel_ads,
+                  slot: adSettings.carousel_ad_slot,
+                  format: adSettings.carousel_ad_format,
+                  fullWidth: adSettings.carousel_ad_full_width,
+                  frequency: adSettings.carousel_ad_frequency,
                 }}
                 onSettingsChange={(newSettings) => setAdSettings({
                   ...adSettings,
-                  showCarouselAds: newSettings.show,
-                  carouselAdSlot: newSettings.slot,
-                  carouselAdFormat: newSettings.format,
-                  carouselAdFullWidth: newSettings.fullWidth,
-                  carouselAdFrequency: newSettings.frequency,
+                  show_carousel_ads: newSettings.show,
+                  carousel_ad_slot: newSettings.slot,
+                  carousel_ad_format: newSettings.format,
+                  carousel_ad_full_width: newSettings.fullWidth,
+                  carousel_ad_frequency: newSettings.frequency,
                 })}
               />
 
               <AdTypeSettings
                 adType="sidebar"
                 settings={{
-                  show: adSettings.showSidebarAds,
-                  slot: adSettings.sidebarAdSlot,
-                  format: adSettings.sidebarAdFormat,
-                  fullWidth: adSettings.sidebarAdFullWidth,
+                  show: adSettings.show_sidebar_ads,
+                  slot: adSettings.sidebar_ad_slot,
+                  format: adSettings.sidebar_ad_format,
+                  fullWidth: adSettings.sidebar_ad_full_width,
+                  count: adSettings.sidebar_ad_count,
                 }}
                 onSettingsChange={(newSettings) => setAdSettings({
                   ...adSettings,
-                  showSidebarAds: newSettings.show,
-                  sidebarAdSlot: newSettings.slot,
-                  sidebarAdFormat: newSettings.format,
-                  sidebarAdFullWidth: newSettings.fullWidth,
+                  show_sidebar_ads: newSettings.show,
+                  sidebar_ad_slot: newSettings.slot,
+                  sidebar_ad_format: newSettings.format,
+                  sidebar_ad_full_width: newSettings.fullWidth,
+                  sidebar_ad_count: newSettings.count,
                 })}
               />
 
               <AdTypeSettings
                 adType="gameView"
                 settings={{
-                  show: adSettings.showGameViewAds,
-                  slot: adSettings.gameViewAdSlot,
-                  format: adSettings.gameViewAdFormat,
-                  fullWidth: adSettings.gameViewAdFullWidth,
+                  show: adSettings.show_game_view_ads,
+                  slot: adSettings.game_view_ad_slot,
+                  format: adSettings.game_view_ad_format,
+                  fullWidth: adSettings.game_view_ad_full_width,
                 }}
                 onSettingsChange={(newSettings) => setAdSettings({
                   ...adSettings,
-                  showGameViewAds: newSettings.show,
-                  gameViewAdSlot: newSettings.slot,
-                  gameViewAdFormat: newSettings.format,
-                  gameViewAdFullWidth: newSettings.fullWidth,
+                  show_game_view_ads: newSettings.show,
+                  game_view_ad_slot: newSettings.slot,
+                  game_view_ad_format: newSettings.format,
+                  game_view_ad_full_width: newSettings.fullWidth,
                 })}
               />
 
               <AdTypeSettings
                 adType="commentSection"
                 settings={{
-                  show: adSettings.showCommentSectionAds,
-                  slot: adSettings.commentSectionAdSlot,
-                  format: adSettings.commentSectionAdFormat,
-                  fullWidth: adSettings.commentSectionAdFullWidth,
+                  show: adSettings.show_comment_section_ads,
+                  slot: adSettings.comment_section_ad_slot,
+                  format: adSettings.comment_section_ad_format,
+                  fullWidth: adSettings.comment_section_ad_full_width,
                 }}
                 onSettingsChange={(newSettings) => setAdSettings({
                   ...adSettings,
-                  showCommentSectionAds: newSettings.show,
-                  commentSectionAdSlot: newSettings.slot,
-                  commentSectionAdFormat: newSettings.format,
-                  commentSectionAdFullWidth: newSettings.fullWidth,
+                  show_comment_section_ads: newSettings.show,
+                  comment_section_ad_slot: newSettings.slot,
+                  comment_section_ad_format: newSettings.format,
+                  comment_section_ad_full_width: newSettings.fullWidth,
                 })}
               />
 
