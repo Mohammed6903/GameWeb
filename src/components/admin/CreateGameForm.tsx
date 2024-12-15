@@ -2,7 +2,7 @@
 import { BaseGameForm } from './BaseGameForm';
 import { GameFormData } from '@/types/games';
 import { Provider } from '@/components/admin/ProviderForm';
-import { toast, Toaster } from 'sonner';
+import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { addGame } from '@/lib/controllers/games';
 
@@ -35,7 +35,6 @@ export function CreateGameForm({ providers, categories, tags }: CreateGameFormPr
         onSubmit={handleAddGame}
         submitButtonText="Add Game"
       />
-      <Toaster position='bottom-right' />
     </>
   );
 }

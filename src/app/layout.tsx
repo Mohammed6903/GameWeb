@@ -18,8 +18,6 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: 'Paneer Gaming',
-  description: 'A site for enjoying games.',
   icons: {
     icon: [
       { url: '/favicon.ico' },

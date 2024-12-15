@@ -129,7 +129,7 @@ export function GameSearch() {
                     >
                       <div className="flex flex-col w-full">
                         <div className="flex items-center justify-between">
-                          <span className="font-medium">{game.name}</span>
+                          <span className="font-medium text-black">{game.name}</span>
                           {game.tags && game.tags.length > 0 && (
                             <span className="text-xs text-gray-400">
                               {game.tags.slice(0, 3).join(' • ')}

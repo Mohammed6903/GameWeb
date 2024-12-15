@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/sidebar"
 import React, { useEffect, useState } from 'react'
 import { getUsedCategories } from '@/lib/controllers/categories'
-import { toast, Toaster } from 'sonner'
+import { toast } from 'sonner'
 import { capitalizeCategory } from '@/app/(dashboard)/categories/[category]/clientCategory'
 import { getMeta } from '@/lib/controllers/meta'
 
@@ -135,7 +135,6 @@ export const AppSideBar: React.FC<sidebarProps> = ({siteName}) => {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <Toaster position='bottom-right' />
     </Sidebar>
   )
 }

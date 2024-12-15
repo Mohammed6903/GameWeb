@@ -2,7 +2,11 @@ import React from 'react'
 import Link from 'next/link'
 import { Home, Info, Phone, Shield, FileText, Settings } from 'lucide-react'
 
-export default function Footer() {
+interface footerProps {
+  siteName: string
+}
+
+export default function Footer({siteName}: footerProps) {
   return (
     <footer className='bg-gradient-to-br from-purple-600 to-purple-800 w-full py-4 md:py-6'>
       <div className="max-w-7xl mx-auto px-4 md:px-6">
@@ -10,7 +14,7 @@ export default function Footer() {
           <div className='text-white'>
             <Link href="/">
               <h1 className='text-xl font-semibold hover:text-purple-300 transition-colors'>
-                Game | Browse all games
+                {siteName ?? "Game"} | Browse all games
               </h1>
             </Link>
           </div>
@@ -22,7 +26,7 @@ export default function Footer() {
             <FooterLink href="/pages/dmca" icon={Shield} text="DMCA" />
             <FooterLink href="/pages/privacy-policy" icon={FileText} text="Privacy Policy" />
             <FooterLink href="/pages/terms" icon={FileText} text="Terms of Service" />
-            <FooterLink href="/pages/powered-by" icon={Settings} text="Powered by Games" />
+            <FooterLink href="/pages/powered-by" icon={Settings} text={`Powered by ${siteName ?? "Games"}`} />
           </nav>
         </div>
       </div>

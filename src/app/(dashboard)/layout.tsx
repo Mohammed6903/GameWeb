@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import Footer from "@/components/footer";
 import { getMeta } from "@/lib/controllers/meta";
 import { useMetadataStore } from "@/hooks/stores/meta";
+import { Toaster } from "sonner";
 
 export default function DashboardLayout({
   children,
@@ -37,7 +38,8 @@ export default function DashboardLayout({
             {children}
           </main>
         </div>
-        <Footer />
+        <Footer siteName={siteName}/>
+        <Toaster position="bottom-right" />
       </div>
     </SidebarProvider>
   );
