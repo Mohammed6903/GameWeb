@@ -164,3 +164,8 @@ export async function getGameStats() {
     inactiveGames: mockGames.filter(game => game.status === 'active').length
   };
 }
+
+export const getGameBySlug = async (slug: string) => {
+  const game = await getGameById(slug);
+  return game;
+}

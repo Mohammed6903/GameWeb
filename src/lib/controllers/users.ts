@@ -115,3 +115,9 @@ export async function deleteUser(id: string) {
     return { success: false, message: error.message };
   }
 }
+
+export const getAuthenticatedUser = async () => {
+    const supabase = await createClient();
+    const user = (await supabase.auth.getUser()).data.user;
+    return user;
+};

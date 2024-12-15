@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { signOutAction } from "@/lib/actions/authActions"
+import { getLikedGameDetails } from "@/lib/controllers/like"
 
 interface NavBarprops {
   siteName: string
@@ -25,6 +26,8 @@ export const NavBar: React.FC<NavBarprops> = ({siteName}) => {
   const [isSearchVisible, setIsSearchVisible] = useState(false)
   const [user, setUser] = useState<any>();
   const [emailInfo, setEmailInfo] = useState<any>();
+  const [likedGames, setLikedGames] = useState<any[]>([]);
+  const [isLikedGamesOpen, setIsLikedGamesOpen] = useState(false);
   const router = useRouter();
   const supabase = createClient();
 
@@ -62,13 +65,31 @@ export const NavBar: React.FC<NavBarprops> = ({siteName}) => {
         }
       }
     };
+
+    const fetchGames = async () => {
+      if (user?.id) {
+        const response = await getLikedGameDetails(user.id);
+        if (response) {
+          setLikedGames(response);
+        } else {
+          setLikedGames([]);
+        }
+      }
+    }
   
     if (user) {
       fetchEmailInfo();
+      fetchGames();
     }
   }, [user, supabase]);
   
+  const handleLikedGamesClick = () => {
+    setIsLikedGamesOpen(!isLikedGamesOpen);
+  };
 
+  const goToGame = (gameId: string) => {
+    router.push(`/play/${gameId}`)
+  }
 
   return (
     <header className="sticky p-2 top-0 z-50 border-b border-white/10 bg-purple-700">
@@ -102,20 +123,30 @@ export const NavBar: React.FC<NavBarprops> = ({siteName}) => {
           >
             <Search className="size-5" />
           </Button>
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="hidden sm:inline-flex text-white/80 hover:text-white hover:bg-white/10"
-          >
-            <Bell className="size-5" />
-          </Button>
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="hidden sm:inline-flex text-white/80 hover:text-white hover:bg-white/10"
-          >
-            <Heart className="size-5" />
-          </Button>
+          <DropdownMenu open={isLikedGamesOpen} onOpenChange={setIsLikedGamesOpen}>
+            <DropdownMenuTrigger asChild>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="hidden sm:inline-flex text-white/80 hover:text-white hover:bg-white/10"
+                onClick={handleLikedGamesClick}
+              >
+                <Heart className="size-5" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56 bg-white" align="end" forceMount>
+              {likedGames.length > 0 ? (
+                likedGames.map((game) => (
+                  <DropdownMenuItem key={game.id} className="flex items-center gap-2" onClick={() => goToGame(game.id)}>
+                    <img src={game.thumbnail_url} alt={game.name} className="w-8 h-8 object-cover rounded" />
+                    <span className="text-sm">{game.name}</span>
+                  </DropdownMenuItem>
+                ))
+              ) : (
+                <DropdownMenuItem disabled>No liked games</DropdownMenuItem>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
