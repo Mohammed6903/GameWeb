@@ -61,14 +61,14 @@
 //     </html>
 //   );
 // }
-
 import type { Metadata } from "next";
+import React from "react";
 import localFont from "next/font/local";
 import "./globals.css";
-import Script from "next/script";
 import { getMeta } from "@/lib/controllers/meta";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { getAllScripts } from "@/lib/controllers/ads";
+import DynamicScripts from "@/components/adSense/DynamicScripts";
 
 const geistSans = localFont({
   src: "fonts/GeistVF.woff",
@@ -100,6 +100,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Fetch metadata and ad scripts
   const metaResult = await getMeta();
   const adResponse = await getAllScripts();
 
@@ -110,25 +111,7 @@ export default async function RootLayout({
   metadata.title = siteTitle;
   metadata.description = siteDescription;
 
-  const renderAds = () => {
-    if (adResponse.status !== 200 || !adResponse.data) return null;
-
-    return adResponse.data.map((ad: any, index: number) => {
-      const { parsedElement, script } = ad;
-      console.log(parsedElement);
-      const { type, attributes } = parsedElement;
-
-      // Dynamically create the parent element
-      const ParentElement = type as keyof JSX.IntrinsicElements;
-      console.log(ParentElement);
-
-      return (
-        <ParentElement key={index} {...attributes}>
-          <Script id={`dynamic-script-${index}`} dangerouslySetInnerHTML={{ __html: script }} />
-        </ParentElement>
-      );
-    });
-  };
+  const adsData = adResponse.status === 200 && adResponse.data ? adResponse.data : [];
 
   return (
     <html lang="en">
@@ -141,10 +124,15 @@ export default async function RootLayout({
         ></script>
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        {renderAds()}
+        {/* Inject Ads dynamically */}
+        <DynamicScripts adsData={adsData} />
+
+        {/* Main Application Content */}
         {children}
+
+        {/* Google Analytics */}
+        <GoogleAnalytics gaId="G-0TVV790ZXC" />
       </body>
-      <GoogleAnalytics gaId="G-0TVV790ZXC" />
     </html>
   );
 }

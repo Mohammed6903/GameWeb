@@ -35,31 +35,39 @@ export async function getAdSettings(): Promise<{data: any, error: PostgrestError
 export async function updateAdSettings(adSettings: AdSettings) {
     const supabase = await createClient()
     try {
-        const {data: lastSetting, error: previousError} = await supabase.from('ad_settings').select('*').single();
-        if (previousError) {
-            console.error('Error getting last setting: ', previousError);
-        }
-        else if (lastSetting) {
-            console.log(lastSetting);
-            const { data, error } = await supabase
+        const { data: existingRow, error: fetchError } = await supabase
             .from('ad_settings')
-            .update(adSettings)
-            .eq('id', lastSetting.id);
+            .select('id')
+            .single();
+
+        if (fetchError && fetchError.details !== 'Results contain 0 rows') {
+            console.error('Error fetching existing settings:', fetchError);
+            return { data: null, error: fetchError };
+        }
+
+        if (existingRow) {
+            // If a row exists, update it
+            const { id, ...saveSettings } = adSettings;
+            const { data, error } = await supabase
+                .from('ad_settings')
+                .update(saveSettings)
+                .eq('id', existingRow.id);
+
             if (error) {
                 console.error('Error updating ad settings:', error);
                 return { data: null, error };
             }
-        }
-        const { data, error } = await supabase
-        .from('ad_settings')
-        .insert(adSettings)
-        if (error) {
-            console.error('Error updating ad settings:', error);
-            return { data: null, error };
-        } else {
-            return { lastSetting, error: null };
-        }
 
+            return { data, error: null };
+        } else {
+            const { data, error } = await supabase.from('ad_settings').insert([adSettings]);
+            if (error) {
+                console.error('Error inserting new ad settings:', error);
+                return { data: null, error };
+            }
+
+            return { data, error: null };
+        }
     } catch (error) {
         console.error('Unexpected error updating ad settings:', error);
         return { data: null, error };

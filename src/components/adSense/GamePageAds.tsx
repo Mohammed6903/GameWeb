@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import { getAdSettings } from '@/lib/controllers/ads';
+import React, { useEffect, useState } from 'react';
 
 interface GamePageAdProps {
   adSlot: string;
@@ -15,8 +16,17 @@ export const GamePageAd: React.FC<GamePageAdProps> = ({
   dataFullWidthResponsive,
   className = '',
 }) => {
+  const [pubId, setPubId] = useState();
   useEffect(() => {
     try {
+      const fetchAndSet = async () => {
+        const {data, error} = await getAdSettings();
+        if (data) {
+          setPubId(data.google_client_id);
+          console.log(pubId);
+        }
+      }
+      fetchAndSet();
       ((window as any).adsbygoogle = (window as any).adsbygoogle || []).push({});
     } catch (error) {
       console.error('Ad loading error:', error);
@@ -28,7 +38,7 @@ export const GamePageAd: React.FC<GamePageAdProps> = ({
       <ins
         className="adsbygoogle"
         style={{ display: 'block' }}
-        data-ad-client="ca-pub-4863652914816266"
+        data-ad-client={pubId}
         data-ad-slot={adSlot}
         data-ad-format={adFormat}
         data-full-width-responsive={dataFullWidthResponsive.toString()}

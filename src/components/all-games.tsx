@@ -8,19 +8,37 @@ import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import AdBanner from '@/components/adSense/AdBanner'
+import { getAdSettings } from '@/lib/controllers/ads'
+
+interface AdSettings {
+  google_client_id: string;
+  carousel_ad_frequency: number;
+  carousel_ad_slot: string;
+  carousel_ad_format: string;
+  carousel_ad_full_width: boolean;
+  show_carousel_ads: boolean;
+}
 
 interface GamesCarouselProps {
   games: FetchedGameData[]
-  adFrequency?: number // Number of games between each ad
 }
 
-export function AllGames({ games, adFrequency = 3 }: GamesCarouselProps) {
+export function AllGames({ games }: GamesCarouselProps) {
   const [cardsToShow, setCardsToShow] = useState(1);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [adSettings, setAdSettings] = useState<AdSettings | null>(null);
   const router = useRouter();
 
   // Calculate cards to show based on screen width
   useEffect(() => {
+    const fetchAndSet = async () => {
+      const {data, error} = await getAdSettings();
+      if (data) {
+        setAdSettings(data as AdSettings);
+      }
+    }
+    fetchAndSet();
+
     const calculateCardsToShow = () => {
       const width = window.innerWidth;
       if (width < 640) return 1;      // Mobile: 1 card
@@ -46,6 +64,7 @@ export function AllGames({ games, adFrequency = 3 }: GamesCarouselProps) {
   }
 
   const paginate = (direction: number) => {
+    const adFrequency = adSettings?.carousel_ad_frequency || 3;
     const maxIndex = games.length + Math.floor(games.length / adFrequency);
     
     setCurrentIndex((prevIndex) => {
@@ -61,12 +80,15 @@ export function AllGames({ games, adFrequency = 3 }: GamesCarouselProps) {
 
   // Prepare visible games with proper wrapping and ad insertion
   const prepareVisibleItems = () => {
+    if (!adSettings) return games.slice(currentIndex, currentIndex + cardsToShow).map(game => ({ type: 'game', game }));
+
+    const { show_carousel_ads, carousel_ad_frequency } = adSettings;
     const visibleItems = [];
     for (let i = 0; i < cardsToShow; i++) {
-      const itemIndex = (currentIndex + i) % (games.length + Math.floor(games.length / adFrequency));
-      const gameIndex = itemIndex - Math.floor(itemIndex / (adFrequency + 1));
+      const itemIndex = (currentIndex + i) % (games.length + Math.floor(games.length / carousel_ad_frequency));
+      const gameIndex = itemIndex - Math.floor(itemIndex / (carousel_ad_frequency + 1));
       
-      if (itemIndex > 0 && itemIndex % (adFrequency + 1) === 0) {
+      if (show_carousel_ads && itemIndex > 0 && itemIndex % (carousel_ad_frequency + 1) === 0) {
         // Insert ad
         visibleItems.push({ type: 'ad', id: `ad-${itemIndex}` });
       } else {
@@ -105,17 +127,17 @@ export function AllGames({ games, adFrequency = 3 }: GamesCarouselProps) {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
         {visibleItems.map((item, index) => (
           <motion.div
-            key={item.type === 'ad' ? item.id : item.game && item.game.id}
+            key={`${item.type}-${item.type === 'ad' ? item.id : item.game && item.game.id}-${index}`}
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.3, delay: index * 0.05 }}
           >
-            {item.type === 'ad' ? (
+            {item.type === 'ad' && adSettings ? (
               <Card className="aspect-square relative overflow-hidden rounded-xl bg-white/5 border-transparent">
                 <AdBanner
-                  dataAdSlot="8349769512"
-                  dataAdFormat="fluid"
-                  dataFullWidthResponsive={true}
+                  dataAdSlot={adSettings.carousel_ad_slot}
+                  dataAdFormat={adSettings.carousel_ad_format}
+                  dataFullWidthResponsive={adSettings.carousel_ad_full_width}
                 />
               </Card>
             ) : (
@@ -143,8 +165,7 @@ export function AllGames({ games, adFrequency = 3 }: GamesCarouselProps) {
                         </div>
                       </div>
                     </div>
-                    )
-                  }
+                  )}
               </Card>
             )}
           </motion.div>

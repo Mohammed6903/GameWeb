@@ -97,13 +97,13 @@ export const getLikedOrDisliked = async (gameId: number, userId: string) => {
                         .eq('user_id', userId)
                         .eq('game_id', gameId)
                         .single()
-        if (response.error) {
-            console.error(`Error fetching games: ${response.error.message}`);
+        if (response.error && (response.status !== 406)) {
+            console.error(`Error fetching like or dislike info: ${response.error.message}`);
             return null;
         }
         return response.data;
     } catch (error: any) {
-      console.error(`Error fetching games: ${error.message}`);
+      console.error(`Error fetching like or dislikes: ${error.status} ${error.message}`);
       return null
     }
 }

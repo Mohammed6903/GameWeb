@@ -140,7 +140,7 @@ export default function SettingsPage() {
     const fetchAdSettings = async () => {
       const { data, error } = await getAdSettings();
       if (error) {
-        if (error.code === 'PGRST116') {
+        if (error.code === 'PGRST116' || data === null) {
           toast.error('No settings created yet!');
         } else {
           toast.error('Error fetching ad settings');
@@ -192,8 +192,6 @@ export default function SettingsPage() {
   };
 
   const saveAdSenseScript = async () => {
-    // This is a dummy function for demonstration purposes
-    // In a real application, you would save this to your Supabase table
     const parsedElement = await parseElementAttributesFromText(adSenseTargetElement);
     const pushScript: SavedScript = {
       id: Date.now().toString(),
@@ -210,7 +208,6 @@ export default function SettingsPage() {
     } else if (response.data) {
       setSavedScripts([...savedScripts, response.data]);
       toast.success("Successfully saved the script");
-      // Reset form fields
       setAdSenseScriptName("");
       setAdSenseScript("");
       setAdSenseTargetElement("");
