@@ -135,6 +135,7 @@ export function AllGames({ games }: GamesCarouselProps) {
             {item.type === 'ad' && adSettings ? (
               <Card className="aspect-square relative overflow-hidden rounded-xl bg-white/5 border-transparent">
                 <AdBanner
+                  pubId={adSettings.google_client_id}
                   dataAdSlot={adSettings.carousel_ad_slot}
                   dataAdFormat={adSettings.carousel_ad_format}
                   dataFullWidthResponsive={adSettings.carousel_ad_full_width}

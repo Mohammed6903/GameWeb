@@ -14,6 +14,7 @@ import { deleteHeadScript, deleteScript, getAdSettings, getAllHeadScripts, getAl
 import { toast, Toaster } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AdTypeSettings } from '@/components/AdTypeSettings';
+import { useRouter } from "next/navigation";
 import {
   Table,
   TableBody,
@@ -54,7 +55,7 @@ export interface AdSettings {
 }
 
 export interface SavedScript {
-  id: number;
+  id: string;
   name: string;
   element: string;
   position: string;
@@ -90,6 +91,7 @@ export default function SettingsPage() {
   const [newHeaderScript, setNewHeaderScript] = useState<HeaderScript>({ id: 0, name: '', script: '' });
   const [editingHeaderScript, setEditingHeaderScript] = useState<HeaderScript | null>(null);
   const [reload, setReload] = useState(false);
+  const router = useRouter();
 
   const [siteTitle, setSiteTitle] = useState("");
   const [siteDescription, setSiteDescription] = useState("");
@@ -221,7 +223,7 @@ export default function SettingsPage() {
   const saveAdSenseScript = async () => {
     const parsedElement = await parseElementAttributesFromText(adSenseTargetElement);
     const pushScript: SavedScript = {
-      id: -1,
+      id: "create",
       name: adSenseScriptName,
       element: adSenseTargetElement,
       position: adSenseInjectionPosition,
@@ -252,13 +254,16 @@ export default function SettingsPage() {
       parsedElement: parsedElement,
       script: updatedScript.script
     };
+    console.log(pushScript)
     const response = await saveScript(pushScript);
     if (response.message) {
       toast.error('Error updated the script');
       console.error(response.message);
     } else if (response.data) {
-      setSavedScripts([...savedScripts, response.data]);
-      toast.success("Successfully updated the script");
+      // setSavedScripts([...savedScripts, response.data]);
+      setReload(!reload);
+      router.refresh();
+      toast.success("Successfully updated the script!");
       setAdSenseScriptName("");
       setAdSenseScript("");
       setAdSenseTargetElement("");
@@ -266,9 +271,10 @@ export default function SettingsPage() {
     }
   };
 
-  const deleteSavedScript = async (id: number) => {
+  const deleteSavedScript = async (id: string) => {
     const {status, message} = await deleteScript(id);
     if (status === 200) {
+      setReload(!reload);
       setSavedScripts(savedScripts.filter((script) => script.id !== id));
       toast.success("AdSense script deleted successfully");
     } else {
@@ -420,7 +426,7 @@ export default function SettingsPage() {
                   id="header-script-content"
                   value={newHeaderScript.script}
                   onChange={(e) => setNewHeaderScript({...newHeaderScript, script: e.target.value})}
-                  placeholder="Enter the header script content"
+                  placeholder="Enter the header content like meta tags or scripts."
                   className="border-gray-300 min-h-[150px]"
                 />
               </div>
@@ -515,7 +521,7 @@ export default function SettingsPage() {
           onClick={() => setShowAdSenseSettings(!showAdSenseSettings)}
         >
           <CardTitle className="text-xl font-semibold text-gray-800">
-            AdSense Script Management
+            Body Script Management
           </CardTitle>
           {showAdSenseSettings ? (
             <ChevronUp className="text-gray-600" />
@@ -567,7 +573,7 @@ export default function SettingsPage() {
                   id="adsense-script"
                   value={adSenseScript}
                   onChange={(e) => setAdSenseScript(e.target.value)}
-                  placeholder="Paste your AdSense script here"
+                  placeholder="Paste your script here. Be sure to verify that your script is secure and its syntax is correct as it can be harmful to your website."
                   className="border-gray-300 min-h-[150px]"
                 />
               </div>
@@ -615,8 +621,8 @@ export default function SettingsPage() {
                                     </Label>
                                     <Input
                                       id="edit-name"
-                                      value={script.name}
-                                      onChange={(e) => setEditingScript({...script, name: e.target.value})}
+                                      value={editingScript?.name || ''}
+                                      onChange={(e) => editingScript ? setEditingScript({...editingScript, name: e.target.value}) : setEditingScript({...script, name: e.target.value})}
                                       className="col-span-3"
                                     />
                                   </div>
@@ -626,8 +632,8 @@ export default function SettingsPage() {
                                     </Label>
                                     <Input
                                       id="edit-element"
-                                      value={script.element}
-                                      onChange={(e) => setEditingScript({...script, element: e.target.value})}
+                                      value={editingScript?.element}
+                                      onChange={(e) => editingScript ? setEditingScript({...editingScript, element: e.target.value}) : setEditingScript({...script, element: e.target.value})}
                                       className="col-span-3"
                                     />
                                   </div>
@@ -636,13 +642,13 @@ export default function SettingsPage() {
                                       Position
                                     </Label>
                                     <Select
-                                      value={script.position}
-                                      onValueChange={(value) => setEditingScript({...script, position: value})}
+                                      value={editingScript?.position}
+                                      onValueChange={(value) => editingScript ? setEditingScript({...editingScript, position: value}) : setEditingScript({...script, position: value})}
                                     >
                                       <SelectTrigger className="col-span-3">
                                         <SelectValue />
                                       </SelectTrigger>
-                                      <SelectContent>
+                                      <SelectContent className="bg-white">
                                         <SelectItem value="before">Before</SelectItem>
                                         <SelectItem value="after">After</SelectItem>
                                       </SelectContent>
@@ -654,17 +660,14 @@ export default function SettingsPage() {
                                     </Label>
                                     <Textarea
                                       id="edit-script"
-                                      value={script.script}
-                                      onChange={(e) => setEditingScript({...script, script: e.target.value})}
+                                      value={editingScript?.script}
+                                      onChange={(e) => editingScript ? setEditingScript({...editingScript, script: e.target.value}) : setEditingScript({...script, script: e.target.value})}
                                       className="col-span-3"
                                     />
                                   </div>
                                 </div>
                                 <div className="flex justify-end space-x-2">
-                                  <Button variant="outline" onClick={() => setEditingScript(null)}>
-                                    Cancel
-                                  </Button>
-                                  <Button onClick={() => updateSavedScript(script)}>
+                                  <Button onClick={() => updateSavedScript(editingScript ?? script)}>
                                     Save Changes
                                   </Button>
                                 </div>

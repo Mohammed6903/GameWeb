@@ -123,7 +123,7 @@ export async function getAllScripts(): Promise<{status: number, data?: SavedScri
 
 export async function saveScript(saveData: SavedScript): Promise<{status: number, data?: SavedScript, message?: string}> {
     try {
-        if (saveData.id !== -1) {
+        if (saveData.id === "create") {
             const {data, error} = await supabaseAdmin.from('adsense_scripts').upsert({
                 name: saveData.name,
                 element: saveData.element,
@@ -147,6 +147,7 @@ export async function saveScript(saveData: SavedScript): Promise<{status: number
                 parsedElement: saveData.parsedElement,
                 updated_at: new Date().toISOString()
             }).eq('id', saveData.id).select().single();
+            console.log(data);
             if (error) {
                 return {status: 500, message: error.message};
             } else {
@@ -158,9 +159,9 @@ export async function saveScript(saveData: SavedScript): Promise<{status: number
     }
 }
 
-export async function deleteScript(id: number): Promise<{status: number, message?: string}> {
+export async function deleteScript(id: string): Promise<{status: number, message?: string}> {
     try {
-        const {data, error} = await supabaseAdmin.from('adsense_scripts').delete().eq('id', id);
+        const {data, error} = await supabaseAdmin.from('adsense_scripts').delete().eq('id', id).select().single();
         if (data) {
             return {status: 200, message: 'Successfully deleted the script'};
         } else {
