@@ -1,16 +1,16 @@
 'use server'
-import { AdSettings, SavedScript } from "@/app/admin/settings/page";
+import { AdSettings, HeaderScript, SavedScript } from "@/app/admin/settings/page";
 import { createClient } from "../utils/supabase/server";
 import { PostgrestError } from "@supabase/supabase-js";
+import { supabaseAdmin } from "../utils/supabase/admin";
 
 /**
  * Fetch ad settings from the database.
  * @returns {Promise<{data: any, error: any}>}
  */
 export async function getAdSettings(): Promise<{data: any, error: PostgrestError | null | any}> {
-    const supabase = await createClient()
     try {
-        const { data, error } = await supabase
+        const { data, error } = await supabaseAdmin
         .from('ad_settings')
         .select('*')
         .single();
@@ -33,9 +33,8 @@ export async function getAdSettings(): Promise<{data: any, error: PostgrestError
  * @returns {Promise<{data: any, error: any}>}
  */
 export async function updateAdSettings(adSettings: AdSettings) {
-    const supabase = await createClient()
     try {
-        const { data: existingRow, error: fetchError } = await supabase
+        const { data: existingRow, error: fetchError } = await supabaseAdmin
             .from('ad_settings')
             .select('id')
             .single();
@@ -48,7 +47,7 @@ export async function updateAdSettings(adSettings: AdSettings) {
         if (existingRow) {
             // If a row exists, update it
             const { id, ...saveSettings } = adSettings;
-            const { data, error } = await supabase
+            const { data, error } = await supabaseAdmin
                 .from('ad_settings')
                 .update(saveSettings)
                 .eq('id', existingRow.id);
@@ -60,7 +59,7 @@ export async function updateAdSettings(adSettings: AdSettings) {
 
             return { data, error: null };
         } else {
-            const { data, error } = await supabase.from('ad_settings').insert([adSettings]);
+            const { data, error } = await supabaseAdmin.from('ad_settings').insert([adSettings]);
             if (error) {
                 console.error('Error inserting new ad settings:', error);
                 return { data: null, error };
@@ -110,9 +109,8 @@ export async function parseElementAttributesFromText(
 }
 
 export async function getAllScripts(): Promise<{status: number, data?: SavedScript[], message?: string}> {
-    const supabase = await createClient();
     try {
-        const {data, error} = await supabase.from('adsense_scripts').select();
+        const {data, error} = await supabaseAdmin.from('adsense_scripts').select();
         if (error) {
             return {status: 404, message: 'Error fetching adsense scripts'};
         } else {
@@ -124,30 +122,45 @@ export async function getAllScripts(): Promise<{status: number, data?: SavedScri
 }
 
 export async function saveScript(saveData: SavedScript): Promise<{status: number, data?: SavedScript, message?: string}> {
-    const supabase = await createClient();
     try {
-        const {data, error} = await supabase.from('adsense_scripts').upsert({
-            name: saveData.name,
-            element: saveData.element,
-            position: saveData.position,
-            script: saveData.script,
-            parsedElement: saveData.parsedElement,
-            updated_at: new Date().toISOString()
-        }, {onConflict: 'name'}).select().single();
-        if (data) {
-            return {status: 200, data: data};
-        } else {
-            return {status: 500, message: 'Error upserting the data'};
+        if (saveData.id !== -1) {
+            const {data, error} = await supabaseAdmin.from('adsense_scripts').upsert({
+                name: saveData.name,
+                element: saveData.element,
+                position: saveData.position,
+                script: saveData.script,
+                parsedElement: saveData.parsedElement,
+                updated_at: new Date().toISOString()
+            }, {onConflict: 'name'}).select().single();
+            if (data) {
+                return {status: 200, data: data};
+            } else {
+                return {status: 500, message: 'Error upserting the data'};
+            }
+        }
+        else {
+            const {data, error} = await supabaseAdmin.from('adsense_scripts').update({
+                name: saveData.name,
+                element: saveData.element,
+                position: saveData.position,
+                script: saveData.script,
+                parsedElement: saveData.parsedElement,
+                updated_at: new Date().toISOString()
+            }).eq('id', saveData.id).select().single();
+            if (error) {
+                return {status: 500, message: error.message};
+            } else {
+                return {status: 200, data: data};
+            }
         }
     } catch (error: any) {
         return {status: 500, message: 'Internal Error while inserting scripts'};
     }
 }
 
-export async function deleteScript(id: string): Promise<{status: number, data: any} | {status: number, message: string}> {
-    const supabase = await createClient();
+export async function deleteScript(id: number): Promise<{status: number, message?: string}> {
     try {
-        const {data, error} = await supabase.from('adsense_scripts').delete().match({id: id});
+        const {data, error} = await supabaseAdmin.from('adsense_scripts').delete().eq('id', id);
         if (data) {
             return {status: 200, message: 'Successfully deleted the script'};
         } else {
@@ -158,10 +171,9 @@ export async function deleteScript(id: string): Promise<{status: number, data: a
     }
 }
 
-export async function getScript(id: string): Promise<{status: number, data: any} | {status: number, message: string}> {
-    const supabase = await createClient();
+export async function getScript(id: number): Promise<{status: number, data?: any, message?: string}> {
     try {
-        const {data, error} = await supabase.from('adsense_scripts').select().eq('id', id);
+        const {data, error} = await supabaseAdmin.from('adsense_scripts').select().eq('id', id);
         if (data) {
             return {status: 200, data: data};
         } else {
@@ -169,5 +181,77 @@ export async function getScript(id: string): Promise<{status: number, data: any}
         }
     } catch (error: any) {
         return {status: 500, message: `Internal Server Error whilte fetching the script: ${error}`};
+    }
+}
+
+export async function getAllHeadScripts() {
+    try {
+        const {data, error} = await supabaseAdmin.from('header_scripts').select();
+        if (error) {
+            console.error(`Error fetching head scripts: ${error.message}`);
+            return {data: null, error: error.message};
+        } else {
+            return {data: data, error: null}
+        }
+    } catch (error: any) {
+        return {data: null, error: error.message}
+    }
+}
+
+export async function getHeadScript(id: number) {
+    try {
+        const {data, error} = await supabaseAdmin.from('header_scripts').select().eq('id', Number(id)).single();
+        if (error) {
+            console.error(`Error fetching head script: ${error.message}`);
+            return {data: null, error: error.message};
+        } else {
+            return {data: data, error: null}
+        }
+    } catch (error: any) {
+        return {data: null, error: error.message}
+    }
+}
+
+export async function saveHeadScript(saveData: HeaderScript): Promise<{data: any | null, error: string | null}> {
+    try {
+        if (saveData.id === -1) {
+            const {data, error} = await supabaseAdmin.from('header_scripts').upsert({
+                script: saveData.script,
+                name: saveData.name
+            }, {onConflict: 'name'}).select().single();
+            if (error) {
+                console.error(`Error saving head script: ${error.message}`);
+                return {data: null, error: error.message};
+            } else {
+                return {data: data, error: null}
+            }
+        }
+        const {data, error} = await supabaseAdmin.from('header_scripts').update({
+            script: saveData.script,
+            name: saveData.name
+        }).eq('id', saveData.id).select().single();
+        if (error) {
+            console.error(`Error fetching head scripts: ${error.message}`);
+            return {data: null, error: error.message};
+        } else {
+            return {data: data, error: null}
+        }
+    } catch (error: any) {
+        return {data: null, error: error.message}
+    }
+}
+
+export async function deleteHeadScript(id: number) {
+    const supabaseAdmin = await createClient();
+    try {
+        const {data, error} = await supabaseAdmin.from('header_scripts').delete().eq('id', id);
+        if (error) {
+            console.error(`Error deleting head script: ${error.message}`);
+            return {status: 404, error: error.message};
+        } else {
+            return {status: 200, error: null}
+        }
+    } catch (error: any) {
+        return {data: null, error: error.message}
     }
 }

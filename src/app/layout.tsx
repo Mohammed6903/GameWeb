@@ -67,7 +67,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { getMeta } from "@/lib/controllers/meta";
 import { GoogleAnalytics } from "@next/third-parties/google";
-import { getAllScripts } from "@/lib/controllers/ads";
+import { getAllHeadScripts, getAllScripts } from "@/lib/controllers/ads";
 import DynamicScripts from "@/components/adSense/DynamicScripts";
 
 const geistSans = localFont({
@@ -103,6 +103,7 @@ export default async function RootLayout({
   // Fetch metadata and ad scripts
   const metaResult = await getMeta();
   const adResponse = await getAllScripts();
+  const headResponse = await getAllHeadScripts();
 
   const metaData = metaResult.status === 200 && metaResult.data ? metaResult.data : {};
   const siteTitle = metaData.site_name || "Paneer World";
@@ -112,20 +113,15 @@ export default async function RootLayout({
   metadata.description = siteDescription;
 
   const adsData = adResponse.status === 200 && adResponse.data ? adResponse.data : [];
+  const headData = ((headResponse.error === null) && headResponse.data !== null)? headResponse.data : [];
 
   return (
     <html lang="en">
       <head>
-        <meta name="google-adsense-account" content="ca-pub-4863652914816266" />
-        <script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4863652914816266"
-          crossOrigin="anonymous"
-        ></script>
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         {/* Inject Ads dynamically */}
-        <DynamicScripts adsData={adsData} />
+        <DynamicScripts headScripts={headData} adsData={adsData} />
 
         {/* Main Application Content */}
         {children}

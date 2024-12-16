@@ -10,7 +10,7 @@ import { ChevronDown, ChevronUp, Pencil, Trash2 } from 'lucide-react';
 import { UserList } from "@/components/admin/UserList";
 import { listAllUsers, promoteUser } from "@/lib/controllers/users";
 import { getMeta, insertMeta } from "@/lib/controllers/meta";
-import { getAdSettings, parseElementAttributesFromText, saveScript, updateAdSettings } from "@/lib/controllers/ads";
+import { deleteHeadScript, deleteScript, getAdSettings, getAllHeadScripts, getAllScripts, parseElementAttributesFromText, saveHeadScript, saveScript, updateAdSettings } from "@/lib/controllers/ads";
 import { toast, Toaster } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AdTypeSettings } from '@/components/AdTypeSettings';
@@ -54,7 +54,7 @@ export interface AdSettings {
 }
 
 export interface SavedScript {
-  id: string;
+  id: number;
   name: string;
   element: string;
   position: string;
@@ -63,6 +63,12 @@ export interface SavedScript {
     attributes: Record<string, string>;
     type: string;
   };
+}
+
+export interface HeaderScript {
+  id: number;
+  name: string;
+  script: string;
 }
 
 export default function SettingsPage() {
@@ -79,6 +85,10 @@ export default function SettingsPage() {
   const [adSenseInjectionPosition, setAdSenseInjectionPosition] = useState("before");
   const [savedScripts, setSavedScripts] = useState<SavedScript[]>([]);
   const [editingScript, setEditingScript] = useState<SavedScript | null>(null);
+  const [showHeaderScripts, setShowHeaderScripts] = useState(false);
+  const [headerScripts, setHeaderScripts] = useState<HeaderScript[]>([]);
+  const [newHeaderScript, setNewHeaderScript] = useState<HeaderScript>({ id: 0, name: '', script: '' });
+  const [editingHeaderScript, setEditingHeaderScript] = useState<HeaderScript | null>(null);
   const [reload, setReload] = useState(false);
 
   const [siteTitle, setSiteTitle] = useState("");
@@ -118,6 +128,23 @@ export default function SettingsPage() {
         setTotalPages(total);
       }
     }
+    const fetchScripts = async () => {
+      const adScripts = await getAllScripts();
+      if (adScripts.status === 200 && adScripts.data) {
+        setSavedScripts(adScripts.data);
+      } else {
+        toast.error("Error fetching AdSense scripts");
+      }
+
+      const headScripts = await getAllHeadScripts();
+      if (headScripts.data) {
+        setHeaderScripts(headScripts.data);
+      } else {
+        toast.error("Error fetching header scripts");
+      }
+    };
+
+    fetchScripts();
     fetchUsers();
   }, [currentPage, reload]);
 
@@ -194,7 +221,7 @@ export default function SettingsPage() {
   const saveAdSenseScript = async () => {
     const parsedElement = await parseElementAttributesFromText(adSenseTargetElement);
     const pushScript: SavedScript = {
-      id: Date.now().toString(),
+      id: -1,
       name: adSenseScriptName,
       element: adSenseTargetElement,
       position: adSenseInjectionPosition,
@@ -215,17 +242,73 @@ export default function SettingsPage() {
     }
   };
 
-  const updateSavedScript = (updatedScript: SavedScript) => {
-    setSavedScripts(savedScripts.map(script => 
-      script.id === updatedScript.id ? updatedScript : script
-    ));
-    setEditingScript(null);
-    toast.success("Successfully updated the script");
+  const updateSavedScript = async (updatedScript: SavedScript) => {
+    const parsedElement = await parseElementAttributesFromText(updatedScript.element);
+    const pushScript: SavedScript = {
+      id: updatedScript.id,
+      name: updatedScript.name,
+      element: updatedScript.element,
+      position: updatedScript.position,
+      parsedElement: parsedElement,
+      script: updatedScript.script
+    };
+    const response = await saveScript(pushScript);
+    if (response.message) {
+      toast.error('Error updated the script');
+      console.error(response.message);
+    } else if (response.data) {
+      setSavedScripts([...savedScripts, response.data]);
+      toast.success("Successfully updated the script");
+      setAdSenseScriptName("");
+      setAdSenseScript("");
+      setAdSenseTargetElement("");
+      setAdSenseInjectionPosition("before");
+    }
   };
 
-  const deleteSavedScript = (id: string) => {
-    setSavedScripts(savedScripts.filter(script => script.id !== id));
-    toast.success("Successfully deleted the script");
+  const deleteSavedScript = async (id: number) => {
+    const {status, message} = await deleteScript(id);
+    if (status === 200) {
+      setSavedScripts(savedScripts.filter((script) => script.id !== id));
+      toast.success("AdSense script deleted successfully");
+    } else {
+      console.error(message);
+      toast.error("Error deleting script");
+    }
+  };
+
+  const createHeaderScript = async () => {
+    const newScript = { ...newHeaderScript, id: -1 };
+    const {data, error} = await saveHeadScript(newScript);
+    if (error) {
+      toast.error(error);
+    }
+    setHeaderScripts([...headerScripts, newScript]);
+    setNewHeaderScript({ id: 0, name: '', script: '' });
+    toast.success("Header script created successfully");
+  };
+
+  const updateHeaderScript = async (updatedScript: HeaderScript) => {
+    const {data, error} = await saveHeadScript(updatedScript);
+    if (error) {
+      toast.error(error);
+    } else if (data) {
+      setHeaderScripts(headerScripts.map(script => 
+        script.id === data.id ? data : script
+      ));
+      setEditingHeaderScript(null);
+      toast.success("Header script updated successfully");
+    }
+  };
+
+  const deleteHeaderScript = async (id: number) => {
+    const response = await deleteHeadScript(id);
+    if (response.status === 200) {
+      setHeaderScripts(headerScripts.filter((script) => script.id !== id));
+      toast.success("Header script deleted successfully");
+    } else {
+      toast.error("Error deleting script");
+    }
   };
 
   return (
@@ -299,6 +382,128 @@ export default function SettingsPage() {
               onDelete={handleDeleteUser}
               onPromote={handlePromoteUser}
             />
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Header Script Management */}
+      <Card className="bg-white border border-gray-200 shadow-lg hover:shadow-xl transition-shadow duration-300">
+        <CardHeader
+          className="cursor-pointer flex flex-row items-center justify-between"
+          onClick={() => setShowHeaderScripts(!showHeaderScripts)}
+        >
+          <CardTitle className="text-xl font-semibold text-gray-800">
+            Header Script Management
+          </CardTitle>
+          {showHeaderScripts ? (
+            <ChevronUp className="text-gray-600" />
+          ) : (
+            <ChevronDown className="text-gray-600" />
+          )}
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {showHeaderScripts && (
+            <>
+              <div className="flex flex-col space-y-2">
+                <Label htmlFor="header-script-name" className="text-gray-700">Script Name</Label>
+                <Input
+                  id="header-script-name"
+                  value={newHeaderScript.name}
+                  onChange={(e) => setNewHeaderScript({...newHeaderScript, name: e.target.value})}
+                  placeholder="Enter a name for this header script"
+                  className="border-gray-300"
+                />
+              </div>
+              <div className="flex flex-col space-y-2">
+                <Label htmlFor="header-script-content" className="text-gray-700">Script Content</Label>
+                <Textarea
+                  id="header-script-content"
+                  value={newHeaderScript.script}
+                  onChange={(e) => setNewHeaderScript({...newHeaderScript, script: e.target.value})}
+                  placeholder="Enter the header script content"
+                  className="border-gray-300 min-h-[150px]"
+                />
+              </div>
+              <Button
+                className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white"
+                onClick={createHeaderScript}
+              >
+                Add Header Script
+              </Button>
+
+              <div className="mt-8">
+                <h3 className="text-lg font-semibold mb-4">Saved Header Scripts</h3>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Name</TableHead>
+                      <TableHead>Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {headerScripts.map((script) => (
+                      <TableRow key={script.id}>
+                        <TableCell>{script.name}</TableCell>
+                        <TableCell>
+                          <div className="flex space-x-2">
+                            <Dialog>
+                              <DialogTrigger asChild>
+                                <Button variant="outline" size="sm" onClick={() => setEditingHeaderScript(script)}>
+                                  <Pencil className="h-4 w-4 mr-2"/>
+                                  Edit
+                                </Button>
+                              </DialogTrigger>
+                              <DialogContent className="sm:max-w-[425px]">
+                                <DialogHeader>
+                                  <DialogTitle>Edit Header Script</DialogTitle>
+                                </DialogHeader>
+                                <div className="grid gap-4 py-4">
+                                  <div className="grid grid-cols-4 items-center gap-4">
+                                    <Label htmlFor="edit-header-name" className="text-right">
+                                      Name
+                                    </Label>
+                                    <Input
+                                      id="edit-header-name"
+                                      value={editingHeaderScript?.name || ''}
+                                      onChange={(e) => setEditingHeaderScript(prev => prev ? {...prev, name: e.target.value} : null)}
+                                      className="col-span-3"
+                                    />
+                                  </div>
+                                  <div className="grid grid-cols-4 items-center gap-4">
+                                    <Label htmlFor="edit-header-content" className="text-right">
+                                      Content
+                                    </Label>
+                                    <Textarea
+                                      id="edit-header-content"
+                                      value={editingHeaderScript?.script || ''}
+                                      onChange={(e) => setEditingHeaderScript(prev => prev ? {...prev, script: e.target.value} : null)}
+                                      className="col-span-3"
+                                    />
+                                  </div>
+                                </div>
+                                <div className="flex justify-end space-x-2">
+                                  <Button onClick={() => editingHeaderScript && updateHeaderScript(editingHeaderScript)}>
+                                    Save Changes
+                                  </Button>
+                                </div>
+                              </DialogContent>
+                            </Dialog>
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              onClick={() => deleteHeaderScript(script.id)}
+                            >
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              Delete
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </>
           )}
         </CardContent>
       </Card>
@@ -394,7 +599,7 @@ export default function SettingsPage() {
                           <div className="flex space-x-2">
                             <Dialog>
                               <DialogTrigger asChild>
-                                <Button variant="outline" size="sm">
+                                <Button variant="outline" size="sm" onClick={() => setEditingScript(script)}>
                                   <Pencil className="h-4 w-4 mr-2" />
                                   Edit
                                 </Button>

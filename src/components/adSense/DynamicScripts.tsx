@@ -2,6 +2,12 @@
 
 import { useEffect } from "react";
 
+interface HeadScriptItem {
+  script: string;
+  name?: string;
+  id?: string;
+}
+
 interface DynamicScriptsProps {
   adsData: {
     parsedElement: {
@@ -10,9 +16,10 @@ interface DynamicScriptsProps {
     };
     script: string;
   }[];
+  headScripts: HeadScriptItem[];
 }
 
-const DynamicScripts: React.FC<DynamicScriptsProps> = ({ adsData }) => {
+const DynamicScripts: React.FC<DynamicScriptsProps> = ({ adsData, headScripts }) => {
   useEffect(() => {
     adsData.forEach((ad) => {
       const { parsedElement, script } = ad;
@@ -67,9 +74,62 @@ const DynamicScripts: React.FC<DynamicScriptsProps> = ({ adsData }) => {
       }
     });
   }, [adsData]);
+  useEffect(() => {
+    headScripts.forEach((item) => {
+      const tempDiv = document.createElement("div");
+      tempDiv.innerHTML = item.script;
 
-  return null; // No UI, only script injection
+      Array.from(tempDiv.children).forEach((child) => {
+        if (!(child instanceof HTMLElement)) return;
+
+        switch (child.tagName.toLowerCase()) {
+          case 'script':
+            const scriptElement = document.createElement('script');
+            if (isHTMLScriptElement(child)) {
+              if (child.src) {
+                scriptElement.src = child.src;
+              }
+              Array.from(child.attributes).forEach(attr => {
+                scriptElement.setAttribute(attr.name, attr.value);
+              });
+              
+              if (!child.src) {
+                scriptElement.textContent = child.textContent || '';
+              }
+            }
+            
+            document.head.appendChild(scriptElement);
+            break;
+          
+          case 'meta':
+            const metaElement = document.createElement('meta');
+            Array.from(child.attributes).forEach(attr => {
+              metaElement.setAttribute(attr.name, attr.value);
+            });
+            document.head.appendChild(metaElement);
+            break;
+          
+          case 'link':
+            const linkElement = document.createElement('link');
+            Array.from(child.attributes).forEach(attr => {
+              linkElement.setAttribute(attr.name, attr.value);
+            });
+            document.head.appendChild(linkElement);
+            break;
+          
+          default:
+            console.warn(`Unsupported tag type: ${child.tagName}`);
+        }
+      });
+    });
+  }, [headScripts]);
+
+  return null;
 };
+
+function isHTMLScriptElement(element: HTMLElement): element is HTMLScriptElement {
+  return element.tagName.toLowerCase() === 'script';
+}
 
 // Helper function to build a CSS selector
 const buildSelector = (type: string, attributes: Record<string, string>): string => {
