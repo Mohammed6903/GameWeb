@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ChevronDown, ChevronUp, Pencil, Trash2 } from 'lucide-react';
 import { UserList } from "@/components/admin/UserList";
 import { listAllUsers, promoteUser } from "@/lib/controllers/users";
-import { getMeta, insertMeta } from "@/lib/controllers/meta";
+import { getMeta, insertMeta, saveFavIcon } from "@/lib/controllers/meta";
 import { deleteHeadScript, deleteScript, getAdSettings, getAllHeadScripts, getAllScripts, parseElementAttributesFromText, saveHeadScript, saveScript, updateAdSettings } from "@/lib/controllers/ads";
 import { toast, Toaster } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -30,6 +30,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { uploadFavIcon } from "@/lib/services/storageServices";
 
 export interface AdSettings {
   id?: number;
@@ -117,6 +118,68 @@ export default function SettingsPage() {
     show_comment_section_ads: true,
     sidebar_ad_count: 2
   });
+
+  const [faviconUrls, setFaviconUrls] = useState({
+    favicon: null,
+    svg: null,
+    favicon16: null,
+    favicon32: null,
+    androidChrome192: null,
+    androidChrome512: null,
+    appleTouchIcon: null,
+  });
+
+  const handleFaviconUpload = async (e: React.ChangeEvent<HTMLInputElement>, type: string) => {
+    const file = e.target.files?.[0];
+    if (!file) {
+      toast.error("No file selected.");
+      return;
+    }
+  
+    try {
+      // Upload favicon
+      const response = await uploadFavIcon(file);
+      if (response.error) {
+        console.error(`Error uploading favIcon: ${response.error}`);
+        toast.error(`Error uploading favicon: ${response.error}`);
+        return;
+      }
+  
+      // Save favicon
+      if (response.url) {
+        const saveResponse = await saveFavIcon(type, response.url);
+        if (saveResponse.status !== 200) {
+          console.error(`Error saving favIcon: ${saveResponse.status}`);
+          return;
+        }
+  
+        // Update favicon URLs
+        const base64Result = await convertFileToBase64(file);
+        if (base64Result) {
+          setFaviconUrls((prev) => ({ ...prev, [type]: base64Result }));
+        }
+      }
+    } catch (error) {
+      console.error("Unexpected error in handleFaviconUpload: ", error);
+      toast.error("An unexpected error occurred while uploading the favicon.");
+    }
+  };
+  
+  const convertFileToBase64 = (file: File): Promise<string | null> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (typeof reader.result === "string") {
+          resolve(reader.result);
+        } else {
+          resolve(null);
+        }
+      };
+      reader.onerror = (err) => reject(err);
+      reader.readAsDataURL(file);
+    });
+  };  
+
 
   useEffect(() => {
     async function fetchUsers() {
@@ -360,6 +423,93 @@ export default function SettingsPage() {
         </CardContent>
       </Card>
 
+      {/* Favicon Settings */}
+      <Card className="bg-white border border-gray-200 shadow-lg hover:shadow-xl transition-shadow duration-300">
+        <CardHeader>
+          <CardTitle className="text-xl font-semibold text-gray-800">
+            Favicon Settings
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex flex-col space-y-2">
+            <Label htmlFor="favicon" className="text-gray-700">Favicon (ICO)</Label>
+            <Input
+              id="favicon"
+              type="file"
+              accept=".ico"
+              onChange={(e) => handleFaviconUpload(e, 'favicon')}
+              className="border-gray-300"
+            />
+            {faviconUrls.favicon && <img src={faviconUrls.favicon} alt="Favicon" className="w-8 h-8" />}
+          </div>
+          {/* <div className="flex flex-col space-y-2">
+            <Label htmlFor="favicon-svg" className="text-gray-700">Favicon (SVG)</Label>
+            <Input
+              id="favicon-svg"
+              type="file"
+              accept=".svg"
+              onChange={(e) => handleFaviconUpload(e, 'svg')}
+              className="border-gray-300"
+            />
+            {faviconUrls.svg && <img src={faviconUrls.svg} alt="Favicon SVG" className="w-8 h-8" />}
+          </div> */}
+          <div className="flex flex-col space-y-2">
+            <Label htmlFor="favicon-16" className="text-gray-700">Favicon 16x16 (PNG)</Label>
+            <Input
+              id="favicon-16"
+              type="file"
+              accept=".png"
+              onChange={(e) => handleFaviconUpload(e, 'favicon16')}
+              className="border-gray-300"
+            />
+            {faviconUrls.favicon16 && <img src={faviconUrls.favicon16} alt="Favicon 16x16" className="w-4 h-4" />}
+          </div>
+          <div className="flex flex-col space-y-2">
+            <Label htmlFor="favicon-32" className="text-gray-700">Favicon 32x32 (PNG)</Label>
+            <Input
+              id="favicon-32"
+              type="file"
+              accept=".png"
+              onChange={(e) => handleFaviconUpload(e, 'favicon32')}
+              className="border-gray-300"
+            />
+            {faviconUrls.favicon32 && <img src={faviconUrls.favicon32} alt="Favicon 32x32" className="w-8 h-8" />}
+          </div>
+          <div className="flex flex-col space-y-2">
+            <Label htmlFor="android-chrome-192" className="text-gray-700">Android Chrome 192x192 (PNG)</Label>
+            <Input
+              id="android-chrome-192"
+              type="file"
+              accept=".png"
+              onChange={(e) => handleFaviconUpload(e, 'androidChrome192')}
+              className="border-gray-300"
+            />
+            {faviconUrls.androidChrome192 && <img src={faviconUrls.androidChrome192} alt="Android Chrome 192x192" className="w-12 h-12" />}
+          </div>
+          <div className="flex flex-col space-y-2">
+            <Label htmlFor="android-chrome-512" className="text-gray-700">Android Chrome 512x512 (PNG)</Label>
+            <Input
+              id="android-chrome-512"
+              type="file"
+              accept=".png"
+              onChange={(e) => handleFaviconUpload(e, 'androidChrome512')}
+              className="border-gray-300"
+            />
+            {faviconUrls.androidChrome512 && <img src={faviconUrls.androidChrome512} alt="Android Chrome 512x512" className="w-16 h-16" />}
+          </div>
+          <div className="flex flex-col space-y-2">
+            <Label htmlFor="apple-touch-icon" className="text-gray-700">Apple Touch Icon (PNG)</Label>
+            <Input
+              id="apple-touch-icon"
+              type="file"
+              accept=".png"
+              onChange={(e) => handleFaviconUpload(e, 'appleTouchIcon')}
+              className="border-gray-300"
+            />
+            {faviconUrls.appleTouchIcon && <img src={faviconUrls.appleTouchIcon} alt="Apple Touch Icon" className="w-16 h-16" />}
+          </div>
+        </CardContent>
+      </Card>
       {/* User Management */}
       <Card className="bg-white border border-gray-200 shadow-lg hover:shadow-xl transition-shadow duration-300">
         <CardHeader

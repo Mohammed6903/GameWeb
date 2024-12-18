@@ -1,10 +1,8 @@
 "use client";
 import { createClient } from "@/lib/utils/supabase/client";
-// import { supabaseAdmin } from "../utils/supabase/admin";
 
 export async function uploadGameThumbnail(file: File): Promise<string> {
     const supabase = await createClient();
-    // Return a placeholder URL for mock implementation
     const {data: uploadedFile, error} = await supabase
     .storage
     .from('gameThumbnails')
@@ -22,4 +20,26 @@ export async function uploadGameThumbnail(file: File): Promise<string> {
     .getPublicUrl(`${uploadedFile?.path}`);
     
     return data.publicUrl;
+}
+
+export async function uploadFavIcon(file: File): Promise<{url?: string, error?: string}> {
+    const supabase = await createClient();
+    const {data: uploadedFile, error} = await supabase
+    .storage
+    .from('favIcons')
+    .upload(`public/${file.name}`, file, {
+        cacheControl: '3600',
+        upsert: true
+    });
+    if (error) {
+        throw new Error(`Error uploading file: ${error}`);
+        return {error: error?.message};
+    }
+
+    const {data} = supabase
+    .storage
+    .from('favIcons')
+    .getPublicUrl(`${uploadedFile?.path}`);
+    
+    return {url: data.publicUrl};
 }

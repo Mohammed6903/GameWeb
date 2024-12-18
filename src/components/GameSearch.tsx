@@ -25,14 +25,15 @@ export function GameSearch() {
   const [games, setGames] = useState<Game[]>([]);
   const [filteredGames, setFilteredGames] = useState<Game[]>([]);
   const [groupedGames, setGroupedGames] = useState<GroupedGames>({});
+  const searchRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const supabase = createClient();
 
   const fetchGames = useCallback(async () => {
     const { data, error } = await supabase
       .from('games')
-      .select('id, name, categories, tags');
-    
+      .select('id, name, categories, tags').eq('is_active', true);
+
     if (error) {
       console.error('Error fetching games:', error);
     } else {
@@ -47,7 +48,7 @@ export function GameSearch() {
   useEffect(() => {
     const filtered = games.filter(game => {
       if (!searchTerm) return true;
-      
+
       const searchLower = searchTerm.toLowerCase();
       const nameMatch = game.name.toLowerCase().includes(searchLower);
       const categoryMatch = game.categories?.some(
@@ -96,8 +97,22 @@ export function GameSearch() {
     setSearchTerm('');
   };
 
+  // Hide search results on outside click
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
   return (
-    <div className="w-full relative group">
+    <div className="w-full relative group" ref={searchRef}>
       <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-white/50 group-focus-within:text-white/70" />
       <Input
         placeholder="Search games by name, category, or tags..."

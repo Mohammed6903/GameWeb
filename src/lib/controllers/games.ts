@@ -2,36 +2,6 @@
 import { FetchedGameData, Game, GameFormData } from '@/types/games';
 import { createClient } from "../utils/supabase/server";
 
-// Mock games data
-const mockGames: Game[] = [
-  {
-    id: '1',
-    name: 'Space Invaders',
-    description: 'Classic arcade space shooting game',
-    play_url: 'https://example.com/space-invaders',
-    thumbnail_url: 'https://via.placeholder.com/150',
-    status: "active",
-    tags: ['Arcade', 'Shooter'],
-    categories: ['2 player games', 'game for kids'],
-    provider_id: '1',
-    created_at: new Date(),
-    updated_at: new Date()
-  },
-  {
-    id: '2',
-    name: 'Puzzle Master',
-    description: 'Challenging puzzle game with multiple levels',
-    play_url: 'https://example.com/puzzle-master',
-    thumbnail_url: 'https://via.placeholder.com/150',
-    status: "active",
-    tags: ['Puzzle', 'Strategy'],
-    categories: ['2 player games', 'game for kids'],
-    provider_id: '1',
-    created_at: new Date(),
-    updated_at: new Date()
-  }
-];
-
 export async function addGame(gameData: GameFormData) {
   const supabase = await createClient();
   try{
@@ -113,7 +83,7 @@ export async function deleteGame(gameId: string) {
 
 export async function getAllGames(): Promise<FetchedGameData[]> {
   const supabase = await createClient();
-  const {data, error} = await supabase.from('games').select('*');
+  const {data, error} = await supabase.from('games').select('*').eq('is_active', true);
   if (error) {
     throw Error(`Error fetching all games.`);
   } else {    
@@ -180,6 +150,7 @@ export async function getGamesByCategory(category: string, { page = 1, limit = 1
     const { data: capData, error: capErr, count: capCount } = await supabase
     .from('games')
     .select('*', { count: 'exact' })
+    .eq('is_active', true)
     .contains('categories', [category])
     .range(from, to);
     
@@ -187,6 +158,7 @@ export async function getGamesByCategory(category: string, { page = 1, limit = 1
       const { data, error, count } = await supabase
         .from('games')
         .select('*', { count: 'exact' })
+        .eq('is_active', true)
         .contains('categories', [cat])
         .range(from, to);
       if (error) {
@@ -201,13 +173,13 @@ export async function getGamesByCategory(category: string, { page = 1, limit = 1
   }
 }
 
-export async function getGameStats() {
-  return {
-    totalGames: mockGames.length,
-    activeGames: mockGames.filter(game => game.status === 'active').length,
-    inactiveGames: mockGames.filter(game => game.status === 'active').length
-  };
-}
+// export async function getGameStats() {
+//   return {
+//     totalGames: mockGames.length,
+//     activeGames: mockGames.filter(game => game.status === 'active').length,
+//     inactiveGames: mockGames.filter(game => game.status === 'active').length
+//   };
+// }
 
 export const getGameBySlug = async (slug: string) => {
   const game = await getGameById(slug);
