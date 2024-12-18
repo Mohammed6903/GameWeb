@@ -18,11 +18,27 @@ alter table "public"."game_plays" add column "play_date" date not null;
 
 alter table "public"."game_plays" alter column "game_id" drop not null;
 
-alter table "public"."game_plays" alter column "id" set default gen_random_uuid();
+-- Drop the existing constraints if needed
+ALTER TABLE "public"."game_plays" DROP CONSTRAINT IF EXISTS game_plays_pkey;
 
-alter table "public"."game_plays" alter column "id" drop identity;
+-- Add a new UUID column
+ALTER TABLE "public"."game_plays" 
+ADD COLUMN "new_id" UUID DEFAULT gen_random_uuid();
 
-alter table "public"."game_plays" alter column "id" set data type uuid using "id"::uuid;
+-- Copy existing data to the new column
+UPDATE "public"."game_plays" 
+SET "new_id" = uuid_generate_v4();
+
+-- Drop the old id column
+ALTER TABLE "public"."game_plays" DROP COLUMN "id";
+
+-- Rename the new column to id
+ALTER TABLE "public"."game_plays" 
+RENAME COLUMN "new_id" TO "id";
+
+-- Add primary key constraint
+ALTER TABLE "public"."game_plays" 
+ADD PRIMARY KEY ("id");
 
 alter table "public"."game_plays" enable row level security;
 
