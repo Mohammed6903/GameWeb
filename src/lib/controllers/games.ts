@@ -122,6 +122,21 @@ export async function getTotalGamesCount(): Promise<number> {
   return count || 0;
 }
 
+export async function getActiveGamesCount(): Promise<number> {
+  const supabase = await createClient();
+  
+  const { count, error } = await supabase
+    .from('games')
+    .select('*', { count: 'exact', head: true })
+    .eq('is_active', true);
+
+  if (error) {
+    throw new Error(`Error fetching total games count: ${error.message}`);
+  }
+
+  return count || 0;
+}
+
 export async function getGameById(gameId: string) {
   const supabase = await createClient();
   try {
@@ -180,6 +195,86 @@ export async function getGamesByCategory(category: string, { page = 1, limit = 1
 //     inactiveGames: mockGames.filter(game => game.status === 'active').length
 //   };
 // }
+export async function fetchWeeklyGamePlays() {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from('game_plays')
+    .select('play_date, play_count')
+    .gte('play_date', new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString().split('T')[0])
+    .order('play_date', { ascending: true });
+
+  if (error) {
+    console.error('Error fetching weekly game plays:', error);
+    return [];
+  }
+
+  // Aggregate plays by date
+  const aggregatedData: { date: string; totalPlays: number }[] = [];
+
+  data.forEach((row) => {
+    const existingDate = aggregatedData.find((d) => d.date === row.play_date);
+    if (existingDate) {
+      existingDate.totalPlays += row.play_count;
+    } else {
+      aggregatedData.push({ date: row.play_date, totalPlays: row.play_count });
+    }
+  });
+
+  return aggregatedData;
+}
+
+
+export async function updateGamePlays(gameId: number) {
+  const supabase = await createClient();
+
+  try {
+    const currentDate = new Date().toISOString().split('T')[0];
+
+    // Check if the record already exists
+    const { data: existingPlay, error: fetchError } = await supabase
+      .from('game_plays')
+      .select('play_count')
+      .eq('game_id', gameId)
+      .eq('play_date', currentDate)
+      .single();
+
+    if (fetchError && fetchError.code !== 'PGRST116') { // Ignore "Row not found" error
+      throw new Error(fetchError.message);
+    }
+
+    if (existingPlay) {
+      // Increment play count if record exists
+      const { error: incrementError } = await supabase.rpc('increment_play_count', {
+        game_id_param: gameId,
+        play_date_param: currentDate,
+      });
+
+      if (incrementError) {
+        throw new Error(incrementError.message);
+      }
+    } else {
+      // Insert new record if it doesn't exist
+      const { error: insertError } = await supabase
+        .from('game_plays')
+        .insert([
+          {
+            game_id: gameId,
+            play_date: currentDate,
+            play_count: 1,
+          },
+        ]);
+
+      if (insertError) {
+        throw new Error(insertError.message);
+      }
+    }
+
+    return { status: 200 };
+  } catch (error: any) {
+    return { error: error.message };
+  }
+}
 
 export const getGameBySlug = async (slug: string) => {
   const game = await getGameById(slug);

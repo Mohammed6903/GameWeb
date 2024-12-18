@@ -127,7 +127,7 @@ export default function GamePage({ game, user, adSetting }: GamePageProps) {
 
             {/* Game Viewer */}
             <div className="rounded-2xl overflow-hidden shadow-2xl border-4 border-purple-800/50">
-              <GameViewer play_url={game.play_url} thumbnail={game.thumbnail_url} />
+              <GameViewer play_url={game.play_url} thumbnail={game.thumbnail_url} game_id={game.id} />
             </div>
 
             {/* Game Details */}

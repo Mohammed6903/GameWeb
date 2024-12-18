@@ -5,13 +5,15 @@ import { Maximize2, Minimize2 } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
 import GameNotFound from "./game-not-found"
+import { updateGamePlays } from "@/lib/controllers/games"
 
 interface GameViewerProps {
   play_url: string
   thumbnail?: string
+  game_id: number
 }
 
-export function GameViewer({ play_url, thumbnail }: GameViewerProps) {
+export function GameViewer({ play_url, thumbnail, game_id }: GameViewerProps) {
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [isPlaying, setIsPlaying] = useState(false)
   const [iframeError, setIframeError] = useState(false);
@@ -38,6 +40,14 @@ export function GameViewer({ play_url, thumbnail }: GameViewerProps) {
     }
   }
 
+  const onPlay = async () => {
+    const response = await updateGamePlays(game_id);
+    if (response.error) {
+      console.error(`Error updating game play count: ${response.error}`);
+    }
+    setIsPlaying(true);
+  }
+
   return (
     <div ref={containerRef} className="relative rounded-lg overflow-hidden bg-[#2a1b52]">
       {!isPlaying ? (
@@ -55,7 +65,7 @@ export function GameViewer({ play_url, thumbnail }: GameViewerProps) {
             </div>
           )}
           <Button
-            onClick={() => setIsPlaying(true)}
+            onClick={async () => await onPlay()}
             className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-green-600 hover:bg-green-700"
             size="lg"
           >

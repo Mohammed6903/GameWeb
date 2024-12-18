@@ -13,30 +13,65 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { useEffect, useState } from 'react';
 import { useRouter } from "next/navigation";
+import { fetchWeeklyGamePlays, getActiveGamesCount, getTotalGamesCount } from '@/lib/controllers/games';
+import { getUsedCategories } from '@/lib/controllers/categories';
+import { getNewUsersCount } from '@/lib/controllers/analytics';
  
 // Dynamically import ApexCharts to ensure client-side rendering
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
 export default function GameAnalyticsDashboard() {
+  const [playsOverTimeSeries, setPlaysOverTimeSeries] = useState<[{name: string, data: number[]}]>([{ name: 'Game Plays', data: [] }]);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [gameCategorySeries, setGameCategorySeries] = useState<number[]>([]);
+  const [gameCategoryLabels, setGameCategoryLabels] = useState<string[]>([]);
+  const [gamesCount, setGamesCount] = useState<{totalCount: number, activeCount: number}>({totalCount: 176, activeCount: 176});
+  const [newUsers, setNewUsers] = useState<number>(0);
   const router = useRouter();
   const supabase = createClient();
   const [confirmedUser, setConfirmed] = useState(false);
 
-  // Mock data - in a real implementation, this would come from your API
-  const gameStats = {
-    totalGames: 42,
-    activeGames: 35,
-    inactiveGames: 7,
-    totalPlays: 15420,
-    uniquePlayers: 8563,
-    averagePlayTime: 14.5
-  };
+  useEffect(() => {
+    async function loadData() {
+      const weeklyData = await fetchWeeklyGamePlays();
 
-  // Game Plays Over Time
-  const playsOverTimeSeries = [{
-    name: 'Game Plays',
-    data: [120, 200, 180, 250, 300, 280, 350]
-  }];
+      // Transform the data for ApexCharts
+      const categories = weeklyData.map((d) => d.date);
+      const data = weeklyData.map((d) => d.totalPlays);
+
+      setCategories(categories);
+      setPlaysOverTimeSeries([{ name: 'Game Plays', data }]);
+    }
+
+    async function loadCategoryData() {
+      const categoriesData = await getUsedCategories();
+      const labels = categoriesData.map((item) => item.category);
+      const series = categoriesData.map((item) => item.count);
+
+      setGameCategoryLabels(labels);
+      setGameCategorySeries(series);
+    }
+
+    async function loadTotalCounts() {
+      const totalCount = await getTotalGamesCount();
+      const activeCount = await getActiveGamesCount();
+      if (totalCount && activeCount) {
+        setGamesCount({totalCount, activeCount});
+      }
+    }
+
+    async function getNewUsers() {
+      const count = await getNewUsersCount();
+      if (count) {
+        setNewUsers(count);
+      }
+    }
+
+    loadData();
+    loadCategoryData();
+    loadTotalCounts();
+    getNewUsers()
+  }, []);
 
   const playsOverTimeOptions: ApexOptions = {
     chart: {
@@ -46,10 +81,10 @@ export default function GameAnalyticsDashboard() {
     colors: ['#6366f1'], // Indigo color
     stroke: { curve: 'smooth' },
     xaxis: {
-      categories: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+      categories
     },
     title: {
-      text: 'Daily Game Plays',
+      // text: 'Daily Game Plays',
       style: { 
         fontSize: '16px', 
         fontWeight: 'bold',
@@ -63,10 +98,10 @@ export default function GameAnalyticsDashboard() {
     chart: { 
       type: 'donut' 
     },
-    labels: ['Arcade', 'Puzzle', 'Strategy', 'Action'],
+    labels: gameCategoryLabels,
     colors: ['#6366f1', '#10b981', '#f43f5e', '#f97316'],
     title: {
-      text: 'Game Category Distribution',
+      // text: 'Game Category Distribution',
       style: { 
         fontSize: '16px', 
         fontWeight: 'bold',
@@ -74,8 +109,6 @@ export default function GameAnalyticsDashboard() {
       }
     }
   };
-
-  const gameCategorySeries = [30, 25, 20, 25];
 
   useEffect(() => {
     const checkUser = async () => {
@@ -126,21 +159,21 @@ export default function GameAnalyticsDashboard() {
         {[
           { 
             title: 'Total Games', 
-            value: gameStats.totalGames, 
+            value: gamesCount.totalCount, 
             icon: Gamepad, 
             color: 'text-blue-500',
             bg: 'bg-blue-50'
           },
           { 
             title: 'Active Games', 
-            value: gameStats.activeGames, 
+            value: gamesCount.activeCount, 
             icon: CheckCircle, 
             color: 'text-green-500',
             bg: 'bg-green-50'
           },
           { 
             title: 'Unique Players', 
-            value: gameStats.uniquePlayers, 
+            value: newUsers, 
             icon: Users, 
             color: 'text-purple-500',
             bg: 'bg-purple-50'
@@ -168,11 +201,11 @@ export default function GameAnalyticsDashboard() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <Chart 
-              options={playsOverTimeOptions} 
-              series={playsOverTimeSeries} 
-              type="line" 
-              height={300} 
+            <Chart
+              options={playsOverTimeOptions}
+              series={playsOverTimeSeries}
+              type="line"
+              height={300}
             />
           </CardContent>
         </Card>
