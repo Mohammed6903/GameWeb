@@ -276,6 +276,101 @@ export async function updateGamePlays(gameId: number) {
   }
 }
 
+export async function fetchPopularGames() {
+  const supabase = await createClient();
+
+  try {
+    // Get aggregated play counts for all games
+    const { data: playCounts, error: playCountsError } = await supabase
+      .from('game_plays')
+      .select('game_id, play_count')
+      .order('play_count', { ascending: false });
+
+    if (playCountsError) {
+      throw new Error(`Error fetching play counts: ${playCountsError.message}`);
+    }
+
+    if (!playCounts || playCounts.length === 0) {
+      return []; // No popular games
+    }
+
+    const gameIds = playCounts.map((play) => play.game_id);
+
+    // Fetch game details for popular games
+    const { data: games, error: gamesError } = await supabase
+      .from('games')
+      .select('id, name, play_url, thumbnail_url, description, categories, tags, created_at, updated_at')
+      .eq('is_active', true)
+      .in('id', gameIds);
+
+    if (gamesError) {
+      throw new Error(`Error fetching game details: ${gamesError.message}`);
+    }
+
+    // Return popular games sorted by play counts
+    const gamesMap = games.reduce((acc, game) => {
+      acc[game.id] = game;
+      return acc;
+    }, {} as Record<number, any>);
+
+    return gameIds.map((id) => gamesMap[id]);
+  } catch (error) {
+    console.error('Error fetching popular games:', error);
+    throw error;
+  }
+}
+
+export async function fetchTopNewGames() {
+  const supabase = await createClient();
+
+  try {
+    // Fetch the total count of games
+    const { count: totalGames, error: countError } = await supabase
+      .from('games')
+      .select('*', { count: 'exact', head: true });
+
+    if (countError) {
+      throw new Error(`Error fetching total games count: ${countError.message}`);
+    }
+
+    // If there are less than 10 games, fetch all games regardless of date
+    if (totalGames && totalGames < 10) {
+      const { data: allGames, error: allGamesError } = await supabase
+        .from('games')
+        .select(`*, created_at::date`)
+        .order('created_at', { ascending: false });
+
+      if (allGamesError) {
+        throw new Error(`Error fetching all games: ${allGamesError.message}`);
+      }
+
+      return allGames.map(game => ({
+        ...game,
+        created_at: game.created_at.toString(), // Convert to date string
+      }));
+    }
+
+    // Otherwise, fetch the 10 most recently added games
+    const { data: newGames, error: newGamesError } = await supabase
+      .from('games')
+      .select(`*, created_at::date`)
+      .order('created_at', { ascending: false })
+      .limit(10);
+
+    if (newGamesError) {
+      throw new Error(`Error fetching new games: ${newGamesError.message}`);
+    }
+
+    return newGames.map(game => ({
+      ...game,
+      created_at: game.created_at.toString(), // Convert to date string
+    }));
+  } catch (error) {
+    console.error('Error fetching top new games:', error);
+    throw error;
+  }
+}
+
 export const getGameBySlug = async (slug: string) => {
   const game = await getGameById(slug);
   return game;

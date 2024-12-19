@@ -17,13 +17,12 @@ import React, { useEffect, useState } from 'react'
 import { getUsedCategories } from '@/lib/controllers/categories'
 import { toast } from 'sonner'
 import { capitalizeCategory } from '@/app/(dashboard)/categories/[category]/clientCategory'
-import { getMeta } from '@/lib/controllers/meta'
 
 const mainNavItems = [
-  { name: "Recently Played", url: "/recent", icon: History },
+  // { name: "Recently Played", url: "/recent", icon: History },
   { name: "New Games", url: "/new", icon: Sparkles },
   { name: "Trending", url: "/trending", icon: Flame },
-  { name: "Updated", url: "/updated", icon: RefreshCw },
+  // { name: "Updated", url: "/updated", icon: RefreshCw },
 ]
 
 interface sidebarProps{
