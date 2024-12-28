@@ -9,7 +9,8 @@ import {
   List, 
   Settings,
   Menu,
-  Edit
+  Edit,
+  DatabaseBackup
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -45,6 +46,15 @@ export function Sidebar() {
       activeBackground: 'bg-blue-50',
       hoverColor: 'hover:text-blue-600',
       hoverBackground: 'hover:bg-blue-100'
+    },
+    { 
+      href: '/admin/import-games', 
+      icon: DatabaseBackup, 
+      label: 'Import Games',
+      activeColor: 'text-teal-500',
+      activeBackground: 'bg-teal-50',
+      hoverColor: 'hover:text-teal-600',
+      hoverBackground: 'hover:bg-teal-100'
     },
     { 
       href: '/admin/settings', 

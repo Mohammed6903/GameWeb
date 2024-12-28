@@ -30,8 +30,27 @@ const nextConfig = {
               pathname: '/**',
               search: '',
             },
+            {
+              protocol: 'https',
+              hostname: 'games.assets.gamepix.com',
+              port: '',
+              pathname: '/**',
+              search: '',
+            },
+            {
+              protocol: 'https',
+              hostname: 'img.gamemonetize.com',
+              port: '',
+              pathname: '/**',
+              search: '',
+            },
         ],
     },
+    experimental: {
+      serverActions: {
+        bodySizeLimit: '3mb'
+      }
+    }
 };
 
 export default nextConfig;
