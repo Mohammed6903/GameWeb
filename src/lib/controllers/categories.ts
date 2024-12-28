@@ -33,36 +33,90 @@ export const addCategory = async (category: string) => {
     }
 }
 
+// export async function getUsedCategories() {
+//     const supabase = await createClient();
+//     try {
+//         const { data, error } = await supabase
+//             .from('games')
+//             .select('categories')
+//             .not('categories', 'is', null);
+
+//         if (error) {
+//             throw new Error(`Error fetching categories: ${error.message}`);
+//         }
+
+//         // Flatten the categories array and count occurrences
+//         const categoryCounts: { [key: string]: number } = {};
+
+//         data.forEach((game) => {
+//             if (Array.isArray(game.categories)) { // Ensure it's an array
+//                 game.categories.forEach((category: string) => {
+//                     categoryCounts[category] = (categoryCounts[category] || 0) + 1;
+//                 });
+//             }
+//         });
+
+//         const sortedCategories = Object.entries(categoryCounts)
+//             .map(([category, count]) => ({ category, count }))
+//             .sort((a, b) => b.count - a.count);
+
+//         return sortedCategories;
+//     } catch (error) {
+//         console.error('Error fetching used categories:', error);
+//         return [];
+//     }
+// }
+
 export async function getUsedCategories() {
     const supabase = await createClient();
+    const chunkSize = 1000;
+    let allGamesCategories: any[] = [];
+    let hasMore = true;
+    let lastId = 0;
+  
     try {
+      while (hasMore) {
         const { data, error } = await supabase
-            .from('games')
-            .select('categories')
-            .not('categories', 'is', null);
-
+          .from('games')
+          .select('id, categories')
+          .not('categories', 'is', null)
+          .gt('id', lastId)
+          .order('id', { ascending: true })
+          .limit(chunkSize);
+  
         if (error) {
-            throw new Error(`Error fetching categories: ${error.message}`);
+          throw new Error(`Error fetching categories: ${error.message}`);
         }
-
-        // Flatten the categories array and count occurrences
-        const categoryCounts: { [key: string]: number } = {};
-
-        data.forEach((game) => {
-            if (Array.isArray(game.categories)) { // Ensure it's an array
-                game.categories.forEach((category: string) => {
-                    categoryCounts[category] = (categoryCounts[category] || 0) + 1;
-                });
-            }
-        });
-
-        const sortedCategories = Object.entries(categoryCounts)
-            .map(([category, count]) => ({ category, count }))
-            .sort((a, b) => b.count - a.count);
-
-        return sortedCategories;
+  
+        if (data.length === 0) {
+          hasMore = false;
+        } else {
+          allGamesCategories = [...allGamesCategories, ...data];
+          lastId = data[data.length - 1].id;
+          if (data.length < chunkSize) {
+            hasMore = false;
+          }
+        }
+      }
+  
+      // Flatten the categories array and count occurrences
+      const categoryCounts: { [key: string]: number } = {};
+  
+      allGamesCategories.forEach((game) => {
+        if (Array.isArray(game.categories)) {
+          game.categories.forEach((category: string) => {
+            categoryCounts[category] = (categoryCounts[category] || 0) + 1;
+          });
+        }
+      });
+  
+      const sortedCategories = Object.entries(categoryCounts)
+        .map(([category, count]) => ({ category, count }))
+        .sort((a, b) => b.count - a.count);
+  
+      return sortedCategories;
     } catch (error) {
-        console.error('Error fetching used categories:', error);
-        return [];
+      console.error('Error fetching used categories:', error);
+      return [];
     }
 }

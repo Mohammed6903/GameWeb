@@ -9,7 +9,7 @@ import { translateGamesToFormData, ExternalGame } from '@/lib/utils/translator';
 export async function saveGames(games: ExternalGame[], providerId: string) {
   const supabase = await createClient();
   const translatedGames = translateGamesToFormData(games, providerId);
-  
+
   try {
     // Convert translated games to the format expected by Supabase
     const gamesToInsert = translatedGames.map(game => ({
@@ -25,26 +25,33 @@ export async function saveGames(games: ExternalGame[], providerId: string) {
 
     const { data, error } = await supabase
       .from('games')
-      .upsert(gamesToInsert, {onConflict: 'play_url'})
+      .upsert(gamesToInsert, { onConflict: 'play_url' })
       .select();
 
     if (error) {
-      console.error(`Error inserting games: ${error.message}`);
-      throw new Error(`Error inserting games: ${error.message}`);
+      console.error(`Supabase Error - Inserting Games Failed: ${error.message}`, {
+        code: error.code,
+        details: error.details,
+      });
+      throw new Error(`Supabase Error: ${error.message}`);
     }
 
     return {
       success: true,
       data,
-      message: `Successfully saved ${data.length} games`
+      message: `Successfully saved ${data.length} games`,
     };
 
   } catch (err) {
-    console.error('Error saving games:', err);
+    console.error('Critical Error - Failed to Save Games:', {
+      message: err instanceof Error ? err.message : 'Unknown error occurred',
+      stack: err instanceof Error ? err.stack : null,
+    });
+
     return {
       success: false,
       error: err instanceof Error ? err.message : 'Unknown error occurred',
-      message: 'Failed to save games'
+      message: 'Failed to save games',
     };
   }
 }

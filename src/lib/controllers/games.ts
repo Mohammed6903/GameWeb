@@ -83,12 +83,37 @@ export async function deleteGame(gameId: string) {
 
 export async function getAllGames(): Promise<FetchedGameData[]> {
   const supabase = await createClient();
-  const {data, error} = await supabase.from('games').select('*').eq('is_active', true);
-  if (error) {
-    throw Error(`Error fetching all games.`);
-  } else {    
-    return data;
+  const chunkSize = 1000; // Supabase's max limit
+  let allGames: FetchedGameData[] = [];
+  let hasMore = true;
+  let lastId = 0;
+
+  while (hasMore) {
+    const { data, error } = await supabase
+      .from('games')
+      .select('*')
+      .eq('is_active', true)
+      .gt('id', lastId)
+      .order('id', { ascending: true })
+      .limit(chunkSize);
+
+    if (error) {
+      throw Error(`Error fetching games: ${error.message}`);
+    }
+
+    if (data.length === 0) {
+      hasMore = false;
+    } else {
+      allGames = [...allGames, ...data];
+      lastId = data[data.length - 1].id;
+      
+      if (data.length < chunkSize) {
+        hasMore = false;
+      }
+    }
   }
+
+  return allGames;
 }
 
 export async function getPaginatedGames(page: number, pageSize: number): Promise<FetchedGameData[]> {
@@ -99,7 +124,8 @@ export async function getPaginatedGames(page: number, pageSize: number): Promise
   const { data, error } = await supabase
     .from('games')
     .select('*')
-    .range(offset, offset + pageSize - 1);
+    .range(offset, offset + pageSize - 1)
+    .limit(100000);
 
   if (error) {
     throw new Error(`Error fetching games: ${error.message}`);
@@ -155,34 +181,64 @@ function capitalizeFirstLetter(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 }
 
-export async function getGamesByCategory(category: string, { page = 1, limit = 10 } = {}) {
+export async function getGamesByCategory(category: string) {
   const supabase = await createClient();
+  const chunkSize = 1000;
+  let allGames: FetchedGameData[] = [];
+  let hasMore = true;
+  let lastId = 0;
+
   try {
     const cat = capitalizeFirstLetter(category);
-    const from = (page - 1) * limit;
-    const to = from + limit - 1;
 
-    const { data: capData, error: capErr, count: capCount } = await supabase
-    .from('games')
-    .select('*', { count: 'exact' })
-    .eq('is_active', true)
-    .contains('categories', [category])
-    .range(from, to);
-    
-    if (capErr) {
-      const { data, error, count } = await supabase
+    while (hasMore) {
+      const { data, error } = await supabase
         .from('games')
-        .select('*', { count: 'exact' })
+        .select('*')
         .eq('is_active', true)
-        .contains('categories', [cat])
-        .range(from, to);
+        .contains('categories', [category])
+        .gt('id', lastId)
+        .order('id', { ascending: true })
+        .limit(chunkSize);
+
       if (error) {
-        throw new Error(`Error fetching games: ${capErr.message}`);
+        // Try with capitalized category if the first attempt fails
+        const { data: capData, error: capError } = await supabase
+          .from('games')
+          .select('*')
+          .eq('is_active', true)
+          .contains('categories', [cat])
+          .gt('id', lastId)
+          .order('id', { ascending: true })
+          .limit(chunkSize);
+
+        if (capError) {
+          throw new Error(`Error fetching games: ${capError.message}`);
+        }
+
+        if (capData.length === 0) {
+          hasMore = false;
+        } else {
+          allGames = [...allGames, ...capData];
+          lastId = capData[capData.length - 1].id;
+          if (capData.length < chunkSize) {
+            hasMore = false;
+          }
+        }
+      } else {
+        if (data.length === 0) {
+          hasMore = false;
+        } else {
+          allGames = [...allGames, ...data];
+          lastId = data[data.length - 1].id;
+          if (data.length < chunkSize) {
+            hasMore = false;
+          }
+        }
       }
-      return { games: data, total: count };
-    } else {
-      return {games: capData, total: capCount}
     }
+
+    return { games: allGames, total: allGames.length };
   } catch (error: any) {
     throw new Error(`Error fetching games: ${error.message}`);
   }
@@ -202,7 +258,8 @@ export async function fetchWeeklyGamePlays() {
     .from('game_plays')
     .select('play_date, play_count')
     .gte('play_date', new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString().split('T')[0])
-    .order('play_date', { ascending: true });
+    .order('play_date', { ascending: true })
+    .limit(100000);
 
   if (error) {
     console.error('Error fetching weekly game plays:', error);
@@ -235,6 +292,7 @@ export async function updateGamePlays(gameId: number) {
     const { data: existingPlay, error: fetchError } = await supabase
       .from('game_plays')
       .select('play_count')
+      .limit(100000)
       .eq('game_id', gameId)
       .eq('play_date', currentDate)
       .single();
@@ -284,7 +342,8 @@ export async function fetchPopularGames() {
     const { data: playCounts, error: playCountsError } = await supabase
       .from('game_plays')
       .select('game_id, play_count')
-      .order('play_count', { ascending: false });
+      .order('play_count', { ascending: false })
+      .limit(100000);
 
     if (playCountsError) {
       throw new Error(`Error fetching play counts: ${playCountsError.message}`);
@@ -327,7 +386,8 @@ export async function fetchTopNewGames() {
     // Fetch the total count of games
     const { count: totalGames, error: countError } = await supabase
       .from('games')
-      .select('*', { count: 'exact', head: true });
+      .select('*', { count: 'exact', head: true })
+      .limit(100000);
 
     if (countError) {
       throw new Error(`Error fetching total games count: ${countError.message}`);
