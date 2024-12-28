@@ -25,7 +25,7 @@ export default function GameAnalyticsDashboard() {
   const [categories, setCategories] = useState<string[]>([]);
   const [gameCategorySeries, setGameCategorySeries] = useState<number[]>([]);
   const [gameCategoryLabels, setGameCategoryLabels] = useState<string[]>([]);
-  const [gamesCount, setGamesCount] = useState<{totalCount: number, activeCount: number}>({totalCount: 176, activeCount: 176});
+  const [gamesCount, setGamesCount] = useState<{totalCount: number, activeCount: number}>({totalCount: 0, activeCount: 0});
   const [newUsers, setNewUsers] = useState<number>(0);
   const router = useRouter();
   const supabase = createClient();

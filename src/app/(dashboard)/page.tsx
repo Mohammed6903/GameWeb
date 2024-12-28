@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { FeaturedGames } from '@/components/featured-games'
 import { AllGames } from '@/components/all-games'
 import { FetchedGameData, Game } from '@/types/games'
-import { getAllGames } from '@/lib/controllers/games'
+import { getActiveGamesCount, getAllGames } from '@/lib/controllers/games'
 import { getMeta } from '@/lib/controllers/meta'
 
 function capitalizeCategory(category: string) {
@@ -46,6 +46,7 @@ export default async function DashboardPage() {
   const categories = await getGamesByCategory(games);
   const metaResult = await getMeta();
   const metaData = metaResult.status === 200 && metaResult.data ? metaResult.data : {};
+  const activeCount = await getActiveGamesCount();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-purple-900 text-white p-6 md:p-8 lg:p-12">

@@ -83,12 +83,37 @@ export async function deleteGame(gameId: string) {
 
 export async function getAllGames(): Promise<FetchedGameData[]> {
   const supabase = await createClient();
-  const {data, error} = await supabase.from('games').select('*').eq('is_active', true);
-  if (error) {
-    throw Error(`Error fetching all games.`);
-  } else {    
-    return data;
+  const chunkSize = 1000; // Supabase's max limit
+  let allGames: FetchedGameData[] = [];
+  let hasMore = true;
+  let lastId = 0;
+
+  while (hasMore) {
+    const { data, error } = await supabase
+      .from('games')
+      .select('*')
+      .eq('is_active', true)
+      .gt('id', lastId)
+      .order('id', { ascending: true })
+      .limit(chunkSize);
+
+    if (error) {
+      throw Error(`Error fetching games: ${error.message}`);
+    }
+
+    if (data.length === 0) {
+      hasMore = false;
+    } else {
+      allGames = [...allGames, ...data];
+      lastId = data[data.length - 1].id;
+      
+      if (data.length < chunkSize) {
+        hasMore = false;
+      }
+    }
   }
+
+  return allGames;
 }
 
 export async function getPaginatedGames(page: number, pageSize: number): Promise<FetchedGameData[]> {
@@ -188,13 +213,6 @@ export async function getGamesByCategory(category: string, { page = 1, limit = 1
   }
 }
 
-// export async function getGameStats() {
-//   return {
-//     totalGames: mockGames.length,
-//     activeGames: mockGames.filter(game => game.status === 'active').length,
-//     inactiveGames: mockGames.filter(game => game.status === 'active').length
-//   };
-// }
 export async function fetchWeeklyGamePlays() {
   const supabase = await createClient();
 
@@ -202,7 +220,7 @@ export async function fetchWeeklyGamePlays() {
     .from('game_plays')
     .select('play_date, play_count')
     .gte('play_date', new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString().split('T')[0])
-    .order('play_date', { ascending: true });
+    .order('play_date', { ascending: true })
 
   if (error) {
     console.error('Error fetching weekly game plays:', error);
@@ -284,7 +302,7 @@ export async function fetchPopularGames() {
     const { data: playCounts, error: playCountsError } = await supabase
       .from('game_plays')
       .select('game_id, play_count')
-      .order('play_count', { ascending: false });
+      .order('play_count', { ascending: false })
 
     if (playCountsError) {
       throw new Error(`Error fetching play counts: ${playCountsError.message}`);
@@ -327,7 +345,7 @@ export async function fetchTopNewGames() {
     // Fetch the total count of games
     const { count: totalGames, error: countError } = await supabase
       .from('games')
-      .select('*', { count: 'exact', head: true });
+      .select('*', { count: 'exact', head: true })
 
     if (countError) {
       throw new Error(`Error fetching total games count: ${countError.message}`);
