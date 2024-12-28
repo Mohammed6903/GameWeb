@@ -1,5 +1,5 @@
 'use server'
-import { FetchedGameData, Game, GameFormData } from '@/types/games';
+import { FetchedGameData, Game, GameBasicData, GameFormData } from '@/types/games';
 import { createClient } from "../utils/supabase/server";
 
 export async function addGame(gameData: GameFormData) {
@@ -114,6 +114,36 @@ export async function getAllGames(): Promise<FetchedGameData[]> {
   }
 
   return allGames;
+}
+
+export async function getGamesPage(page: number = 1, pageSize: number = 24): Promise<{
+  games: GameBasicData[];
+  total: number;
+}> {
+  const supabase = await createClient();
+  const start = (page - 1) * pageSize;
+  
+  const [gamesQuery, countQuery] = await Promise.all([
+    supabase
+      .from('games')
+      .select('id, name, thumbnail_url, categories, description, tags')
+      .eq('is_active', true)
+      .order('id', { ascending: true })
+      .range(start, start + pageSize - 1),
+    
+    supabase
+      .from('games')
+      .select('id', { count: 'exact', head: true })
+      .eq('is_active', true)
+  ]);
+
+  if (gamesQuery.error) throw Error(`Error fetching games: ${gamesQuery.error.message}`);
+  if (countQuery.error) throw Error(`Error getting count: ${countQuery.error.message}`);
+
+  return {
+    games: gamesQuery.data,
+    total: countQuery.count || 0
+  };
 }
 
 export async function getPaginatedGames(page: number, pageSize: number): Promise<FetchedGameData[]> {

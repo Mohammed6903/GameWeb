@@ -18,9 +18,11 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { signOutAction } from "@/lib/actions/authActions"
 import { getLikedGameDetails } from "@/lib/controllers/like"
+import { getFavIconByType, getFavIcons } from "@/lib/controllers/meta"
 
 interface NavBarprops {
-  siteName: string
+  siteName: string,
+
 }
 
 export const NavBar: React.FC<NavBarprops> = ({siteName}) => {
@@ -29,8 +31,19 @@ export const NavBar: React.FC<NavBarprops> = ({siteName}) => {
   const [emailInfo, setEmailInfo] = useState<any>();
   const [likedGames, setLikedGames] = useState<any[]>([]);
   const [isLikedGamesOpen, setIsLikedGamesOpen] = useState(false);
+  const [favIcon, setFavIcon] = useState<any>();
   const router = useRouter();
   const supabase = createClient();
+
+  useEffect(() => {
+    const fetchFavIcon = async() => {
+      const response = await getFavIconByType('favicon');
+      if (response.status === 200) {
+        setFavIcon(response.data);
+      }
+    };
+    fetchFavIcon();
+  }, [])
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -99,7 +112,7 @@ export const NavBar: React.FC<NavBarprops> = ({siteName}) => {
           <SidebarTrigger className="text-white/80 hover:text-white" />
           <Link href="/" className="flex items-center gap-2">
             <div className="size-8 rounded-lg bg-white/20 flex items-center justify-center">
-              <img src="/favicon.ico" alt="icon" />
+              <img src={favIcon?.publicUrl ? favIcon?.publicUrl : '/favicon.ico'} alt="icon" />
             </div>
             <span className="font-semibold text-white">{siteName ? siteName : 'Paneer Gaming'}</span>
           </Link>

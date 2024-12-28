@@ -29,7 +29,7 @@ export function AllGames({ games }: GamesCarouselProps) {
   const [adSettings, setAdSettings] = useState<AdSettings | null>(null);
   const router = useRouter();
 
-  // Calculate cards to show based on screen width
+  // Calculate optimal layout based on screen width and available games
   useEffect(() => {
     const fetchAndSet = async () => {
       const {data, error} = await getAdSettings();
@@ -39,92 +39,152 @@ export function AllGames({ games }: GamesCarouselProps) {
     }
     fetchAndSet();
 
-    const calculateCardsToShow = () => {
+    const calculateOptimalLayout = () => {
       const width = window.innerWidth;
-      if (width < 640) return 1;      // Mobile: 1 card
-      if (width < 768) return 2;      // Small tablets: 2 cards
-      if (width < 1024) return 3;     // Tablets: 3 cards
-      if (width < 1280) return 4;     // Laptops: 4 cards
-      if (width < 1536) return 5;     // Large laptops: 5 cards
-      return 6;                       // Desktops: 6 cards
+      let defaultCards;
+      if (width < 640) defaultCards = 1;      
+      else if (width < 768) defaultCards = 2;
+      else if (width < 1024) defaultCards = 3;     
+      else if (width < 1280) defaultCards = 4;     
+      else if (width < 1536) defaultCards = 5;
+      else defaultCards = 6;
+
+      // Adjust cards to show based on available games
+      const totalItems = getTotalItems();
+      if (totalItems < defaultCards) {
+        return Math.max(1, totalItems);
+      }
+      return defaultCards;
     };
 
-    setCardsToShow(calculateCardsToShow());
+    setCardsToShow(calculateOptimalLayout());
+    setCurrentIndex(0);
 
     const handleResize = () => {
-      setCardsToShow(calculateCardsToShow());
+      setCardsToShow(calculateOptimalLayout());
     };
 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  }, [games]);
 
   const openGame = (gameId: string) => {
     router.push(`/play/${gameId}`);
   }
 
+  const getTotalItems = () => {
+    if (!adSettings?.show_carousel_ads) return games.length;
+    const adCount = Math.floor(games.length / (adSettings.carousel_ad_frequency || 3));
+    return games.length + adCount;
+  }
+
+  const shouldShowNavigation = () => {
+    const totalItems = getTotalItems();
+    return totalItems > cardsToShow;
+  }
+
   const paginate = (direction: number) => {
-    const adFrequency = adSettings?.carousel_ad_frequency || 3;
-    const maxIndex = games.length + Math.floor(games.length / adFrequency);
-    
+    const totalItems = getTotalItems();
+    if (totalItems <= cardsToShow) return;
+
     setCurrentIndex((prevIndex) => {
       const newIndex = prevIndex + (direction * cardsToShow);
-      
-      // Wrap around logic
-      if (newIndex < 0) return maxIndex - (maxIndex % cardsToShow || cardsToShow);
-      if (newIndex >= maxIndex) return 0;
-      
+      if (newIndex < 0) {
+        const lastPageItems = totalItems % cardsToShow;
+        return lastPageItems ? totalItems - lastPageItems : totalItems - cardsToShow;
+      }
+      if (newIndex >= totalItems) return 0;
       return newIndex;
     });
   }
 
-  // Prepare visible games with proper wrapping and ad insertion
   const prepareVisibleItems = () => {
     if (!adSettings) return games.slice(currentIndex, currentIndex + cardsToShow).map(game => ({ type: 'game', game }));
 
     const { show_carousel_ads, carousel_ad_frequency } = adSettings;
     const visibleItems = [];
-    for (let i = 0; i < cardsToShow; i++) {
-      const itemIndex = (currentIndex + i) % (games.length + Math.floor(games.length / carousel_ad_frequency));
+    const totalItems = getTotalItems();
+    
+    for (let i = 0; i < Math.min(cardsToShow, totalItems); i++) {
+      const itemIndex = (currentIndex + i) % totalItems;
       const gameIndex = itemIndex - Math.floor(itemIndex / (carousel_ad_frequency + 1));
       
       if (show_carousel_ads && itemIndex > 0 && itemIndex % (carousel_ad_frequency + 1) === 0) {
-        // Insert ad
         visibleItems.push({ type: 'ad', id: `ad-${itemIndex}` });
-      } else {
-        // Insert game
+      } else if (gameIndex < games.length) {
         visibleItems.push({ type: 'game', game: games[gameIndex] });
       }
     }
     return visibleItems;
   }
 
+  const getContainerClasses = () => {
+    if (games.length === 1) {
+      return 'max-w-2xl mx-auto px-4'; // Centered, narrower container for single game
+    }
+    return 'max-w-7xl mx-auto px-4'; // Full width for multiple games
+  }
+
+  const getGridColumns = () => {
+    const totalItems = getTotalItems();
+    const columns = Math.min(cardsToShow, totalItems);
+    
+    if (games.length === 1) {
+      return 'grid-cols-1'; // Single column for single game
+    }
+    
+    switch (columns) {
+      case 2: return 'grid-cols-1 sm:grid-cols-2';
+      case 3: return 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3';
+      case 4: return 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4';
+      case 5: return 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5';
+      default: return 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6';
+    }
+  }
+
+  const getSingleGameCardClasses = () => {
+    if (games.length === 1) {
+      return "group relative overflow-hidden rounded-xl bg-white/5 border-transparent hover:bg-white/10 transition-all duration-300 cursor-pointer aspect-video"; // 16:9 aspect ratio for single game
+    }
+    return "group relative overflow-hidden rounded-xl bg-white/5 border-transparent hover:bg-white/10 transition-all duration-300 cursor-pointer";
+  }
+
+  const getImageContainerClasses = () => {
+    if (games.length === 1) {
+      return "relative w-full h-full"; // Full height/width for single game
+    }
+    return "aspect-square relative"; // Square aspect for multiple games
+  }
+
   const visibleItems = prepareVisibleItems();
+  const showNavigation = shouldShowNavigation();
+
+  if (games.length === 0) return null;
 
   return (
-    <div className="relative w-full max-w-7xl mx-auto px-4">
-      {/* Navigation Buttons */}
-      <div className="absolute inset-y-0 z-10 flex items-center justify-between w-full pointer-events-none">
-        <motion.button
-          className="pointer-events-auto bg-white/20 rounded-full p-2 hover:bg-white/30 transition"
-          onClick={() => paginate(-1)}
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-        >
-          <ChevronLeft className="text-white" />
-        </motion.button>
-        <motion.button
-          className="pointer-events-auto bg-white/20 rounded-full p-2 hover:bg-white/30 transition"
-          onClick={() => paginate(1)}
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-        >
-          <ChevronRight className="text-white" />
-        </motion.button>
-      </div>
+    <div className={`relative w-full ${getContainerClasses()}`}>
+      {showNavigation && (
+        <div className="absolute inset-y-0 z-10 flex items-center justify-between w-full pointer-events-none">
+          <motion.button
+            className="pointer-events-auto bg-white/20 rounded-full p-2 hover:bg-white/30 transition"
+            onClick={() => paginate(-1)}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+          >
+            <ChevronLeft className="text-white" />
+          </motion.button>
+          <motion.button
+            className="pointer-events-auto bg-white/20 rounded-full p-2 hover:bg-white/30 transition"
+            onClick={() => paginate(1)}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+          >
+            <ChevronRight className="text-white" />
+          </motion.button>
+        </div>
+      )}
 
-      {/* Carousel Container */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
+      <div className={`grid ${getGridColumns()} gap-4`}>
         {visibleItems.map((item, index) => (
           <motion.div
             key={`${item.type}-${item.type === 'ad' ? item.id : item.game && item.game.id}-${index}`}
@@ -143,30 +203,32 @@ export function AllGames({ games }: GamesCarouselProps) {
               </Card>
             ) : (
               <Card 
-                className="group relative overflow-hidden rounded-xl bg-white/5 border-transparent hover:bg-white/10 transition-all duration-300 cursor-pointer"
+                className={getSingleGameCardClasses()}
                 onClick={() => (item.game && openGame(item.game.id))}
               >
-                  {item.game && (
-                    <div className="aspect-square relative">
-                      <Image
-                        src={item.game && item.game.thumbnail_url || '/placeholder.png'}
-                        alt={item.game.name}
-                        className="object-cover group-hover:scale-105 transition-transform duration-300"
-                        fill
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 33vw, (max-width: 1280px) 25vw, (max-width: 1536px) 20vw, 16.6vw"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent p-4 flex flex-col justify-end">
-                        <h3 className="text-sm font-semibold mb-1 line-clamp-2">{item.game.name}</h3>
-                        <div className="flex flex-wrap gap-1">
-                          {item.game.categories.slice(0, 2).map((category, i) => (
-                            <span key={i} className="text-xs bg-white/20 px-2 py-1 rounded-full">
-                              {category}
-                            </span>
-                          ))}
-                        </div>
+                {item.game && (
+                  <div className={getImageContainerClasses()}>
+                    <Image
+                      src={item.game.thumbnail_url || '/placeholder.png'}
+                      alt={item.game.name}
+                      className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      fill
+                      sizes={games.length === 1 ? "100vw" : "(max-width: 640px) 100vw, (max-width: 1024px) 33vw, (max-width: 1280px) 25vw, (max-width: 1536px) 20vw, 16.6vw"}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent p-4 flex flex-col justify-end">
+                      <h3 className={`font-semibold mb-1 line-clamp-2 ${games.length === 1 ? 'text-xl' : 'text-sm'}`}>
+                        {item.game.name}
+                      </h3>
+                      <div className="flex flex-wrap gap-1">
+                        {item.game.categories.slice(0, games.length === 1 ? 3 : 2).map((category, i) => (
+                          <span key={i} className={`bg-white/20 px-2 py-1 rounded-full ${games.length === 1 ? 'text-sm' : 'text-xs'}`}>
+                            {category}
+                          </span>
+                        ))}
                       </div>
                     </div>
-                  )}
+                  </div>
+                )}
               </Card>
             )}
           </motion.div>

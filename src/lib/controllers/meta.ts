@@ -87,3 +87,24 @@ export const getFavIcons = async () => {
         return {error: error};
     }
 }
+
+export const getFavIconByType = async (type: string) => {
+    const supabase = await createClient();
+    try {
+        const { data, error } = await supabase
+          .from('favIcon')
+          .select()
+          .eq('type', type)
+          .single();
+        
+        if (error) {
+            console.error("Error saving favIcon in table: ", error);
+            return {error: error.message};
+        }
+
+        return {status: 200, data: data}
+    } catch (error) {
+        console.error("Unexpected error saving site meta:", error);
+        return {error: error};
+    }
+}

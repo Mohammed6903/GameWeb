@@ -73,7 +73,7 @@ export default async function DashboardPage() {
             <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center gap-3 sm:gap-4 mt-4 sm:mt-0">
               <Button variant="ghost" className="flex items-center gap-2 text-white hover:bg-white/20">
                 <Laptop2 className="text-pink-400 w-5 h-5 sm:w-6 sm:h-6" />
-                {games.length}+ games
+                {activeCount}+ games
               </Button>
               <Button variant="ghost" className="flex items-center gap-2 text-white hover:bg-white/20">
                 <Users2 className="text-purple-400 w-5 h-5 sm:w-6 sm:h-6" />

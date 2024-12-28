@@ -19,6 +19,15 @@ export interface RelatedGame {
   slug: string
 }
 
+export interface GameBasicData {
+  id: string;
+  name: string;
+  description: string;
+  thumbnail_url: string;
+  categories: string[];
+  tags: string[];
+}
+
 export interface GameFormData extends Omit<Game, 'id' | 'createdAt' | 'updatedAt'> {
   thumbnailFile?: File;
 }
