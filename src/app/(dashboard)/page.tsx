@@ -9,9 +9,9 @@ import { getMeta } from '@/lib/controllers/meta'
 
 function capitalizeCategory(category: string) {
   return category
-      .split(' ')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ');
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
 }
 
 async function getGamesByCategory(games: FetchedGameData[]): Promise<Record<string, FetchedGameData[]>> {
@@ -51,39 +51,45 @@ export default async function DashboardPage() {
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-purple-900 text-white p-6 md:p-8 lg:p-12">
       <div className="max-w-7xl mx-auto space-y-12">
         {/* Welcome Section */}
-        <section className="bg-gradient-to-br from-purple-700 to-purple-900 rounded-3xl p-4 md:p-6 lg:p-8 shadow-xl">
-        <div className="flex flex-row justify-between gap-6">
-          <div className="flex items-center gap-4 sm:gap-6">
-            <div className="size-10 sm:size-12 rounded-2xl bg-white flex items-center justify-center shrink-0 shadow-lg">
-              <Gamepad2 className="size-8 sm:size-10 text-purple-700" />
+        <section className="bg-gradient-to-br from-purple-700 to-purple-900 rounded-3xl p-4 shadow-xl">
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-6">
+            {/* Left Section */}
+            <div className="flex items-center gap-4 sm:gap-6">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-white flex items-center justify-center shadow-lg">
+                <Gamepad2 className="w-8 h-8 sm:w-10 sm:h-10 text-purple-700" />
+              </div>
+              <div>
+                <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-purple-300">
+                  {metaData.site_name ? capitalizeCategory(metaData.site_name) : 'Gamers Arena'}
+                </h1>
+                <p className="text-purple-200 mt-1 text-sm sm:text-base">
+                  Play instantly, no downloads needed
+                </p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-purple-300">
-                {metaData.site_name ? capitalizeCategory(metaData.site_name) : 'Gamers Arena'}
-              </h1>
-              <p className="text-purple-200 mt-1 sm:mt-2 text-base sm:text-lg">Play instantly, no downloads needed</p>
+
+            {/* Buttons Section */}
+            <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center gap-3 sm:gap-4 mt-4 sm:mt-0">
+              <Button variant="ghost" className="flex items-center gap-2 text-white hover:bg-white/20">
+                <Laptop2 className="text-pink-400 w-5 h-5 sm:w-6 sm:h-6" />
+                {games.length}+ games
+              </Button>
+              <Button variant="ghost" className="flex items-center gap-2 text-white hover:bg-white/20">
+                <Users2 className="text-purple-400 w-5 h-5 sm:w-6 sm:h-6" />
+                Play with friends
+              </Button>
+              <Button variant="ghost" className="flex items-center gap-2 text-white hover:bg-white/20">
+                <Sparkles className="text-yellow-400 w-5 h-5 sm:w-6 sm:h-6" />
+                All for free
+              </Button>
             </div>
           </div>
-          <div className="flex flex-row flex-wrap items-center justify-center gap-3 sm:gap-4 mt-4">
-            <Button variant="ghost" className="gap-2 text-white hover:bg-white/20">
-              <Laptop2 className="text-pink-400 size-5 sm:size-6" />
-              {games.length}+ games
-            </Button>
-            <Button variant="ghost" className="gap-2 text-white hover:bg-white/20">
-              <Users2 className="text-purple-400 size-5 sm:size-6" />
-              Play with friends
-            </Button>
-            <Button variant="ghost" className="gap-2 text-white hover:bg-white/20">
-              <Sparkles className="text-yellow-400 size-5 sm:size-6" />
-              All for free
-            </Button>
-          </div>
-        </div>
-      </section>
+        </section>
+
 
         {/* Featured Games */}
         <section>
-          <h2 className="text-2xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500">
+          <h2 className="text-2xl sm:text-xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500">
             Featured Games
           </h2>
           <Suspense fallback={<div className="h-36 bg-white/5 rounded-3xl animate-pulse"></div>}>
