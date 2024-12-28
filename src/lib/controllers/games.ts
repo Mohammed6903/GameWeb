@@ -124,8 +124,7 @@ export async function getPaginatedGames(page: number, pageSize: number): Promise
   const { data, error } = await supabase
     .from('games')
     .select('*')
-    .range(offset, offset + pageSize - 1)
-    .limit(100000);
+    .range(offset, offset + pageSize - 1);
 
   if (error) {
     throw new Error(`Error fetching games: ${error.message}`);
@@ -214,13 +213,6 @@ export async function getGamesByCategory(category: string, { page = 1, limit = 1
   }
 }
 
-// export async function getGameStats() {
-//   return {
-//     totalGames: mockGames.length,
-//     activeGames: mockGames.filter(game => game.status === 'active').length,
-//     inactiveGames: mockGames.filter(game => game.status === 'active').length
-//   };
-// }
 export async function fetchWeeklyGamePlays() {
   const supabase = await createClient();
 
@@ -229,7 +221,6 @@ export async function fetchWeeklyGamePlays() {
     .select('play_date, play_count')
     .gte('play_date', new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString().split('T')[0])
     .order('play_date', { ascending: true })
-    .limit(100000);
 
   if (error) {
     console.error('Error fetching weekly game plays:', error);
@@ -262,7 +253,6 @@ export async function updateGamePlays(gameId: number) {
     const { data: existingPlay, error: fetchError } = await supabase
       .from('game_plays')
       .select('play_count')
-      .limit(100000)
       .eq('game_id', gameId)
       .eq('play_date', currentDate)
       .single();
@@ -313,7 +303,6 @@ export async function fetchPopularGames() {
       .from('game_plays')
       .select('game_id, play_count')
       .order('play_count', { ascending: false })
-      .limit(100000);
 
     if (playCountsError) {
       throw new Error(`Error fetching play counts: ${playCountsError.message}`);
@@ -357,7 +346,6 @@ export async function fetchTopNewGames() {
     const { count: totalGames, error: countError } = await supabase
       .from('games')
       .select('*', { count: 'exact', head: true })
-      .limit(100000);
 
     if (countError) {
       throw new Error(`Error fetching total games count: ${countError.message}`);
