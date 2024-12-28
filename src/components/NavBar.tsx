@@ -120,11 +120,6 @@ export const NavBar: React.FC<NavBarprops> = ({siteName}) => {
         
         <div className="hidden sm:flex flex-1 items-center justify-center max-w-lg mx-6">
           <div className="w-full relative group">
-            {/* <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-white/50 group-focus-within:text-white/70" />
-            <Input
-              placeholder="Search games..."
-              className="h-9 w-full pl-9 bg-white/10 border-transparent text-white placeholder:text-white/50 focus:bg-white/20 focus:border-white/20"
-            /> */}
              <GameSearch />
           </div>
         </div>

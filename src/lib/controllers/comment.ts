@@ -17,28 +17,61 @@ export const fetchComments = async (gameId: number) => {
       // Fetch usernames for each comment
       const commentsWithUsernames = await Promise.all(
         data.map(async (comment) => {
-          const { data: userData, error: userError } = await supabase
-            .from('user_roles')
-            .select('email')
-            .eq('user_id', comment.user_id)
-            .single();
-  
-          if (userError) {
-            console.error('Error fetching username:', userError.message);
+          try {
+            const { data: userData, error: userError } = await supabase
+              .from('user_roles')
+              .select('username, email')
+              .eq('user_id', comment.user_id)
+              .single();
+      
+            if (!userError && userData?.username) {
+              return {
+                id: comment.id,
+                user: userData.username,
+                content: comment.content,
+                createdAt: comment.created_at,
+              };
+            }
+      
+            const { data: emailUserData, error: emailUserError } = await supabase
+              .from('emailUser')
+              .select('first_name, last_name')
+              .eq('email', userData?.email)
+              .single();
+      
+            if (!emailUserError && (emailUserData?.first_name || emailUserData?.last_name)) {
+              const username = [
+                emailUserData.first_name,
+                emailUserData.last_name
+              ]
+                .filter(Boolean)  
+                .join(' ')       
+                .trim();         
+      
+              return {
+                id: comment.id,
+                user: username || 'Unknown User',
+                content: comment.content,
+                createdAt: comment.created_at,
+              };
+            }
+      
             return {
               id: comment.id,
-              user: 'Unknown',  
+              user: 'Unknown User',
+              content: comment.content,
+              createdAt: comment.created_at,
+            };
+      
+          } catch (error: any) {
+            console.error('Error in username resolution:', error.message);
+            return {
+              id: comment.id,
+              user: 'Unknown User',
               content: comment.content,
               createdAt: comment.created_at,
             };
           }
-  
-          return {
-            id: comment.id,
-            user: userData?.email || 'Unknown', 
-            content: comment.content,
-            createdAt: comment.created_at,
-          };
         })
       );
   
@@ -47,8 +80,7 @@ export const fetchComments = async (gameId: number) => {
       console.error("Error fetching comments:", error);
       throw error;
     }
-  };
-  
+};
 
 export const postComment = async (gameId: number, content: string) => {
     const supabase = await createClient();
