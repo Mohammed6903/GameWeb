@@ -181,64 +181,34 @@ function capitalizeFirstLetter(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 }
 
-export async function getGamesByCategory(category: string) {
+export async function getGamesByCategory(category: string, { page = 1, limit = 10 } = {}) {
   const supabase = await createClient();
-  const chunkSize = 1000;
-  let allGames: FetchedGameData[] = [];
-  let hasMore = true;
-  let lastId = 0;
-
   try {
     const cat = capitalizeFirstLetter(category);
+    const from = (page - 1) * limit;
+    const to = from + limit - 1;
 
-    while (hasMore) {
-      const { data, error } = await supabase
+    const { data: capData, error: capErr, count: capCount } = await supabase
+    .from('games')
+    .select('*', { count: 'exact' })
+    .eq('is_active', true)
+    .contains('categories', [category])
+    .range(from, to);
+    
+    if (capErr) {
+      const { data, error, count } = await supabase
         .from('games')
-        .select('*')
+        .select('*', { count: 'exact' })
         .eq('is_active', true)
-        .contains('categories', [category])
-        .gt('id', lastId)
-        .order('id', { ascending: true })
-        .limit(chunkSize);
-
+        .contains('categories', [cat])
+        .range(from, to);
       if (error) {
-        // Try with capitalized category if the first attempt fails
-        const { data: capData, error: capError } = await supabase
-          .from('games')
-          .select('*')
-          .eq('is_active', true)
-          .contains('categories', [cat])
-          .gt('id', lastId)
-          .order('id', { ascending: true })
-          .limit(chunkSize);
-
-        if (capError) {
-          throw new Error(`Error fetching games: ${capError.message}`);
-        }
-
-        if (capData.length === 0) {
-          hasMore = false;
-        } else {
-          allGames = [...allGames, ...capData];
-          lastId = capData[capData.length - 1].id;
-          if (capData.length < chunkSize) {
-            hasMore = false;
-          }
-        }
-      } else {
-        if (data.length === 0) {
-          hasMore = false;
-        } else {
-          allGames = [...allGames, ...data];
-          lastId = data[data.length - 1].id;
-          if (data.length < chunkSize) {
-            hasMore = false;
-          }
-        }
+        throw new Error(`Error fetching games: ${capErr.message}`);
       }
+      return { games: data, total: count };
+    } else {
+      return {games: capData, total: capCount}
     }
-
-    return { games: allGames, total: allGames.length };
   } catch (error: any) {
     throw new Error(`Error fetching games: ${error.message}`);
   }
