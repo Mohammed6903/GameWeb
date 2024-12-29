@@ -67,7 +67,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...staticUrls,
     ...(response
       ? response.map((game) => ({
-          url: `${process.env.NEXT_PUBLIC_SITE_URL}/games/${game.id}`,
+          url: `${process.env.NEXT_PUBLIC_SITE_URL}/play/${game.id}`,
           lastModified: game.updated_at,
           changeFrequency: 'weekly' as const,
           priority: 0.8,
