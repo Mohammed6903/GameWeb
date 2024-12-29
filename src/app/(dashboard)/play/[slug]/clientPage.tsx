@@ -1,15 +1,13 @@
 'use client';
 
+import { memo, useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { CommentSection } from '@/components/comment';
-import { GameViewer } from '@/components/game-viewer';
-import { GamePageAd } from '@/components/adSense/GamePageAds';
+import dynamic from 'next/dynamic';
 import { ArrowLeft, ThumbsUp, ThumbsDown, Tag } from 'lucide-react';
 import { toast } from 'sonner';
 import { dislikeGame, getLikedOrDisliked, likeGame } from '@/lib/controllers/like';
-import { useEffect, useState } from 'react';
 
 interface AdSettings {
   google_client_id: string;
@@ -47,74 +45,137 @@ interface GamePageProps {
   adSetting: AdSettings;
 }
 
+// Lazy load heavy components
+const CommentSection = dynamic(() => 
+  import('@/components/comment').then(mod => mod.CommentSection), {
+  ssr: false
+});
+
+const GameViewer = dynamic(() => 
+  import('@/components/game-viewer').then(mod => mod.GameViewer), {
+  ssr: false
+});
+
+const GamePageAd = dynamic(() => 
+  import('@/components/adSense/GamePageAds').then(mod => mod.GamePageAd), {
+  ssr: false
+});
+
+// Memoized subcomponents for better performance
+const GameHeader = memo(({ name, like, onLike, onDislike }: {
+  name: string;
+  like: boolean | null;
+  onLike: () => void;
+  onDislike: () => void;
+}) => (
+  <div className="flex justify-between items-center">
+    <Link href="/">
+      <ArrowLeft size={24} />
+    </Link>
+    <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-600">
+      {name}
+    </h1>
+    <div className="flex items-center space-x-2">
+      <Button
+        onClick={onLike}
+        variant="outline"
+        size="icon"
+        className={`text-black bg-white hover:bg-purple-700 hover:text-white ${like ? "bg-purple-700 text-white" : ""}`}
+      >
+        <ThumbsUp className="h-5 w-5" />
+      </Button>
+      <Button
+        onClick={onDislike}
+        variant="outline"
+        size="icon"
+        className={`text-black bg-white hover:bg-purple-700 hover:text-white ${(like === false) ? "bg-purple-700 text-white" : ""}`}
+      >
+        <ThumbsDown className="h-5 w-5" />
+      </Button>
+    </div>
+  </div>
+));
+
+GameHeader.displayName = 'GameHeader';
+
+// Memoized game details component
+const GameDetails = memo(({ description, categories }: {
+  description: string;
+  categories: string[];
+}) => (
+  <Card className="bg-[#2a1b52]/70 backdrop-blur-md border-none rounded-2xl shadow-xl">
+    <CardHeader className="border-b border-purple-800/30 pb-4">
+      <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-600">
+        Game Description
+      </h2>
+    </CardHeader>
+    <CardContent className="pt-6 space-y-4">
+      <p className="text-gray-300 leading-relaxed">{description}</p>
+      <div className="flex flex-wrap gap-3 items-center">
+        {categories.map((category) => (
+          <Link
+            key={category}
+            href={`/categories/${category}`}
+            className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-purple-700/30 text-purple-300 hover:bg-purple-700/50 transition-colors border border-purple-700/50"
+          >
+            <Tag className="h-4 w-4 mr-2" />
+            {category}
+          </Link>
+        ))}
+      </div>
+    </CardContent>
+  </Card>
+));
+
+GameDetails.displayName = 'GameDetails';
+
+// Main component with performance optimizations
 export default function GamePage({ game, user, adSetting }: GamePageProps) {
   const [like, setLike] = useState<boolean | null>(null);
 
   useEffect(() => {
-    const fetchStatus = async () => {
-      if (user) {
-        const response = await getLikedOrDisliked(game.id, user.id);
+    if (user) {
+      getLikedOrDisliked(game.id, user.id).then(response => {
         setLike(response?.is_like);
-      }
-    };
-    fetchStatus();
+      });
+    }
   }, [game.id, user]);
 
-  const likeHandler = async () => {
-    if (user) {
-      const response = await likeGame(game.id, user.id);
-      if (response?.status === 200) {
-        setLike(true);
-      }
-    } else {
+  const likeHandler = useCallback(async () => {
+    if (!user) {
       toast('Sign in to like games');
+      return;
     }
-  };
+    
+    const response = await likeGame(game.id, user.id);
+    if (response?.status === 200) {
+      setLike(true);
+    }
+  }, [game.id, user]);
 
-  const dislikeHandler = async () => {
-    if (user) {
-      const response = await dislikeGame(game.id, user.id);
-      if (response?.status === 200) {
-        setLike(false);
-      }
-    } else {
+  const dislikeHandler = useCallback(async () => {
+    if (!user) {
       toast('Sign in to dislike games');
+      return;
     }
-  };
+
+    const response = await dislikeGame(game.id, user.id);
+    if (response?.status === 200) {
+      setLike(false);
+    }
+  }, [game.id, user]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#120a2c] to-[#1e1540] text-white p-6 md:p-8 lg:p-12">
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Main Game Content */}
           <div className="lg:col-span-3 space-y-6">
-            {/* Game Header */}
-            <div className="flex justify-between items-center">
-              <Link href="/">
-                <ArrowLeft size={24} />
-              </Link>
-              <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-600">
-                {game.name}
-              </h1>
-              <div className="flex items-center space-x-2">
-                <Button
-                  onClick={likeHandler}
-                  variant="outline"
-                  size="icon"
-                  className={`text-black bg-white hover:bg-purple-700 hover:text-white ${like ? "bg-purple-700 text-white" : ""}`}
-                >
-                  <ThumbsUp className="h-5 w-5" />
-                </Button>
-                <Button
-                  onClick={dislikeHandler}
-                  variant="outline"
-                  size="icon"
-                  className={`text-black bg-white hover:bg-purple-700 hover:text-white ${(like === false) ? "bg-purple-700 text-white" : ""}`}
-                >
-                  <ThumbsDown className="h-5 w-5" />
-                </Button>
-              </div>
-            </div>
+            <GameHeader 
+              name={game.name}
+              like={like}
+              onLike={likeHandler}
+              onDislike={dislikeHandler}
+            />
 
             {adSetting.show_game_view_ads && (
               <GamePageAd
@@ -125,38 +186,19 @@ export default function GamePage({ game, user, adSetting }: GamePageProps) {
               />
             )}
 
-            {/* Game Viewer */}
             <div className="rounded-2xl overflow-hidden shadow-2xl border-4 border-purple-800/50">
-              <GameViewer play_url={game.play_url} thumbnail={game.thumbnail_url} game_id={game.id} />
+              <GameViewer 
+                play_url={game.play_url} 
+                thumbnail={game.thumbnail_url} 
+                game_id={game.id} 
+              />
             </div>
 
-            {/* Game Details */}
-            <Card className="bg-[#2a1b52]/70 backdrop-blur-md border-none rounded-2xl shadow-xl">
-              <CardHeader className="border-b border-purple-800/30 pb-4">
-                <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-600">
-                  Game Description
-                </h2>
-              </CardHeader>
-              <CardContent className="pt-6 space-y-4">
-                <p className="text-gray-300 leading-relaxed">{game.description}</p>
+            <GameDetails 
+              description={game.description}
+              categories={game.categories}
+            />
 
-                {/* Categories and Metadata */}
-                <div className="flex flex-wrap gap-3 items-center">
-                  {game.categories.map((category) => (
-                    <Link
-                      key={category}
-                      href={`/categories/${category}`}
-                      className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-purple-700/30 text-purple-300 hover:bg-purple-700/50 transition-colors border border-purple-700/50"
-                    >
-                      <Tag className="h-4 w-4 mr-2" />
-                      {category}
-                    </Link>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Ad space before Comments Section */}
             {adSetting.show_comment_section_ads && (
               <GamePageAd
                 adSlot={adSetting.comment_section_ad_slot}
@@ -166,13 +208,11 @@ export default function GamePage({ game, user, adSetting }: GamePageProps) {
               />
             )}
 
-            {/* Comments Section */}
             <div id="commentSection">
               <CommentSection gameId={game.id} />
             </div>
           </div>
 
-          {/* Sidebar Ads */}
           {adSetting.show_sidebar_ads && (
             <div className="lg:col-span-1 space-y-6">
               {Array.from({ length: adSetting.sidebar_ad_count }).map((_, index) => (

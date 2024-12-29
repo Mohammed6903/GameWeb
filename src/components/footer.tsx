@@ -26,7 +26,7 @@ export default function Footer({siteName}: footerProps) {
             <FooterLink href="/pages/dmca" icon={Shield} text="DMCA" />
             <FooterLink href="/pages/privacy-policy" icon={FileText} text="Privacy Policy" />
             <FooterLink href="/pages/terms" icon={FileText} text="Terms of Service" />
-            <FooterLink href="/pages/powered-by" icon={Settings} text={`Powered by ${siteName ?? "Games"}`} />
+            <FooterLink href="#" icon={Settings} text={`Powered by ${siteName ?? "Games"}`} />
           </nav>
         </div>
       </div>
