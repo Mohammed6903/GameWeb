@@ -190,7 +190,7 @@ export function AllGames({ games }: GamesCarouselProps) {
             key={`${item.type}-${item.type === 'ad' ? item.id : item.game && item.game.id}-${index}`}
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.3, delay: index * 0.05 }}
+            transition={{ duration: 0.1, ease: "easeInOut" }}
           >
             {item.type === 'ad' && adSettings ? (
               <Card className="aspect-square relative overflow-hidden rounded-xl bg-white/5 border-transparent">

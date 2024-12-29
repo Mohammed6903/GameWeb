@@ -25,7 +25,7 @@ export function FeaturedGames({ games }: FeaturedGamesProps) {
           key={game.id}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: index * 0.1 }}
+          transition={{ duration: 0.3, ease: "easeInOut" }}
         >
           <Card 
             className="group relative overflow-hidden rounded-2xl bg-white/5 border-transparent hover:bg-white/10 transition-all duration-300 cursor-pointer"
