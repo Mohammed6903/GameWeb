@@ -1,7 +1,8 @@
 'use server'
 
 import { createClient } from "@/lib/utils/supabase/server";
-import { translateGamesToFormData, ExternalGame } from '@/lib/utils/translator';
+import { translateGamesToFormData } from '@/lib/utils/translator';
+import { ExternalGame } from "@/types/games";
 
 /**
  * Saves multiple games to Supabase in a batch operation
