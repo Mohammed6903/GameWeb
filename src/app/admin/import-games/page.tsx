@@ -24,7 +24,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Pagination } from '@/components/pagination';
 import { toast, Toaster } from 'sonner';
 import { getOrCreateProviderId } from '@/lib/utils/provider';
-import { ExternalGame, translateGamesToFormData, translateToGameFormData } from '@/lib/utils/translator';
+import { ExternalGame } from '@/types/games';
 import { saveGames } from '@/lib/controllers/importGame';
 
 interface Category {

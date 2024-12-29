@@ -1,152 +1,141 @@
 "use client"
 import React from 'react';
-import dynamic from 'next/dynamic';
-import { createClient } from "@/lib/utils/supabase/client";
-import { ApexOptions } from 'apexcharts';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { 
-  Gamepad, 
-  Users, 
-  CheckCircle, 
-} from 'lucide-react';
+import { Gamepad, Users, CheckCircle } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { useEffect, useState } from 'react';
-import { useRouter } from "next/navigation";
-import { fetchWeeklyGamePlays, getActiveGamesCount, getTotalGamesCount } from '@/lib/controllers/games';
-import { getUsedCategories } from '@/lib/controllers/categories';
-import { getNewUsersCount } from '@/lib/controllers/analytics';
- 
-// Dynamically import ApexCharts to ensure client-side rendering
-const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
+import { useDashboardData } from '@/hooks/useDashboardData';
+import { QuickStatsCard } from '@/components/admin/QuickStatCard';
+import { ChartCard } from '@/components/admin/ChartCard';
+import { ApexOptions } from 'apexcharts';
 
-export default function GameAnalyticsDashboard() {
-  const [playsOverTimeSeries, setPlaysOverTimeSeries] = useState<[{name: string, data: number[]}]>([{ name: 'Game Plays', data: [] }]);
-  const [categories, setCategories] = useState<string[]>([]);
-  const [gameCategorySeries, setGameCategorySeries] = useState<number[]>([]);
-  const [gameCategoryLabels, setGameCategoryLabels] = useState<string[]>([]);
-  const [gamesCount, setGamesCount] = useState<{totalCount: number, activeCount: number}>({totalCount: 0, activeCount: 0});
-  const [newUsers, setNewUsers] = useState<number>(0);
-  const router = useRouter();
-  const supabase = createClient();
-  const [confirmedUser, setConfirmed] = useState(false);
-
-  useEffect(() => {
-    async function loadData() {
-      const weeklyData = await fetchWeeklyGamePlays();
-
-      // Transform the data for ApexCharts
-      const categories = weeklyData.map((d) => d.date);
-      const data = weeklyData.map((d) => d.totalPlays);
-
-      setCategories(categories);
-      setPlaysOverTimeSeries([{ name: 'Game Plays', data }]);
-    }
-
-    async function loadCategoryData() {
-      const categoriesData = await getUsedCategories();
-      const labels = categoriesData.map((item) => item.category);
-      const series = categoriesData.map((item) => item.count);
-
-      setGameCategoryLabels(labels);
-      setGameCategorySeries(series);
-    }
-
-    async function loadTotalCounts() {
-      const totalCount = await getTotalGamesCount();
-      const activeCount = await getActiveGamesCount();
-      if (totalCount && activeCount) {
-        setGamesCount({totalCount, activeCount});
-      }
-    }
-
-    async function getNewUsers() {
-      const count = await getNewUsersCount();
-      if (count) {
-        setNewUsers(count);
-      }
-    }
-
-    loadData();
-    loadCategoryData();
-    loadTotalCounts();
-    getNewUsers()
-  }, []);
+const GameAnalyticsDashboard = () => {
+  const {
+    playsOverTimeSeries,
+    categories,
+    gameCategorySeries,
+    gameCategoryLabels,
+    gamesCount,
+    newUsers,
+    isLoading,
+    error
+  } = useDashboardData();
 
   const playsOverTimeOptions: ApexOptions = {
     chart: {
       type: 'line',
-      toolbar: { show: false }
-    },
-    colors: ['#6366f1'], // Indigo color
-    stroke: { curve: 'smooth' },
-    xaxis: {
-      categories
-    },
-    title: {
-      // text: 'Daily Game Plays',
-      style: { 
-        fontSize: '16px', 
-        fontWeight: 'bold',
-        color: '#4a5568'
+      toolbar: { show: false },
+      animations: {
+        enabled: true,
+        // easing: 'easeinout',
+        speed: 800,
+        animateGradually: {
+          enabled: true,
+          delay: 150
+        },
+        dynamicAnimation: {
+          enabled: true,
+          speed: 350
+        }
       }
+    },
+    colors: ['#6366f1'],
+    stroke: { curve: 'smooth', width: 2 },
+    xaxis: { 
+      categories,
+      labels: {
+        show: true,
+        rotate: -45,
+        rotateAlways: false,
+        trim: true
+      }
+    },
+    yaxis: {
+      labels: {
+        formatter: (value: any) => value.toString()
+      }
+    },
+    // title: {
+    //   text: 'Weekly Game Plays',
+    //   style: { 
+    //     fontSize: '16px', 
+    //     fontWeight: 'bold',
+    //     color: '#4a5568'
+    //   }
+    // },
+    grid: {
+      show: true,
+      borderColor: '#f3f4f6',
+      strokeDashArray: 4
     }
   };
 
-  // Game Category Distribution
   const gameCategoryOptions: ApexOptions = {
     chart: { 
-      type: 'donut' 
+      type: 'donut',
+      animations: {
+        enabled: true,
+        speed: 500,
+        dynamicAnimation: {
+          enabled: true,
+          speed: 350
+        }
+      }
     },
     labels: gameCategoryLabels,
     colors: ['#6366f1', '#10b981', '#f43f5e', '#f97316'],
-    title: {
-      // text: 'Game Category Distribution',
-      style: { 
-        fontSize: '16px', 
-        fontWeight: 'bold',
-        color: '#4a5568'
-      }
+    // title: {
+    //   text: 'Game Categories',
+    //   style: { 
+    //     fontSize: '16px', 
+    //     fontWeight: 'bold',
+    //     color: '#4a5568'
+    //   }
+    // },
+    dataLabels: {
+      enabled: true,
+      formatter: (val: number) => `${Math.round(val)}%`
     }
   };
 
-  useEffect(() => {
-    const checkUser = async () => {
-      try {
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+  const quickStats = [
+    { 
+      title: 'Total Games', 
+      value: gamesCount.totalCount, 
+      icon: Gamepad, 
+      color: 'text-blue-500',
+      bg: 'bg-blue-50'
+    },
+    { 
+      title: 'Active Games', 
+      value: gamesCount.activeCount, 
+      icon: CheckCircle, 
+      color: 'text-green-500',
+      bg: 'bg-green-50'
+    },
+    { 
+      title: 'Unique Players', 
+      value: newUsers, 
+      icon: Users, 
+      color: 'text-purple-500',
+      bg: 'bg-purple-50'
+    }
+  ];
 
-        if (!session?.user.email) {
-          router.push('/sign-in');
-        }
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500" />
+      </div>
+    );
+  }
 
-        const confirmed = session?.user.user_metadata.email_verified;
-  
-        if (!confirmed && session?.user.email) {
-          console.log('Sending verification email');
-          const { error } = await supabase.auth.resend({
-            type: 'signup',
-            email: session.user.email,
-            options: {
-              emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`
-            }
-          });
-  
-          if (error) {
-            console.error('Verification email resend error:', error);
-          } else {
-            console.log('Verification email resent successfully');
-          }
-        } else {
-          setConfirmed(true);
-        }  
-      } catch (error) {
-        console.error('Unexpected error in checkUser:', error);
-        router.push('/sign-in');
-      }
-    };
-    
-    checkUser();
-  }, [router, supabase.auth]);
+  if (error) {
+    return (
+      <div className="text-center p-6">
+        <p className="text-red-500">Error loading dashboard data. Please try again later.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 p-6 bg-white">
@@ -154,81 +143,38 @@ export default function GameAnalyticsDashboard() {
         Analytics Dashboard
       </h1>
 
-      {/* Quick Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        {[
-          { 
-            title: 'Total Games', 
-            value: gamesCount.totalCount, 
-            icon: Gamepad, 
-            color: 'text-blue-500',
-            bg: 'bg-blue-50'
-          },
-          { 
-            title: 'Active Games', 
-            value: gamesCount.activeCount, 
-            icon: CheckCircle, 
-            color: 'text-green-500',
-            bg: 'bg-green-50'
-          },
-          { 
-            title: 'Unique Players', 
-            value: newUsers, 
-            icon: Users, 
-            color: 'text-purple-500',
-            bg: 'bg-purple-50'
-          }
-        ].map((card) => (
-          <Card key={card.title} className={`${card.bg} border-none`}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{card.title}</CardTitle>
-              <card.icon className={`h-5 w-5 ${card.color}`} />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{card.value.toLocaleString()}</div>
-            </CardContent>
-          </Card>
+        {quickStats.map((stat) => (
+          <QuickStatsCard key={stat.title} stat={stat} />
         ))}
       </div>
 
-      {/* Charts Row */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        {/* Game Plays Over Time */}
-        <Card className="bg-gray-50 border-none">
-          <CardHeader>
-            <CardTitle className="text-lg font-semibold text-gray-700">
-              Weekly Game Plays
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Chart
+        {playsOverTimeSeries[0]?.data?.length > 0 && (
+          <div className="p-4 border rounded-lg shadow-sm">
+            <ChartCard
+              title="Weekly Game Plays"
               options={playsOverTimeOptions}
               series={playsOverTimeSeries}
               type="line"
-              height={300}
+              height={350}
             />
-          </CardContent>
-        </Card>
-
-        {/* Game Category Distribution */}
-        <Card className="bg-gray-50 border-none">
-          <CardHeader>
-            <CardTitle className="text-lg font-semibold text-gray-700">
-              Game Categories
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Chart 
-              options={gameCategoryOptions} 
-              series={gameCategorySeries} 
-              type="donut" 
-              height={300} 
+          </div>
+        )}
+        
+        {gameCategorySeries?.length > 0 && (
+          <div className="p-4 border rounded-lg shadow-sm">
+            <ChartCard
+              title='Game Categories'
+              options={gameCategoryOptions}
+              series={gameCategorySeries}
+              type="donut"
+              height={350}
             />
-          </CardContent>
-        </Card>
+          </div>
+        )}
       </div>
 
-      {/* Quick Actions */}
       <div>
         <h2 className="text-2xl font-semibold mb-4 text-gray-800">Quick Actions</h2>
         <div className="flex space-x-4">
@@ -247,4 +193,6 @@ export default function GameAnalyticsDashboard() {
       </div>
     </div>
   );
-}
+};
+
+export default GameAnalyticsDashboard;

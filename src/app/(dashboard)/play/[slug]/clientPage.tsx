@@ -129,7 +129,6 @@ const GameDetails = memo(({ description, categories }: {
 
 GameDetails.displayName = 'GameDetails';
 
-// Main component with performance optimizations
 export default function GamePage({ game, user, adSetting }: GamePageProps) {
   const [like, setLike] = useState<boolean | null>(null);
 

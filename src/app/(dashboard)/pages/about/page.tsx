@@ -1,10 +1,6 @@
 import { getPageContent } from '@/lib/controllers/dynamicPages';
 import { PolicyLayout, SafeHTML } from '@/components/PolicyLayout'
 
-interface AboutUsContent {
-  content: string
-}
-
 async function fetchAboutUsContent(): Promise<string> {
   try {
     const res = await getPageContent('about');

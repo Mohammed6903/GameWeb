@@ -28,6 +28,17 @@ export interface GameBasicData {
   tags: string[];
 }
 
+export interface ExternalGame {
+  id: string;
+  title: string;
+  description: string;
+  thumbnailUrl: string;
+  category?: string;
+  categories?: string[];
+  tags?: string;
+  url: string;
+}
+
 export interface GameFormData extends Omit<Game, 'id' | 'createdAt' | 'updatedAt'> {
   thumbnailFile?: File;
 }

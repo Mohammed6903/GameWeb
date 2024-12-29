@@ -1,5 +1,6 @@
 'use server'
-import { AdSettings, HeaderScript, SavedScript } from "@/app/admin/settings/page";
+import { AdSettings } from "@/types/ads";
+import { HeaderScript, SavedScript } from "@/types/script";
 import { createClient } from "../utils/supabase/server";
 import { PostgrestError } from "@supabase/supabase-js";
 import { supabaseAdmin } from "../utils/supabase/admin";

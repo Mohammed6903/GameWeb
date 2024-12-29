@@ -1,15 +1,5 @@
 import { Game } from '@/types/games';
-
-export interface ExternalGame {
-  id: string;
-  title: string;
-  description: string;
-  thumbnailUrl: string;
-  category?: string;
-  categories?: string[];
-  tags?: string;
-  url: string;
-}
+import { ExternalGame } from '@/types/games';
 
 function stringToArray(str?: string): string[] {
     if (!str) return [];
