@@ -120,3 +120,11 @@ export async function getUsedCategories() {
       return [];
     }
 }
+
+export const getAllCategoriesForSitemap = async (): Promise<any[]> => {
+  const usedCategories = await getUsedCategories();
+  
+  return usedCategories.map(category => ({
+      category: category.category
+  }));
+};

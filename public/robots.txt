@@ -1,4 +1,9 @@
+# *
 User-agent: *
 Disallow: /admin
 
-Allow: /
+# Host
+Host: http://localhost:8080
+
+# Sitemaps
+Sitemap: http://localhost:8080/sitemap.xml

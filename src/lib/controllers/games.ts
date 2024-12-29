@@ -423,3 +423,26 @@ export const getGameBySlug = async (slug: string) => {
   const game = await getGameById(slug);
   return game;
 }
+
+export async function fetchAllGamesForSitemap() {
+  const supabase = await createClient();
+
+  try {
+    const { data: games, error } = await supabase
+      .from('games')
+      .select('id, name, updated_at');
+
+    if (error) {
+      throw new Error(`Error fetching games for sitemap: ${error.message}`);
+    }
+
+    return games.map((game) => ({
+      id: game.id,
+      name: game.name,
+      updated_at: new Date(game.updated_at).toISOString(),
+    }));
+  } catch (error) {
+    console.error('Error in fetchAllGamesForSitemap:', error);
+    throw error;
+  }
+}
