@@ -192,7 +192,7 @@ export function BaseGameForm({ initialData, providers = [], categories = [], tag
                     <SelectValue placeholder="Select game status" />
                   </SelectTrigger>
                 </FormControl>
-                <SelectContent className='bg-white'>
+                <SelectContent className='bg-black'>
                   <SelectItem value="active">Active</SelectItem>
                   <SelectItem value="inactive">Inactive</SelectItem>
                 </SelectContent>
@@ -244,7 +244,7 @@ export function BaseGameForm({ initialData, providers = [], categories = [], tag
                 <PopoverContent className="w-full p-0">
                   <Command>
                     <CommandInput placeholder="Search categories..." onValueChange={setCustomCategory} />
-                    <CommandList className='bg-white'>
+                    <CommandList className='bg-black'>
                       <CommandEmpty>
                         <h1>
                           No category found.
@@ -326,7 +326,7 @@ export function BaseGameForm({ initialData, providers = [], categories = [], tag
                 <PopoverContent className="w-full p-0">
                   <Command>
                     <CommandInput placeholder="Search tags..." onValueChange={setCustomTag} />
-                    <CommandList className='bg-white'>
+                    <CommandList className='bg-black'>
                       <CommandEmpty>
                         <h1>
                           No such tag found.
@@ -388,7 +388,7 @@ export function BaseGameForm({ initialData, providers = [], categories = [], tag
                 </PopoverTrigger>
                 <PopoverContent className="w-full p-0">
                   <Command>
-                    <CommandList className='bg-white'>
+                    <CommandList className='bg-black'>
                       <CommandInput placeholder="Search providers..." />
                       <CommandEmpty>No provider found.</CommandEmpty>
                       <CommandGroup>

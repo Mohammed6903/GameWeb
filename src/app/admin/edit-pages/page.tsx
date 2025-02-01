@@ -140,25 +140,25 @@ export default function PolicyEditorPage() {
   }, [])
 
   return (
-    <div className="space-y-6 p-6 bg-white">
-      <h1 className="text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-pink-500 mb-6">
+    <div className="space-y-6 p-6 bg-gray-900 text-gray-100">
+      <h1 className="text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-400 mb-6">
         Policy Page Editor
       </h1>
 
-      <Card className="bg-gray-50 border-none">
+      <Card className="bg-gray-800 border-gray-700">
         <CardHeader>
-          <CardTitle className="text-lg font-semibold text-gray-700">
+          <CardTitle className="text-lg font-semibold text-gray-100">
             Edit Policy Pages
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
             <div className="flex flex-col space-y-2">
-              <Label htmlFor="page-select">Select Page to Edit</Label>
+              <Label htmlFor="page-select" className="text-gray-200">Select Page to Edit</Label>
               <Select value={selectedPage} onValueChange={setSelectedPage}>
-                <SelectTrigger id="page-select">
+                <SelectTrigger id="page-select" className="bg-gray-700 text-gray-100 border-gray-600">
                   <SelectValue placeholder="Select a page" />
                 </SelectTrigger>
-                <SelectContent className="bg-white">
+                <SelectContent className="bg-gray-700 text-gray-100 border-gray-600">
                   <SelectItem value="about">About Us</SelectItem>
                   <SelectItem value="contact">Contact Us</SelectItem>
                   <SelectItem value="cookies">Cookies Policy</SelectItem>
@@ -172,90 +172,101 @@ export default function PolicyEditorPage() {
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="title">Title</Label>
+                    <Label htmlFor="title" className="text-gray-200">Title</Label>
                     <Input
                       id="title"
                       value={contactInfo.title}
                       onChange={(e) => handleContactInfoChange('title', e.target.value)}
+                      className="bg-gray-700 text-gray-100 border-gray-600"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="formTitle">Form Title</Label>
+                    <Label htmlFor="formTitle" className="text-gray-200">Form Title</Label>
                     <Input
                       id="formTitle"
                       value={contactInfo.formTitle}
                       onChange={(e) => handleContactInfoChange('formTitle', e.target.value)}
+                      className="bg-gray-700 text-gray-100 border-gray-600"
                     />
                   </div>
                 </div>
                 <div>
-                  <Label htmlFor="description">Description</Label>
+                  <Label htmlFor="description" className="text-gray-200">Description</Label>
                   <Textarea
                     id="description"
                     value={contactInfo.description}
                     onChange={(e) => handleContactInfoChange('description', e.target.value)}
+                    className="bg-gray-700 text-gray-100 border-gray-600"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="formDescription">Form Description</Label>
+                  <Label htmlFor="formDescription" className="text-gray-200">Form Description</Label>
                   <Textarea
                     id="formDescription"
                     value={contactInfo.formDescription}
                     onChange={(e) => handleContactInfoChange('formDescription', e.target.value)}
+                    className="bg-gray-700 text-gray-100 border-gray-600"
                   />
                 </div>
                 <div className="grid grid-cols-3 gap-4">
                   <div>
-                    <Label htmlFor="address">Address</Label>
+                    <Label htmlFor="address" className="text-gray-200">Address</Label>
                     <Input
                       id="address"
                       value={contactInfo.address}
                       onChange={(e) => handleContactInfoChange('address', e.target.value)}
+                      className="bg-gray-700 text-gray-100 border-gray-600"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="email">Email</Label>
+                    <Label htmlFor="email" className="text-gray-200">Email</Label>
                     <Input
                       id="email"
                       value={contactInfo.email}
                       onChange={(e) => handleContactInfoChange('email', e.target.value)}
+                      className="bg-gray-700 text-gray-100 border-gray-600"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="phone">Phone</Label>
+                    <Label htmlFor="phone" className="text-gray-200">Phone</Label>
                     <Input
                       id="phone"
                       value={contactInfo.phone}
                       onChange={(e) => handleContactInfoChange('phone', e.target.value)}
+                      className="bg-gray-700 text-gray-100 border-gray-600"
                     />
                   </div>
                 </div>
                 <div>
-                  <Label htmlFor="socialTitle">Social Media Title</Label>
+                  <Label htmlFor="socialTitle" className="text-gray-200">Social Media Title</Label>
                   <Input
                     id="socialTitle"
                     value={contactInfo.socialTitle}
                     onChange={(e) => handleContactInfoChange('socialTitle', e.target.value)}
+                    className="bg-gray-700 text-gray-100 border-gray-600"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Social Media Links</Label>
+                  <Label className="text-gray-200">Social Media Links</Label>
                   {contactInfo.socialLinks.map((link, index) => (
                     <div key={index} className="flex space-x-2">
                       <Input
                         placeholder="Platform"
                         value={link.platform}
                         onChange={(e) => handleSocialLinkChange(index, 'platform', e.target.value)}
+                        className="bg-gray-700 text-gray-100 border-gray-600"
                       />
                       <Input
                         placeholder="URL"
                         value={link.url}
                         onChange={(e) => handleSocialLinkChange(index, 'url', e.target.value)}
+                        className="bg-gray-700 text-gray-100 border-gray-600"
                       />
                       <Button
                         variant="outline"
                         size="icon"
                         onClick={() => removeSocialLink(index)}
+                        className="bg-gray-700 text-gray-100 border-gray-600 hover:bg-gray-600"
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -264,7 +275,7 @@ export default function PolicyEditorPage() {
                   <Button
                     variant="outline"
                     onClick={addSocialLink}
-                    className="w-full"
+                    className="w-full bg-gray-700 text-gray-100 border-gray-600 hover:bg-gray-600"
                   >
                     <PlusCircle className="h-4 w-4 mr-2" />
                     Add Social Link
@@ -273,12 +284,12 @@ export default function PolicyEditorPage() {
               </div>
             ) : (
               <Tabs defaultValue="edit" className="w-full">
-                <TabsList>
-                  <TabsTrigger value="edit">Edit</TabsTrigger>
-                  <TabsTrigger value="preview">Preview</TabsTrigger>
+                <TabsList className="bg-gray-700">
+                  <TabsTrigger value="edit" className="data-[state=active]:bg-gray-600">Edit</TabsTrigger>
+                  <TabsTrigger value="preview" className="data-[state=active]:bg-gray-600">Preview</TabsTrigger>
                 </TabsList>
                 <TabsContent value="edit">
-                  <div className="h-[600px] border rounded-md overflow-hidden">
+                  <div className="h-[600px] border border-gray-700 rounded-md overflow-hidden">
                     <MonacoEditor
                       height="100%"
                       defaultLanguage="html"
@@ -329,14 +340,14 @@ export default function PolicyEditorPage() {
                   </div>
                 </TabsContent>
                 <TabsContent value="preview">
-                  <div className="border p-4 h-[600px] overflow-auto prose max-w-none">
+                  <div className="border border-gray-700 p-4 h-[600px] overflow-auto prose prose-invert max-w-none">
                     <div dangerouslySetInnerHTML={{ __html: pageContents[selectedPage] }} />
                   </div>
                 </TabsContent>
               </Tabs>
             )}
           <Button
-            className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+            className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
             onClick={handleSave}
             disabled={isSaving}
           >

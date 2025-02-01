@@ -198,80 +198,73 @@ export default function ImportGamesPage() {
     } else if (response.error) {
       toast.error(response.message);
     }
-
-    
-    // Here you would typically send this data to your backend
-    // const response = await fetch('/api/save-games', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify(gamesToSave)
-    // });
-    // if (response.ok) {
-    //   toast.success(`${saveAll ? 'All' : 'Selected'} games saved successfully`);
-    // } else {
-    //   toast.error('Failed to save games');
-    // }
   };
 
   const areAllCurrentPageSelected = displayedGames.length > 0 && 
     displayedGames.every(game => selectedGames.has(game.id));
 
   return (
-    <div className="space-y-6 p-6 bg-white">
-      <h1 className="text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-pink-500 mb-6">
+<div className="space-y-6 p-6 bg-gray-900 text-gray-100">
+      <h1 className="text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-400 mb-6">
         Import Games
       </h1>
 
       <div className="flex justify-between items-center mb-6 space-x-4">
-        <Select onValueChange={(value: 'gamepix' | 'gamemonetize') => setSelectedApi(value)} defaultValue='gamemonetize'>
-          <SelectTrigger className="w-[180px]">
+        <Select
+          onValueChange={(value: "gamepix" | "gamemonetize") => setSelectedApi(value)}
+          defaultValue="gamemonetize"
+        >
+          <SelectTrigger className="w-[180px] bg-gray-800 text-gray-100 border-gray-700">
             <SelectValue placeholder="Select API" />
           </SelectTrigger>
-          <SelectContent className='bg-white'>
+          <SelectContent className="bg-gray-800 text-gray-100 border-gray-700">
             <SelectItem value="gamepix">GamePix</SelectItem>
             <SelectItem value="gamemonetize">GameMonetize</SelectItem>
           </SelectContent>
         </Select>
 
         <Select onValueChange={(value) => setSelectedCategory(value)}>
-          <SelectTrigger className="w-[180px]">
+          <SelectTrigger className="w-[180px] bg-gray-800 text-gray-100 border-gray-700">
             <SelectValue placeholder="Select Category" />
           </SelectTrigger>
-          <SelectContent className='bg-white'>
+          <SelectContent className="bg-gray-800 text-gray-100 border-gray-700">
             {categories.map((category) => (
-              <SelectItem key={category.id} value={category.id}>{category.name}</SelectItem>
+              <SelectItem key={category.id} value={category.id}>
+                {category.name}
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>
 
         <div className="flex-grow relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-          <Input 
+          <Input
             type="text"
             placeholder="Search games by title..."
             value={searchTerm}
             onChange={handleSearch}
-            className="pl-10 w-full"
+            className="pl-10 w-full bg-gray-800 text-gray-100 border-gray-700"
           />
         </div>
       </div>
 
       {/* Games Table */}
-      <Card className="bg-gray-50 border-none">
+      <Card className="bg-gray-800 border-gray-700">
         <CardHeader>
-          <CardTitle className="text-lg font-semibold text-gray-700 flex items-center justify-between">
+          <CardTitle className="text-lg font-semibold text-gray-100 flex items-center justify-between">
             <span>Game Catalog ({selectedGames.size} selected)</span>
             <div className="space-x-2">
-              <Button 
-                onClick={() => handleSaveGames(false)} 
+              <Button
+                onClick={() => handleSaveGames(false)}
                 variant="outline"
                 disabled={selectedGames.size === 0}
+                className="bg-gray-700 text-gray-100 border-gray-600 hover:bg-gray-600"
               >
                 <Save className="mr-2 h-4 w-4" /> Save Selected
               </Button>
-              <Button 
-                onClick={() => handleSaveGames(true)} 
-                className='bg-black text-white'
+              <Button
+                onClick={() => handleSaveGames(true)}
+                className="bg-purple-600 text-white hover:bg-purple-700"
                 disabled={allGames.length === 0}
               >
                 <Save className="mr-2 h-4 w-4" /> Save All
@@ -281,26 +274,23 @@ export default function ImportGamesPage() {
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <div className="text-center py-10">Loading...</div>
+            <div className="text-center py-10 text-gray-300">Loading...</div>
           ) : (
             <>
               <Table>
                 <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-[50px]">
-                      <Checkbox
-                        checked={areAllCurrentPageSelected}
-                        onCheckedChange={handleSelectAll}
-                      />
+                  <TableRow className="border-gray-700">
+                    <TableHead className="w-[50px] text-gray-300">
+                      <Checkbox checked={areAllCurrentPageSelected} onCheckedChange={handleSelectAll} />
                     </TableHead>
-                    <TableHead>Thumbnail</TableHead>
-                    <TableHead>Title</TableHead>
-                    <TableHead>Category</TableHead>
+                    <TableHead className="text-gray-300">Thumbnail</TableHead>
+                    <TableHead className="text-gray-300">Title</TableHead>
+                    <TableHead className="text-gray-300">Category</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {displayedGames.map((game) => (
-                    <TableRow key={game.id}>
+                    <TableRow key={game.id} className="border-gray-700">
                       <TableCell>
                         <Checkbox
                           checked={selectedGames.has(game.id)}
@@ -310,23 +300,23 @@ export default function ImportGamesPage() {
                       <TableCell>
                         {game.thumbnailUrl ? (
                           <img
-                            src={game.thumbnailUrl}
+                            src={game.thumbnailUrl || "/placeholder.svg"}
                             alt={`${game.title} thumbnail`}
                             className="w-16 h-16 object-cover rounded"
                           />
                         ) : (
-                          <div className="w-16 h-16 bg-gray-200 rounded flex items-center justify-center text-xs text-gray-500">
+                          <div className="w-16 h-16 bg-gray-700 rounded flex items-center justify-center text-xs text-gray-400">
                             No Image
                           </div>
                         )}
                       </TableCell>
-                      <TableCell className="font-medium">{game.title}</TableCell>
-                      <TableCell>{game.description}</TableCell>
+                      <TableCell className="font-medium text-gray-100">{game.title}</TableCell>
+                      <TableCell className="text-gray-300">{game.description}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
-              
+
               {/* Pagination */}
               <div className="mt-4 flex justify-center">
                 <Pagination
@@ -343,11 +333,11 @@ export default function ImportGamesPage() {
 
       {/* No Results Handling */}
       {!isLoading && displayedGames.length === 0 && (
-        <div className="text-center py-10 bg-gray-50 rounded-lg">
-          <p className="text-gray-600 mb-4">No games found</p>
+        <div className="text-center py-10 bg-gray-800 rounded-lg">
+          <p className="text-gray-400 mb-4">No games found</p>
         </div>
       )}
-      <Toaster position='bottom-right' />
+      <Toaster position="bottom-right" />
     </div>
   );
 }

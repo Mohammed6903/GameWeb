@@ -67,11 +67,11 @@ export function ProviderForm({ onSubmit }: ProviderFormProps) {
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Provider Name</FormLabel>
+              <FormLabel className="text-gray-200">Provider Name</FormLabel>
               <FormControl>
-                <Input placeholder="Enter provider name" {...field} />
+                <Input placeholder="Enter provider name" {...field} className="bg-gray-700 text-gray-100 border-gray-600" />
               </FormControl>
-              <FormMessage />
+              <FormMessage className="text-red-400" />
             </FormItem>
           )}
         />
@@ -81,11 +81,11 @@ export function ProviderForm({ onSubmit }: ProviderFormProps) {
           name="url"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Website URL</FormLabel>
+              <FormLabel className="text-gray-200">Website URL</FormLabel>
               <FormControl>
-                <Input placeholder="https://example.com" {...field} />
+                <Input placeholder="https://example.com" {...field} className="bg-gray-700 text-gray-100 border-gray-600" />
               </FormControl>
-              <FormMessage />
+              <FormMessage className="text-red-400" />
             </FormItem>
           )}
         />
@@ -95,17 +95,18 @@ export function ProviderForm({ onSubmit }: ProviderFormProps) {
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Description</FormLabel>
+              <FormLabel className="text-gray-200">Description</FormLabel>
               <FormControl>
                 <Textarea 
                   placeholder="Enter provider description (optional)" 
                   {...field} 
+                  className="bg-gray-700 text-gray-100 border-gray-600"
                 />
               </FormControl>
-              <FormDescription>
+              <FormDescription className="text-gray-400">
                 Provide a brief description of the provider (optional).
               </FormDescription>
-              <FormMessage />
+              <FormMessage className="text-red-400" />
             </FormItem>
           )}
         />
@@ -115,14 +116,14 @@ export function ProviderForm({ onSubmit }: ProviderFormProps) {
           name="logo_url"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Logo URL</FormLabel>
+              <FormLabel className="text-gray-200">Logo URL</FormLabel>
               <FormControl>
-                <Input placeholder="https://example.com/logo.png" {...field} />
+                <Input placeholder="https://example.com/logo.png" {...field} className="bg-gray-700 text-gray-100 border-gray-600" />
               </FormControl>
-              <FormDescription>
+              <FormDescription className="text-gray-400">
                 Enter the URL of the provider's logo image (optional).
               </FormDescription>
-              <FormMessage />
+              <FormMessage className="text-red-400" />
             </FormItem>
           )}
         />
@@ -131,12 +132,12 @@ export function ProviderForm({ onSubmit }: ProviderFormProps) {
           control={form.control}
           name="is_active"
           render={({ field }) => (
-            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+            <FormItem className="flex flex-row items-center justify-between rounded-lg border border-gray-600 p-4 bg-gray-800">
               <div className="space-y-0.5">
-                <FormLabel className="text-base">
+                <FormLabel className="text-base text-gray-200">
                   Active Status
                 </FormLabel>
-                <FormDescription>
+                <FormDescription className="text-gray-400">
                   Set whether this provider is currently active.
                 </FormDescription>
               </div>
@@ -150,7 +151,11 @@ export function ProviderForm({ onSubmit }: ProviderFormProps) {
           )}
         />
 
-        <Button type="submit" disabled={isSubmitting}>
+        <Button 
+          type="submit" 
+          disabled={isSubmitting}
+          className="bg-purple-600 text-white hover:bg-purple-700 disabled:bg-purple-800 disabled:text-gray-300"
+        >
           {isSubmitting ? 'Adding Provider...' : 'Add Provider'}
         </Button>
       </form>

@@ -343,42 +343,49 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="space-y-6 p-6 bg-gradient-to-br from-blue-50 to-purple-50 min-h-screen">
-      <h1 className="text-4xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 mb-6">
+    <div className="space-y-6 p-6 bg-gradient-to-br from-gray-900 to-purple-900 min-h-screen text-white">
+      <h1 className="text-4xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400 mb-6">
         Settings
       </h1>
 
       {/* General Settings */}
-      <Card className="bg-white border border-gray-200 shadow-lg hover:shadow-xl transition-shadow duration-300">
+      <Card className="bg-gray-800 border border-gray-700 shadow-lg hover:shadow-xl transition-shadow duration-300">
         <CardHeader>
-          <CardTitle className="text-xl font-semibold text-gray-800">
-            General Settings
-          </CardTitle>
+          <CardTitle className="text-xl font-semibold text-white">General Settings</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex flex-col space-y-2">
-            <Label htmlFor="site-title" className="text-gray-700">Site Name</Label>
+            <Label htmlFor="site-title" className="text-white">
+              Site Name
+            </Label>
             <Input
               id="site-title"
               value={siteTitle}
               onChange={(e) => setSiteTitle(e.target.value)}
               placeholder="Enter your site name"
-              className="border-gray-300"
+              className="bg-gray-700 border-gray-600 text-white"
             />
           </div>
           <div className="flex flex-col space-y-2">
-            <Label htmlFor="site-description" className="text-gray-700">Site Description</Label>
+            <Label htmlFor="site-description" className="text-white">
+              Site Description
+            </Label>
             <Textarea
               id="site-description"
               value={siteDescription}
-              onChange={(e) => {setSiteDescription(e.target.value)}}
+              onChange={(e) => {
+                setSiteDescription(e.target.value)
+              }}
               placeholder="Enter your site description"
-              className="border-gray-300"
+              className="bg-gray-700 border-gray-600 text-white"
             />
           </div>
           <Button
             className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white"
-            onClick={async () => {await saveSiteMeta(); setIsMetadataModified(true)}}
+            onClick={async () => {
+              await saveSiteMeta()
+              setIsMetadataModified(true)
+            }}
           >
             Save Changes
           </Button>
@@ -386,26 +393,24 @@ export default function SettingsPage() {
       </Card>
 
       {/* Favicon Settings */}
-      <Card className="bg-white border border-gray-200 shadow-lg hover:shadow-xl transition-shadow duration-300">
+      <Card className="bg-gray-800 border border-gray-700 shadow-lg hover:shadow-xl transition-shadow duration-300">
         <CardHeader>
-          <CardTitle className="text-xl font-semibold text-gray-800">
-            Favicon Settings
-          </CardTitle>
+          <CardTitle className="text-xl font-semibold text-white">Favicon Settings</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex flex-col space-y-2">
-            <Label htmlFor="favicon" className="text-gray-700">Favicon (ICO)</Label>
+            <Label htmlFor="favicon" className="text-white">Favicon (ICO)</Label>
             <Input
               id="favicon"
               type="file"
               accept=".ico"
               onChange={(e) => handleFaviconUpload(e, 'favicon')}
-              className="border-gray-300"
+              className="border-white"
             />
             {faviconUrls.favicon && <img src={faviconUrls.favicon} alt="Favicon" className="w-8 h-8" />}
           </div>
           {/* <div className="flex flex-col space-y-2">
-            <Label htmlFor="favicon-svg" className="text-gray-700">Favicon (SVG)</Label>
+            <Label htmlFor="favicon-svg" className="text-white">Favicon (SVG)</Label>
             <Input
               id="favicon-svg"
               type="file"
@@ -416,7 +421,7 @@ export default function SettingsPage() {
             {faviconUrls.svg && <img src={faviconUrls.svg} alt="Favicon SVG" className="w-8 h-8" />}
           </div> */}
           <div className="flex flex-col space-y-2">
-            <Label htmlFor="favicon-16" className="text-gray-700">Favicon 16x16 (PNG)</Label>
+            <Label htmlFor="favicon-16" className="text-white">Favicon 16x16 (PNG)</Label>
             <Input
               id="favicon-16"
               type="file"
@@ -427,7 +432,7 @@ export default function SettingsPage() {
             {faviconUrls.favicon16 && <img src={faviconUrls.favicon16} alt="Favicon 16x16" className="w-4 h-4" />}
           </div>
           <div className="flex flex-col space-y-2">
-            <Label htmlFor="favicon-32" className="text-gray-700">Favicon 32x32 (PNG)</Label>
+            <Label htmlFor="favicon-32" className="text-white">Favicon 32x32 (PNG)</Label>
             <Input
               id="favicon-32"
               type="file"
@@ -438,7 +443,7 @@ export default function SettingsPage() {
             {faviconUrls.favicon32 && <img src={faviconUrls.favicon32} alt="Favicon 32x32" className="w-8 h-8" />}
           </div>
           <div className="flex flex-col space-y-2">
-            <Label htmlFor="android-chrome-192" className="text-gray-700">Android Chrome 192x192 (PNG)</Label>
+            <Label htmlFor="android-chrome-192" className="text-white">Android Chrome 192x192 (PNG)</Label>
             <Input
               id="android-chrome-192"
               type="file"
@@ -449,7 +454,7 @@ export default function SettingsPage() {
             {faviconUrls.androidChrome192 && <img src={faviconUrls.androidChrome192} alt="Android Chrome 192x192" className="w-12 h-12" />}
           </div>
           <div className="flex flex-col space-y-2">
-            <Label htmlFor="android-chrome-512" className="text-gray-700">Android Chrome 512x512 (PNG)</Label>
+            <Label htmlFor="android-chrome-512" className="text-white">Android Chrome 512x512 (PNG)</Label>
             <Input
               id="android-chrome-512"
               type="file"
@@ -460,7 +465,7 @@ export default function SettingsPage() {
             {faviconUrls.androidChrome512 && <img src={faviconUrls.androidChrome512} alt="Android Chrome 512x512" className="w-16 h-16" />}
           </div>
           <div className="flex flex-col space-y-2">
-            <Label htmlFor="apple-touch-icon" className="text-gray-700">Apple Touch Icon (PNG)</Label>
+            <Label htmlFor="apple-touch-icon" className="text-white">Apple Touch Icon (PNG)</Label>
             <Input
               id="apple-touch-icon"
               type="file"
@@ -473,24 +478,16 @@ export default function SettingsPage() {
         </CardContent>
       </Card>
       {/* User Management */}
-      <Card className="bg-white border border-gray-200 shadow-lg hover:shadow-xl transition-shadow duration-300">
+      <Card className="bg-gray-800 border border-gray-700 shadow-lg hover:shadow-xl transition-shadow duration-300">
         <CardHeader
           className="cursor-pointer flex flex-row items-center justify-between"
           onClick={() => setShowUserList(!showUserList)}
         >
-          <CardTitle className="text-xl font-semibold text-gray-800">
-            User Management
-          </CardTitle>
-          {showUserList ? (
-            <ChevronUp className="text-gray-600" />
-          ) : (
-            <ChevronDown className="text-gray-600" />
-          )}
+          <CardTitle className="text-xl font-semibold text-white">User Management</CardTitle>
+          {showUserList ? <ChevronUp className="text-white" /> : <ChevronDown className="text-white" />}
         </CardHeader>
         <CardContent className="space-y-4">
-          <p className="text-gray-600">
-            Manage users and their access levels.
-          </p>
+          <p className="text-white">Manage users and their access levels.</p>
           {showUserList && (
             <UserList
               users={users}
@@ -505,25 +502,19 @@ export default function SettingsPage() {
       </Card>
 
       {/* Header Script Management */}
-      <Card className="bg-white border border-gray-200 shadow-lg hover:shadow-xl transition-shadow duration-300">
+      <Card className="bg-gray-800 border border-gray-700 shadow-lg hover:shadow-xl transition-shadow duration-300">
         <CardHeader
           className="cursor-pointer flex flex-row items-center justify-between"
           onClick={() => setShowHeaderScripts(!showHeaderScripts)}
         >
-          <CardTitle className="text-xl font-semibold text-gray-800">
-            Header Script Management
-          </CardTitle>
-          {showHeaderScripts ? (
-            <ChevronUp className="text-gray-600" />
-          ) : (
-            <ChevronDown className="text-gray-600" />
-          )}
+          <CardTitle className="text-xl font-semibold text-white">Header Script Management</CardTitle>
+          {showHeaderScripts ? <ChevronUp className="text-white" /> : <ChevronDown className="text-white" />}
         </CardHeader>
         <CardContent className="space-y-4">
           {showHeaderScripts && (
             <>
               <div className="flex flex-col space-y-2">
-                <Label htmlFor="header-script-name" className="text-gray-700">Script Name</Label>
+                <Label htmlFor="header-script-name" className="text-white">Script Name</Label>
                 <Input
                   id="header-script-name"
                   value={newHeaderScript.name}
@@ -533,7 +524,7 @@ export default function SettingsPage() {
                 />
               </div>
               <div className="flex flex-col space-y-2">
-                <Label htmlFor="header-script-content" className="text-gray-700">Script Content</Label>
+                <Label htmlFor="header-script-content" className="text-white">Script Content</Label>
                 <Textarea
                   id="header-script-content"
                   value={newHeaderScript.script}
@@ -627,25 +618,19 @@ export default function SettingsPage() {
       </Card>
 
       {/* AdSense Script Management */}
-      <Card className="bg-white border border-gray-200 shadow-lg hover:shadow-xl transition-shadow duration-300">
+      <Card className="bg-gray-800 border border-gray-700 shadow-lg hover:shadow-xl transition-shadow duration-300">
         <CardHeader
           className="cursor-pointer flex flex-row items-center justify-between"
           onClick={() => setShowAdSenseSettings(!showAdSenseSettings)}
         >
-          <CardTitle className="text-xl font-semibold text-gray-800">
-            Body Script Management
-          </CardTitle>
-          {showAdSenseSettings ? (
-            <ChevronUp className="text-gray-600" />
-          ) : (
-            <ChevronDown className="text-gray-600" />
-          )}
+          <CardTitle className="text-xl font-semibold text-white">Body Script Management</CardTitle>
+          {showAdSenseSettings ? <ChevronUp className="text-white" /> : <ChevronDown className="text-white" />}
         </CardHeader>
         <CardContent className="space-y-4">
           {showAdSenseSettings && (
             <>
               <div className="flex flex-col space-y-2">
-                <Label htmlFor="adsense-name" className="text-gray-700">Script Name</Label>
+                <Label htmlFor="adsense-name" className="text-white">Script Name</Label>
                 <Input
                   id="adsense-name"
                   value={adSenseScriptName}
@@ -655,7 +640,7 @@ export default function SettingsPage() {
                 />
               </div>
               <div className="flex flex-col space-y-2">
-                <Label htmlFor="adsense-target" className="text-gray-700">Target Element</Label>
+                <Label htmlFor="adsense-target" className="text-white">Target Element</Label>
                 <Input
                   id="adsense-target"
                   value={adSenseTargetElement}
@@ -665,7 +650,7 @@ export default function SettingsPage() {
                 />
               </div>
               <div className="flex flex-col space-y-2">
-                <Label htmlFor="adsense-position" className="text-gray-700">Injection Position</Label>
+                <Label htmlFor="adsense-position" className="text-white">Injection Position</Label>
                 <Select
                   value={adSenseInjectionPosition}
                   onValueChange={(value) => setAdSenseInjectionPosition(value)}
@@ -680,7 +665,7 @@ export default function SettingsPage() {
                 </Select>
               </div>
               <div className="flex flex-col space-y-2">
-                <Label htmlFor="adsense-script" className="text-gray-700">AdSense Script</Label>
+                <Label htmlFor="adsense-script" className="text-white">AdSense Script</Label>
                 <Textarea
                   id="adsense-script"
                   value={adSenseScript}
@@ -806,25 +791,19 @@ export default function SettingsPage() {
       </Card>
 
       {/* Ad Management */}
-      <Card className="bg-white border border-gray-200 shadow-lg hover:shadow-xl transition-shadow duration-300">
+      <Card className="bg-gray-800 border border-gray-700 shadow-lg hover:shadow-xl transition-shadow duration-300">
         <CardHeader
           className="cursor-pointer flex flex-row items-center justify-between"
           onClick={() => setShowAdSettings(!showAdSettings)}
         >
-          <CardTitle className="text-xl font-semibold text-gray-800">
-            Ad Management
-          </CardTitle>
-          {showAdSettings ? (
-            <ChevronUp className="text-gray-600" />
-          ) : (
-            <ChevronDown className="text-gray-600" />
-          )}
+          <CardTitle className="text-xl font-semibold text-white">Ad Management</CardTitle>
+          {showAdSettings ? <ChevronUp className="text-white" /> : <ChevronDown className="text-white" />}
         </CardHeader>
         <CardContent className="space-y-4">
           {showAdSettings && (
             <>
               <div className="flex flex-col space-y-2">
-                <Label htmlFor="google_client_id" className="text-gray-700">Google Client ID</Label>
+                <Label htmlFor="google_client_id" className="text-white">Google Client ID</Label>
                 <Input
                   id="google_client_id"
                   value={adSettings.google_client_id}

@@ -44,16 +44,26 @@ export default function AddGamePage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <h1 className="text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-pink-500 mb-6">
+    <div className="max-w-4xl mx-auto p-6 bg-gray-900 text-gray-100">
+      <h1 className="text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-400 mb-6">
         Game Management
       </h1>
       
-      <Card className="bg-white shadow-lg rounded-lg">
+      <Card className="bg-gray-800 shadow-lg rounded-lg border-gray-700">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="add-game">Add New Game</TabsTrigger>
-            <TabsTrigger value="add-provider">Create New Provider</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-2 bg-gray-700">
+            <TabsTrigger 
+              value="add-game"
+              className="data-[state=active]:bg-gray-800 data-[state=active]:text-gray-100"
+            >
+              Add New Game
+            </TabsTrigger>
+            <TabsTrigger 
+              value="add-provider"
+              className="data-[state=active]:bg-gray-800 data-[state=active]:text-gray-100"
+            >
+              Create New Provider
+            </TabsTrigger>
           </TabsList>
           <CardContent className="p-6">
             <TabsContent value="add-game">  
