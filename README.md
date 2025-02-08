@@ -80,8 +80,8 @@ Game-Web is a web-based gaming platform built with **Next.js** that offers a sea
 ### Steps
 1. Clone the repository:
    ```sh
-   git clone https://github.com/your-username/game-web.git
-   cd game-web
+   git clone https://github.com/Mohammed6903/GameWeb
+   cd GameWeb
    ```
 2. Install dependencies:
    ```sh
